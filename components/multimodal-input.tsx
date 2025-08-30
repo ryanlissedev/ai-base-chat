@@ -1,6 +1,6 @@
 'use client';
 import type { Attachment, ChatMessage, UiToolName } from '@/lib/ai/types';
-import type { ModelId } from '@/lib/ai/model-id';
+import type { ModelId } from '@/lib/models/model-id';
 
 import type React from 'react';
 import {

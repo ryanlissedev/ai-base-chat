@@ -18,7 +18,7 @@ async function fetchAndConvertModels() {
     const jsonData = await response.json();
 
     // Write the JSON file
-    const jsonPath = path.join(__dirname, '../providers/models.json');
+    const jsonPath = path.join(__dirname, '../lib/models/models.json');
     fs.writeFileSync(jsonPath, JSON.stringify(jsonData, null, 2));
     console.log('Saved JSON file:', jsonPath);
 
@@ -38,7 +38,10 @@ async function fetchAndConvertModels() {
     ].sort();
 
     // Generate TypeScript content
-    const outputPath = path.join(__dirname, '../providers/models-generated.ts');
+    const outputPath = path.join(
+      __dirname,
+      '../lib/models/models.generated.ts',
+    );
     const tsContent = `// List of unique providers extracted from models data
 export const providers = ${JSON.stringify(providers, null, 2)} as const;
 
@@ -96,7 +99,7 @@ export const modelsData: ModelData[] = ${JSON.stringify(
     // Also write the providers list to a separate JSON file
     const providersJsonPath = path.join(
       __dirname,
-      '../providers/providers-list.json',
+      '../lib/models/providers-list.json',
     );
     fs.writeFileSync(providersJsonPath, JSON.stringify(providers, null, 2));
     console.log('Generated providers list:', providersJsonPath);

@@ -1,5 +1,5 @@
 import type { ImageModelId, ModelId } from '@/lib/models/model-id';
-import { generatedModelFeatures } from '../models/model-features.generated';
+import { generatedModelFeatures } from './model-features.generated';
 
 export interface ModelFeatures {
   reasoning: boolean;
@@ -9,7 +9,7 @@ export interface ModelFeatures {
     image: boolean;
     text: boolean;
     pdf: boolean;
-    // video: boolean;
+    video?: boolean;
     audio: boolean;
   };
   output: {
@@ -25,7 +25,7 @@ export interface ModelFeatures {
 }
 
 // Base, hand-curated features. Do not remove entries unless truly wrong.
-const customModelFeatures: Record<ModelId, ModelFeatures> = {
+const customModelFeatures = {
   'amazon/nova-lite': {
     reasoning: false,
     toolCall: true,
@@ -1450,12 +1450,58 @@ const customModelFeatures: Record<ModelId, ModelFeatures> = {
       audio: false,
     },
   },
-};
+  // Missing models to satisfy full Record typing
+  'google/gemini-2.5-flash-image-preview': {
+    reasoning: true,
+    toolCall: true,
+    input: {
+      image: true,
+      text: true,
+      pdf: true,
+      audio: false,
+    },
+    output: {
+      image: false,
+      text: true,
+      audio: false,
+    },
+  },
+  'mistral/mistral-medium': {
+    reasoning: false,
+    toolCall: true,
+    input: {
+      image: false,
+      text: true,
+      pdf: false,
+      audio: false,
+    },
+    output: {
+      image: false,
+      text: true,
+      audio: false,
+    },
+  },
+  'xai/grok-code-fast-1': {
+    reasoning: false,
+    toolCall: true,
+    input: {
+      image: false,
+      text: true,
+      pdf: false,
+      audio: false,
+    },
+    output: {
+      image: false,
+      text: true,
+      audio: false,
+    },
+  },
+} satisfies Partial<Record<ModelId, ModelFeatures>>;
 
 export const modelFeatures = {
   ...generatedModelFeatures,
   ...customModelFeatures,
-};
+} as Record<ModelId, ModelFeatures>;
 
 export const imageModelsFeatures: Partial<Record<ImageModelId, ModelFeatures>> =
   {

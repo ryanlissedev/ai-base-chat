@@ -1,6 +1,6 @@
 import type { OpenAIProvider } from '@ai-sdk/openai';
 import type { GatewayModelId, GatewayProvider } from '@ai-sdk/gateway';
-import type { ModelId as GatewayGeneratedModelId } from '@/providers/models-generated';
+import type { ModelId as GatewayGeneratedModelId } from '@/lib/models/models.generated';
 
 // Exclude the non-literal model ids
 type GatewayLiteralModelId = GatewayModelId extends infer T

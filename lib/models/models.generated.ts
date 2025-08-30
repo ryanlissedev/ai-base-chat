@@ -50,6 +50,7 @@ export const models = [
   'google/gemini-2.0-flash',
   'google/gemini-2.0-flash-lite',
   'google/gemini-2.5-flash',
+  'google/gemini-2.5-flash-image-preview',
   'google/gemini-2.5-flash-lite',
   'google/gemini-2.5-pro',
   'google/gemma-2-9b',
@@ -72,6 +73,7 @@ export const models = [
   'mistral/ministral-3b',
   'mistral/ministral-8b',
   'mistral/mistral-large',
+  'mistral/mistral-medium',
   'mistral/mistral-saba-24b',
   'mistral/mistral-small',
   'mistral/mixtral-8x22b-instruct',
@@ -110,6 +112,7 @@ export const models = [
   'xai/grok-3-mini',
   'xai/grok-3-mini-fast',
   'xai/grok-4',
+  'xai/grok-code-fast-1',
   'zai/glm-4.5',
   'zai/glm-4.5-air',
   'zai/glm-4.5v',
@@ -126,6 +129,7 @@ export interface ModelData {
   type: 'language' | 'embedding';
   context_window: number; // Max input tokens
   max_tokens: number; // Max output tokens
+  tags?: 'image-generation'[];
   pricing: {
     input: string; // Input price per token
     output: string; // Output price per token
@@ -147,7 +151,7 @@ export const modelsData: ModelData[] = [
     max_tokens: 16384,
     type: 'language',
     pricing: {
-      input: '0.00000008',
+      input: '0.00000006',
       output: '0.00000024',
     },
   },
@@ -162,7 +166,7 @@ export const modelsData: ModelData[] = [
     max_tokens: 16384,
     type: 'language',
     pricing: {
-      input: '0.0000002',
+      input: '0.00000013',
       output: '0.0000006',
     },
   },
@@ -177,8 +181,8 @@ export const modelsData: ModelData[] = [
     max_tokens: 16384,
     type: 'language',
     pricing: {
-      input: '0.0000001',
-      output: '0.0000003',
+      input: '0.00000008',
+      output: '0.00000029',
     },
   },
   {
@@ -574,6 +578,22 @@ export const modelsData: ModelData[] = [
     },
   },
   {
+    id: 'google/gemini-2.5-flash-image-preview',
+    object: 'model',
+    owned_by: 'google',
+    name: 'Gemini 2.5 Flash Image Preview',
+    description:
+      'Gemini 2.5 Flash Image Preview is our first fully hybrid reasoning model, letting developers turn thinking on or off and set thinking budgets to balance quality, cost, and latency. Upgraded for rapid creative workflows, it can generate interleaved text and images and supports conversational, multi‑turn image editing in natural language. It’s also locale‑aware, enabling culturally and linguistically appropriate image generation for audiences worldwide.',
+    context_window: 1048576,
+    max_tokens: 32768,
+    type: 'language',
+    tags: ['image-generation'],
+    pricing: {
+      input: '0.0000003',
+      output: '0.0000025',
+    },
+  },
+  {
     id: 'google/gemini-2.5-flash-lite',
     object: 'model',
     owned_by: 'google',
@@ -779,7 +799,7 @@ export const modelsData: ModelData[] = [
     max_tokens: 8192,
     type: 'language',
     pricing: {
-      input: '0.0000002',
+      input: '0.00000015',
       output: '0.0000006',
     },
   },
@@ -794,7 +814,7 @@ export const modelsData: ModelData[] = [
     max_tokens: 8192,
     type: 'language',
     pricing: {
-      input: '0.0000001',
+      input: '0.00000008',
       output: '0.0000003',
     },
   },
@@ -904,6 +924,21 @@ export const modelsData: ModelData[] = [
     },
   },
   {
+    id: 'mistral/mistral-medium',
+    object: 'model',
+    owned_by: 'mistral',
+    name: 'Mistral Medium 3.1',
+    description:
+      'Mistral Medium 3 delivers frontier performance while being an order of magnitude less expensive. For instance, the model performs at or above 90% of Claude Sonnet 3.7 on benchmarks across the board at a significantly lower cost.',
+    context_window: 128000,
+    max_tokens: 64000,
+    type: 'language',
+    pricing: {
+      input: '0.0000004',
+      output: '0.000002',
+    },
+  },
+  {
     id: 'mistral/mistral-saba-24b',
     object: 'model',
     owned_by: 'mistral',
@@ -989,8 +1024,8 @@ export const modelsData: ModelData[] = [
     max_tokens: 16384,
     type: 'language',
     pricing: {
-      input: '0.00000055',
-      output: '0.0000022',
+      input: '0.0000005',
+      output: '0.000002',
     },
   },
   {
@@ -1495,6 +1530,21 @@ export const modelsData: ModelData[] = [
     pricing: {
       input: '0.000003',
       output: '0.000015',
+    },
+  },
+  {
+    id: 'xai/grok-code-fast-1',
+    object: 'model',
+    owned_by: 'xai',
+    name: 'Grok Code Fast 1',
+    description:
+      "xAI's latest coding model that offers fast agentic coding with a 256K context window.",
+    context_window: 256000,
+    max_tokens: 256000,
+    type: 'language',
+    pricing: {
+      input: '0.0000002',
+      output: '0.0000015',
     },
   },
   {

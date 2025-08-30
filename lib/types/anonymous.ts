@@ -1,4 +1,4 @@
-import type { ModelId } from '../ai/model-id';
+import type { ModelId } from '../models/model-id';
 import type { ToolName } from '../ai/types';
 import type { DBMessage } from '../db/schema';
 import type { UIChat } from './uiChat';

@@ -1,12 +1,15 @@
-import type { ModelData } from '@/providers/models-generated';
-import { modelsData } from '@/providers/models-generated';
+import type { ModelData } from '@/lib/models/models.generated';
+import { modelsData } from '@/lib/models/models.generated';
 import {
   imageModelsFeatures,
   modelFeatures,
   type ModelFeatures,
-} from './model-features';
-import type { ImageModelId, ModelId } from './model-id';
-import { imageModelsData, type ImageModelData } from '@/providers/image-models';
+} from '../models/model-features';
+import type { ImageModelId, ModelId } from '../models/model-id';
+import {
+  imageModelsData,
+  type ImageModelData,
+} from '@/lib/models/image-models';
 
 const disabledModels: Partial<Record<ModelId, true>> = {
   'anthropic/claude-opus-4': true,

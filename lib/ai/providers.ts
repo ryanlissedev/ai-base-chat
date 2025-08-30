@@ -5,8 +5,8 @@ import type { AnthropicProviderOptions } from '@ai-sdk/anthropic';
 import type { GoogleGenerativeAIProviderOptions } from '@ai-sdk/google';
 import { getImageModelDefinition, getModelDefinition } from './all-models';
 import { gateway } from '@ai-sdk/gateway';
-import type { ImageModelId, ModelId } from './model-id';
-import { getModelAndProvider } from '../../providers/utils';
+import type { ImageModelId, ModelId } from '../models/model-id';
+import { getModelAndProvider } from '../models/utils';
 
 const telemetryConfig = {
   telemetry: {

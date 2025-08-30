@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/tooltip';
 import { Calendar, Building, CheckCircle } from 'lucide-react';
 import type { ModelDefinition } from '@/lib/ai/all-models';
-import type { ProviderId } from '@/providers/models-generated';
+import type { ProviderId } from '@/lib/models/models.generated';
 import { cn } from '@/lib/utils';
 import { getFeatureConfig, isFeatureEnabled } from '@/lib/features-config';
 import { getProviderIcon } from './get-provider-icon';
@@ -165,7 +165,7 @@ export function ModelCard({
                 Reasoning
               </Badge>
             )}
-            {model.features?.functionCalling && (
+            {model.features?.toolCall && (
               <Badge variant="outline" className="text-xs">
                 Function Calling
               </Badge>

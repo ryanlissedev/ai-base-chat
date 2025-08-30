@@ -1,0 +1,359 @@
+'use client';
+
+import { useState, useMemo, useCallback, useTransition } from 'react';
+import {
+  chatModels as allChatModels,
+  type ModelDefinition,
+} from '@/lib/ai/all-models';
+
+import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
+import { X } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ModelCard } from '@/app/(models)/models/gateway-model-card';
+
+import type { FilterState } from '@/app/(models)/models/model-filters';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { ModelFilters } from '@/app/(models)/models/model-filters';
+
+type SortOption =
+  | 'newest'
+  | 'pricing-low'
+  | 'pricing-high'
+  | 'context-high'
+  | 'context-low';
+
+export default function HomePage() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedModels, setSelectedModels] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [isPending, startTransition] = useTransition();
+  const [filters, setFilters] = useState<FilterState>({
+    inputModalities: [],
+    outputModalities: [],
+    contextLength: [1000, 1000000],
+    inputPricing: [0, 0.00002],
+    outputPricing: [0, 0.00002],
+    maxTokens: [0, 300000],
+    providers: [],
+    features: { reasoning: false, toolCall: false, temperatureControl: false },
+    series: [],
+    categories: [],
+    supportedParameters: [],
+  });
+
+  const filteredModels: ModelDefinition[] = useMemo(() => {
+    const filtered = allChatModels.filter((model) => {
+      if (
+        searchQuery &&
+        !model.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !model.owned_by.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !model.description.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
+        return false;
+      }
+
+      if (filters.inputModalities.length > 0) {
+        const inputs = model.features?.input;
+        const hasAny = filters.inputModalities.some((modality) => {
+          if (modality === 'text') return inputs?.text;
+          if (modality === 'image') return inputs?.image;
+          if (modality === 'audio') return inputs?.audio;
+          if (modality === 'pdf') return inputs?.pdf;
+          if (modality === 'video') return inputs?.video;
+          return false;
+        });
+        if (!hasAny) return false;
+      }
+
+      if (filters.outputModalities.length > 0) {
+        const outputs = model.features?.output;
+        const hasAny = filters.outputModalities.some((modality) => {
+          if (modality === 'text') return outputs?.text;
+          if (modality === 'image') return outputs?.image;
+          if (modality === 'audio') return outputs?.audio;
+          return false;
+        });
+        if (!hasAny) return false;
+      }
+
+      if (
+        model.context_window < filters.contextLength[0] ||
+        model.context_window > filters.contextLength[1]
+      ) {
+        return false;
+      }
+
+      // Providers
+      if (
+        filters.providers.length > 0 &&
+        !filters.providers.includes(model.owned_by)
+      ) {
+        return false;
+      }
+
+      // Features
+      if (filters.features?.reasoning) {
+        if (!model.features?.reasoning) return false;
+      }
+      if (filters.features?.toolCall) {
+        if (!model.features?.toolCall) return false;
+      }
+      if (filters.features?.temperatureControl) {
+        // Temperature control means temperature is adjustable (not fixed)
+        if (model.features?.fixedTemperature !== undefined) return false;
+      }
+
+      // Output tokens
+      if (
+        model.max_tokens < filters.maxTokens[0] ||
+        model.max_tokens > filters.maxTokens[1]
+      ) {
+        return false;
+      }
+
+      // Pricing ranges
+      const inputPrice = Number.parseFloat(model.pricing.input);
+      const outputPrice = Number.parseFloat(model.pricing.output);
+      if (
+        inputPrice < filters.inputPricing[0] ||
+        inputPrice > filters.inputPricing[1]
+      ) {
+        return false;
+      }
+      if (
+        outputPrice < filters.outputPricing[0] ||
+        outputPrice > filters.outputPricing[1]
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    return filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          // No releaseDate field; use id as a stable proxy for recency
+          return b.id.localeCompare(a.id);
+        case 'pricing-low':
+          return (
+            Number.parseFloat(a.pricing.input) -
+            Number.parseFloat(b.pricing.input)
+          );
+        case 'pricing-high':
+          return (
+            Number.parseFloat(b.pricing.input) -
+            Number.parseFloat(a.pricing.input)
+          );
+        case 'context-high':
+          return b.context_window - a.context_window;
+        case 'context-low':
+          return a.context_window - b.context_window;
+        default:
+          return 0;
+      }
+    });
+  }, [searchQuery, filters, sortBy]);
+
+  const handleToggleCompare = useCallback((modelId: string) => {
+    startTransition(() => {
+      setSelectedModels((prev) => {
+        if (prev.includes(modelId)) {
+          return prev.filter((id) => id !== modelId);
+        } else if (prev.length < 2) {
+          return [...prev, modelId];
+        } else {
+          return [prev[1], modelId];
+        }
+      });
+    });
+  }, []);
+
+  const handleCompare = () => {
+    if (selectedModels.length > 0) {
+      window.location.href = `/compare?models=${selectedModels.join(',')}`;
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+  };
+
+  const removeSelectedModel = (modelId: string) => {
+    setSelectedModels((prev) => prev.filter((id) => id !== modelId));
+  };
+
+  return (
+    <div className="grid h-full min-h-0 grid-cols-1 md:grid-cols-[auto_1fr] ">
+      <aside className="hidden md:block md:h-full min-h-0 w-full md:w-64 border-b md:border-b-0 md:border-r border-border">
+        <ScrollArea className="h-full">
+          {/* <div className="h-400" /> */}
+
+          <ModelFilters
+            filters={filters}
+            onFiltersChange={setFilters}
+            className="p-4 overflow-y-auto"
+          />
+        </ScrollArea>
+      </aside>
+
+      <main className="min-h-0 md:h-full">
+        <ScrollArea className="h-full">
+          <div className="p-4 lg:p-6">
+            <div className="mb-6 space-y-4 ">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Search models..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 pr-10"
+                  />
+                  {searchQuery && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearSearch}
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                <Select
+                  value={sortBy}
+                  onValueChange={(value: SortOption) => setSortBy(value)}
+                >
+                  <SelectTrigger className="w-full sm:w-48">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest</SelectItem>
+                    <SelectItem value="pricing-low">
+                      Pricing: Low to High
+                    </SelectItem>
+                    <SelectItem value="pricing-high">
+                      Pricing: High to Low
+                    </SelectItem>
+                    <SelectItem value="context-high">
+                      Context: High to Low
+                    </SelectItem>
+                    <SelectItem value="context-low">
+                      Context: Low to High
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                {selectedModels.length > 0 && (
+                  <Button onClick={handleCompare} className="shrink-0">
+                    Compare {selectedModels.length} model
+                    {selectedModels.length > 1 ? 's' : ''}
+                  </Button>
+                )}
+              </div>
+
+              {selectedModels.length > 0 && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm text-muted-foreground">
+                    Selected for comparison:
+                  </span>
+                  {selectedModels.map((modelId) => {
+                    const model = allChatModels.find((m) => m.id === modelId);
+                    return model ? (
+                      <Badge
+                        key={modelId}
+                        variant="secondary"
+                        className="gap-1"
+                      >
+                        {model.owned_by}: {model.name}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeSelectedModel(modelId)}
+                          className="h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </Badge>
+                    ) : null;
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">
+                  Showing {filteredModels.length} of {allChatModels.length}{' '}
+                  models
+                  {searchQuery && (
+                    <span className="ml-2">for &quot;{searchQuery}&quot;</span>
+                  )}
+                </div>
+                {isPending && (
+                  <div className="text-sm text-muted-foreground">
+                    Updating...
+                  </div>
+                )}
+              </div>
+
+              <div className="grid gap-4">
+                {filteredModels.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-muted-foreground mb-4">
+                      No models found matching your criteria.
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setFilters({
+                          inputModalities: [],
+                          outputModalities: [],
+                          contextLength: [1000, 1000000],
+                          inputPricing: [0, 0.00002],
+                          outputPricing: [0, 0.00002],
+                          maxTokens: [0, 300000],
+                          providers: [],
+                          features: {
+                            reasoning: false,
+                            toolCall: false,
+                            temperatureControl: false,
+                          },
+                          series: [],
+                          categories: [],
+                          supportedParameters: [],
+                        });
+                      }}
+                    >
+                      Clear all filters
+                    </Button>
+                  </div>
+                ) : (
+                  filteredModels.map((model) => (
+                    <ModelCard
+                      key={model.id}
+                      model={model}
+                      selectedModels={selectedModels}
+                      onToggleCompare={handleToggleCompare}
+                      isLoading={isPending}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+      </main>
+    </div>
+  );
+}

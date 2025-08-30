@@ -46,8 +46,8 @@ import { ANONYMOUS_LIMITS } from '@/lib/types/anonymous';
 import { LoginCtaBanner } from '@/components/upgrade-cta/login-cta-banner';
 
 import { ChevronUpIcon, FilterIcon } from 'lucide-react';
-import type { ModelId } from '@/lib/ai/model-id';
-import type { ProviderId } from '@/providers/models-generated';
+import type { ModelId } from '@/lib/models/model-id';
+import type { ProviderId } from '@/lib/models/models.generated';
 import { getProviderIcon } from './get-provider-icon';
 
 type FeatureFilter = Record<string, boolean>;
@@ -165,7 +165,7 @@ export function PureModelSelector({
           case 'reasoning':
             return features.reasoning;
           case 'functionCalling':
-            return features.functionCalling;
+            return features.toolCall;
           case 'imageInput':
             return features.input.image;
           case 'pdfInput':
