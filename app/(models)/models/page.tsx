@@ -6,23 +6,15 @@ import {
   type ModelDefinition,
 } from '@/lib/ai/all-models';
 
-import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/select';
-import { X } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { ModelCard } from '@/app/(models)/models/gateway-model-card';
 
 import type { FilterState } from '@/app/(models)/models/model-filters';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ModelFilters } from '@/app/(models)/models/model-filters';
+import { PureModelsToolbar } from '@/app/(models)/models/components/models-toolbar';
+import { PureSelectedTags } from '@/app/(models)/models/components/selected-tags';
+import { PureResultsHeader } from '@/app/(models)/models/components/results-header';
+import { PureEmptyState } from '@/app/(models)/models/components/empty-state';
 
 type SortOption =
   | 'newest'
@@ -40,8 +32,8 @@ export default function HomePage() {
     inputModalities: [],
     outputModalities: [],
     contextLength: [1000, 1000000],
-    inputPricing: [0, 0.00002],
-    outputPricing: [0, 0.00002],
+    inputPricing: [0, 20],
+    outputPricing: [0, 20],
     maxTokens: [0, 300000],
     providers: [],
     features: { reasoning: false, toolCall: false, temperatureControl: false },
@@ -120,9 +112,9 @@ export default function HomePage() {
         return false;
       }
 
-      // Pricing ranges
-      const inputPrice = Number.parseFloat(model.pricing.input);
-      const outputPrice = Number.parseFloat(model.pricing.output);
+      // Pricing ranges (filters are in $/1M tokens; model pricing is $/token)
+      const inputPrice = Number.parseFloat(model.pricing.input) * 1_000_000;
+      const outputPrice = Number.parseFloat(model.pricing.output) * 1_000_000;
       if (
         inputPrice < filters.inputPricing[0] ||
         inputPrice > filters.inputPricing[1]
@@ -146,13 +138,13 @@ export default function HomePage() {
           return b.id.localeCompare(a.id);
         case 'pricing-low':
           return (
-            Number.parseFloat(a.pricing.input) -
-            Number.parseFloat(b.pricing.input)
+            Number.parseFloat(a.pricing.input) * 1_000_000 -
+            Number.parseFloat(b.pricing.input) * 1_000_000
           );
         case 'pricing-high':
           return (
-            Number.parseFloat(b.pricing.input) -
-            Number.parseFloat(a.pricing.input)
+            Number.parseFloat(b.pricing.input) * 1_000_000 -
+            Number.parseFloat(a.pricing.input) * 1_000_000
           );
         case 'context-high':
           return b.context_window - a.context_window;
@@ -192,9 +184,30 @@ export default function HomePage() {
     setSelectedModels((prev) => prev.filter((id) => id !== modelId));
   };
 
+  const resetFiltersAndSearch = () => {
+    setSearchQuery('');
+    setFilters({
+      inputModalities: [],
+      outputModalities: [],
+      contextLength: [1000, 1000000],
+      inputPricing: [0, 20],
+      outputPricing: [0, 20],
+      maxTokens: [0, 300000],
+      providers: [],
+      features: {
+        reasoning: false,
+        toolCall: false,
+        temperatureControl: false,
+      },
+      series: [],
+      categories: [],
+      supportedParameters: [],
+    });
+  };
+
   return (
     <div className="grid h-full min-h-0 grid-cols-1 md:grid-cols-[auto_1fr] ">
-      <aside className="hidden md:block md:h-full min-h-0 w-full md:w-64 border-b md:border-b-0 md:border-r border-border">
+      <aside className="hidden md:block md:h-full min-h-0 w-full md:w-64 bg-sidebar">
         <ScrollArea className="h-full">
           {/* <div className="h-400" /> */}
 
@@ -210,134 +223,38 @@ export default function HomePage() {
         <ScrollArea className="h-full">
           <div className="p-4 lg:p-6">
             <div className="mb-6 space-y-4 ">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    placeholder="Search models..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-10"
-                  />
-                  {searchQuery && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={clearSearch}
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-                <Select
-                  value={sortBy}
-                  onValueChange={(value: SortOption) => setSortBy(value)}
-                >
-                  <SelectTrigger className="w-full sm:w-48">
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="newest">Newest</SelectItem>
-                    <SelectItem value="pricing-low">
-                      Pricing: Low to High
-                    </SelectItem>
-                    <SelectItem value="pricing-high">
-                      Pricing: High to Low
-                    </SelectItem>
-                    <SelectItem value="context-high">
-                      Context: High to Low
-                    </SelectItem>
-                    <SelectItem value="context-low">
-                      Context: Low to High
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                {selectedModels.length > 0 && (
-                  <Button onClick={handleCompare} className="shrink-0">
-                    Compare {selectedModels.length} model
-                    {selectedModels.length > 1 ? 's' : ''}
-                  </Button>
-                )}
-              </div>
+              <PureModelsToolbar
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onClearSearch={clearSearch}
+                sortBy={sortBy}
+                onChangeSort={setSortBy}
+                selectedCount={selectedModels.length}
+                onCompare={handleCompare}
+                onClearAll={resetFiltersAndSearch}
+              />
 
-              {selectedModels.length > 0 && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm text-muted-foreground">
-                    Selected for comparison:
-                  </span>
-                  {selectedModels.map((modelId) => {
-                    const model = allChatModels.find((m) => m.id === modelId);
-                    return model ? (
-                      <Badge
-                        key={modelId}
-                        variant="secondary"
-                        className="gap-1"
-                      >
-                        {model.owned_by}: {model.name}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeSelectedModel(modelId)}
-                          className="h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </Badge>
-                    ) : null;
-                  })}
-                </div>
-              )}
+              <PureSelectedTags
+                selectedModelIds={selectedModels}
+                resolveLabel={(id) => {
+                  const model = allChatModels.find((m) => m.id === id);
+                  return model ? `${model.owned_by}: ${model.name}` : null;
+                }}
+                onRemove={removeSelectedModel}
+              />
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
-                  Showing {filteredModels.length} of {allChatModels.length}{' '}
-                  models
-                  {searchQuery && (
-                    <span className="ml-2">for &quot;{searchQuery}&quot;</span>
-                  )}
-                </div>
-                {isPending && (
-                  <div className="text-sm text-muted-foreground">
-                    Updating...
-                  </div>
-                )}
-              </div>
+              <PureResultsHeader
+                total={allChatModels.length}
+                filtered={filteredModels.length}
+                searchQuery={searchQuery}
+                isPending={isPending}
+              />
 
               <div className="grid gap-4">
                 {filteredModels.length === 0 ? (
-                  <div className="text-center py-12">
-                    <p className="text-muted-foreground mb-4">
-                      No models found matching your criteria.
-                    </p>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setSearchQuery('');
-                        setFilters({
-                          inputModalities: [],
-                          outputModalities: [],
-                          contextLength: [1000, 1000000],
-                          inputPricing: [0, 0.00002],
-                          outputPricing: [0, 0.00002],
-                          maxTokens: [0, 300000],
-                          providers: [],
-                          features: {
-                            reasoning: false,
-                            toolCall: false,
-                            temperatureControl: false,
-                          },
-                          series: [],
-                          categories: [],
-                          supportedParameters: [],
-                        });
-                      }}
-                    >
-                      Clear all filters
-                    </Button>
-                  </div>
+                  <PureEmptyState onClearAll={resetFiltersAndSearch} />
                 ) : (
                   filteredModels.map((model) => (
                     <ModelCard

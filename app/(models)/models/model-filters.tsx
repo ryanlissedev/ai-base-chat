@@ -3,13 +3,12 @@
 import { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { ChevronDown, RotateCcw } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { providers } from '@/lib/models/models.generated';
 import { cn } from '@/lib/utils';
 
@@ -30,20 +29,6 @@ export type FilterState = {
   series: string[];
   categories: string[];
   supportedParameters: string[];
-};
-
-const defaultFilters: FilterState = {
-  inputModalities: [],
-  outputModalities: [],
-  contextLength: [1000, 1000000],
-  inputPricing: [0, 0.00002],
-  outputPricing: [0, 0.00002],
-  maxTokens: [0, 300000],
-  providers: [],
-  features: { reasoning: false, toolCall: false, temperatureControl: false },
-  series: [],
-  categories: [],
-  supportedParameters: [],
 };
 
 export function ModelFilters({
@@ -84,41 +69,9 @@ export function ModelFilters({
     onFiltersChange({ ...filters, [key]: updated });
   };
 
-  const resetFilters = () => {
-    onFiltersChange(defaultFilters);
-  };
-
-  const hasActiveFilters =
-    filters.inputModalities.length > 0 ||
-    filters.outputModalities.length > 0 ||
-    filters.providers.length > 0 ||
-    filters.features.reasoning === true ||
-    filters.features.toolCall === true ||
-    filters.features.temperatureControl === true ||
-    filters.contextLength[0] !== defaultFilters.contextLength[0] ||
-    filters.contextLength[1] !== defaultFilters.contextLength[1] ||
-    filters.maxTokens[0] !== defaultFilters.maxTokens[0] ||
-    filters.maxTokens[1] !== defaultFilters.maxTokens[1] ||
-    filters.inputPricing[0] !== defaultFilters.inputPricing[0] ||
-    filters.inputPricing[1] !== defaultFilters.inputPricing[1] ||
-    filters.outputPricing[0] !== defaultFilters.outputPricing[0] ||
-    filters.outputPricing[1] !== defaultFilters.outputPricing[1];
-
   return (
     <div className={cn('w-full h-full p-4', className)}>
       <div className="sticky top-4 space-y-4 pr-2">
-        {hasActiveFilters && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={resetFilters}
-            className="w-full gap-2 bg-transparent"
-          >
-            <RotateCcw className="h-4 w-4" />
-            Reset Filters
-          </Button>
-        )}
-
         <Collapsible
           open={openSections.inputModalities}
           onOpenChange={() => toggleSection('inputModalities')}
@@ -286,14 +239,16 @@ export function ModelFilters({
           onOpenChange={() => toggleSection('pricing')}
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
-            Pricing (per token)
+            Pricing ($ / 1M tokens)
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${openSections.pricing ? 'rotate-180' : ''}`}
             />
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-3 pb-2 space-y-4">
             <div className="space-y-2">
-              <div className="text-xs text-muted-foreground">Input price</div>
+              <div className="text-xs text-muted-foreground">
+                Input price ($/1M)
+              </div>
               <Slider
                 value={filters.inputPricing}
                 onValueChange={(value) =>
@@ -302,18 +257,20 @@ export function ModelFilters({
                     inputPricing: value as [number, number],
                   })
                 }
-                max={0.00002}
+                max={20}
                 min={0}
-                step={0.00000001}
+                step={0.01}
                 className="w-full"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{filters.inputPricing[0].toFixed(8)}</span>
-                <span>{filters.inputPricing[1].toFixed(8)}</span>
+                <span>${filters.inputPricing[0].toFixed(2)}</span>
+                <span>${filters.inputPricing[1].toFixed(2)}</span>
               </div>
             </div>
             <div className="space-y-2">
-              <div className="text-xs text-muted-foreground">Output price</div>
+              <div className="text-xs text-muted-foreground">
+                Output price ($/1M)
+              </div>
               <Slider
                 value={filters.outputPricing}
                 onValueChange={(value) =>
@@ -322,14 +279,14 @@ export function ModelFilters({
                     outputPricing: value as [number, number],
                   })
                 }
-                max={0.00002}
+                max={20}
                 min={0}
-                step={0.00000001}
+                step={0.01}
                 className="w-full"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{filters.outputPricing[0].toFixed(8)}</span>
-                <span>{filters.outputPricing[1].toFixed(8)}</span>
+                <span>${filters.outputPricing[0].toFixed(2)}</span>
+                <span>${filters.outputPricing[1].toFixed(2)}</span>
               </div>
             </div>
           </CollapsibleContent>

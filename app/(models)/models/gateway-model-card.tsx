@@ -4,6 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ModelDefinition } from '@/lib/ai/all-models';
+import type { ProviderId } from '@/lib/models/models.generated';
+import { getProviderIcon } from '@/components/get-provider-icon';
 
 interface ModelCardProps {
   model: ModelDefinition;
@@ -20,6 +22,7 @@ export function ModelCard({
 }: ModelCardProps) {
   const isSelected = selectedModels.includes(model.id);
   const canAddMore = selectedModels.length < 2;
+  const provider = model.owned_by as ProviderId;
 
   const handleCompareClick = () => {
     if (onToggleCompare) {
@@ -64,39 +67,38 @@ export function ModelCard({
     <Card className="group hover:shadow-lg transition-all duration-200 hover:border-primary/20 cursor-pointer">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="space-y-1 flex-1">
-            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors text-balance">
-              {model.owned_by}: {model.name}
-            </h3>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
-              <span>by {model.owned_by.toLowerCase()}</span>
-              <span className="hidden sm:inline">•</span>
-              <span className="hidden sm:inline">
-                {model.context_window.toLocaleString()} context
-              </span>
-              <span className="hidden md:inline">•</span>
-              <span className="hidden md:inline">
-                $
-                {(Number.parseFloat(model.pricing.input) * 1_000_000).toFixed(
-                  2,
-                )}
-                /M input
-              </span>
-              <span className="hidden lg:inline">•</span>
-              <span className="hidden lg:inline">
-                $
-                {(Number.parseFloat(model.pricing.output) * 1_000_000).toFixed(
-                  2,
-                )}
-                /M output
-              </span>
+          <div className="flex items-center gap-2 flex-1">
+            <div className="transition-transform bg-muted rounded-lg p-1 group-hover:rotate-12">
+              {getProviderIcon(provider, 24)}
             </div>
-          </div>
-          <div className="text-right text-sm text-muted-foreground shrink-0 ml-4">
-            <div className="font-medium">
-              {Math.floor(model.context_window / 1000)}K
+            <div className="space-y-1">
+              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors text-balance">
+                {model.name}
+              </h3>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
+                <span>by {model.owned_by.toLowerCase()}</span>
+                <span className="hidden sm:inline">•</span>
+                <span className="hidden sm:inline">
+                  {model.context_window.toLocaleString()} context
+                </span>
+                <span className="hidden md:inline">•</span>
+                <span className="hidden md:inline">
+                  $
+                  {(Number.parseFloat(model.pricing.input) * 1_000_000).toFixed(
+                    2,
+                  )}
+                  /M input
+                </span>
+                <span className="hidden lg:inline">•</span>
+                <span className="hidden lg:inline">
+                  $
+                  {(
+                    Number.parseFloat(model.pricing.output) * 1_000_000
+                  ).toFixed(2)}
+                  /M output
+                </span>
+              </div>
             </div>
-            <div className="text-xs">tokens</div>
           </div>
         </div>
       </CardHeader>
