@@ -6,21 +6,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { ModelDefinition } from '@/lib/ai/all-models';
 import type { ProviderId } from '@/lib/models/models.generated';
 import { getProviderIcon } from '@/components/get-provider-icon';
+import { CAPABILITY_ICONS } from '@/components/capability-icons';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {
-  Brain,
-  PlugZap,
-  Type as TypeIcon,
-  Image as ImageIcon,
-  FileText,
-  Mic,
-  Volume2,
-} from 'lucide-react';
 
 interface ModelCardProps {
   model: ModelDefinition;
@@ -35,6 +27,13 @@ export function ModelCard({
   onToggleCompare,
   isLoading,
 }: ModelCardProps) {
+  const formatCompact = (value: number): string => {
+    if (value < 1000) return value.toString();
+    if (value < 1_000_000) return `${Math.round(value / 1_000)}K`;
+    if (value < 1_000_000_000) return `${Math.round(value / 1_000_000)}M`;
+    return `${Math.round(value / 1_000_000_000)}B`;
+  };
+
   const isSelected = selectedModels.includes(model.id);
   const canAddMore = selectedModels.length < 2;
   const provider = model.owned_by as ProviderId;
@@ -73,6 +72,30 @@ export function ModelCard({
         <TooltipContent>{label}</TooltipContent>
       </Tooltip>
     ) : null;
+
+  const CapabilityIcon = ({
+    enabled,
+    capability,
+  }: {
+    enabled: boolean | undefined;
+    capability:
+      | 'input.text'
+      | 'input.image'
+      | 'input.pdf'
+      | 'input.audio'
+      | 'output.text'
+      | 'output.image'
+      | 'output.audio'
+      | 'reasoning'
+      | 'tools';
+  }) => {
+    const { Icon, label } = CAPABILITY_ICONS[capability];
+    return (
+      <ModalityIcon enabled={enabled} label={label}>
+        <Icon className="size-3.5" />
+      </ModalityIcon>
+    );
+  };
 
   const handleCompareClick = () => {
     if (onToggleCompare) {
@@ -128,9 +151,9 @@ export function ModelCard({
               <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
                 <span>by {model.owned_by.toLowerCase()}</span>
                 <span>•</span>
-                <span>{model.context_window.toLocaleString()} context</span>
+                <span>{formatCompact(model.context_window)} context</span>
                 <span>•</span>
-                <span>{model.max_tokens.toLocaleString()} max out</span>
+                <span>{formatCompact(model.max_tokens)} max out</span>
                 <span>•</span>
                 <span>
                   $
@@ -174,30 +197,22 @@ export function ModelCard({
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs text-muted-foreground">Input</span>
                   <div className="flex items-center gap-1.5">
-                    <ModalityIcon
+                    <CapabilityIcon
                       enabled={model.features?.input?.text}
-                      label="Text in"
-                    >
-                      <TypeIcon className="size-3.5" />
-                    </ModalityIcon>
-                    <ModalityIcon
+                      capability="input.text"
+                    />
+                    <CapabilityIcon
                       enabled={model.features?.input?.image}
-                      label="Image in"
-                    >
-                      <ImageIcon className="size-3.5" />
-                    </ModalityIcon>
-                    <ModalityIcon
+                      capability="input.image"
+                    />
+                    <CapabilityIcon
                       enabled={model.features?.input?.pdf}
-                      label="PDF in"
-                    >
-                      <FileText className="size-3.5" />
-                    </ModalityIcon>
-                    <ModalityIcon
+                      capability="input.pdf"
+                    />
+                    <CapabilityIcon
                       enabled={model.features?.input?.audio}
-                      label="Audio in"
-                    >
-                      <Mic className="size-3.5" />
-                    </ModalityIcon>
+                      capability="input.audio"
+                    />
                   </div>
                 </div>
               )}
@@ -208,24 +223,18 @@ export function ModelCard({
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs text-muted-foreground">Output</span>
                   <div className="flex items-center gap-1.5">
-                    <ModalityIcon
+                    <CapabilityIcon
                       enabled={model.features?.output?.text}
-                      label="Text out"
-                    >
-                      <TypeIcon className="size-3.5" />
-                    </ModalityIcon>
-                    <ModalityIcon
+                      capability="output.text"
+                    />
+                    <CapabilityIcon
                       enabled={model.features?.output?.image}
-                      label="Image out"
-                    >
-                      <ImageIcon className="size-3.5" />
-                    </ModalityIcon>
-                    <ModalityIcon
+                      capability="output.image"
+                    />
+                    <CapabilityIcon
                       enabled={model.features?.output?.audio}
-                      label="Audio out"
-                    >
-                      <Volume2 className="size-3.5" />
-                    </ModalityIcon>
+                      capability="output.audio"
+                    />
                   </div>
                 </div>
               )}
@@ -233,18 +242,32 @@ export function ModelCard({
                 <>
                   <span className="text-muted-foreground/40">•</span>
                   <div className="flex items-center gap-1.5">
-                    {model.features?.reasoning && (
-                      <Badge variant="secondary" className="text-[10px] gap-1">
-                        <Brain className="size-3" />
-                        Reasoning
-                      </Badge>
-                    )}
-                    {model.features?.toolCall && (
-                      <Badge variant="secondary" className="text-[10px] gap-1">
-                        <PlugZap className="size-3" />
-                        Tools
-                      </Badge>
-                    )}
+                    {model.features?.reasoning &&
+                      (() => {
+                        const { Icon, label } = CAPABILITY_ICONS.reasoning;
+                        return (
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] gap-1"
+                          >
+                            <Icon className="size-3" />
+                            {label}
+                          </Badge>
+                        );
+                      })()}
+                    {model.features?.toolCall &&
+                      (() => {
+                        const { Icon, label } = CAPABILITY_ICONS.tools;
+                        return (
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] gap-1"
+                          >
+                            <Icon className="size-3" />
+                            {label}
+                          </Badge>
+                        );
+                      })()}
                   </div>
                 </>
               )}

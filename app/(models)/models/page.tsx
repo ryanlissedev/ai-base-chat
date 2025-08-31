@@ -11,8 +11,7 @@ import { ModelCard } from '@/app/(models)/models/gateway-model-card';
 import type { FilterState } from '@/app/(models)/models/model-filters';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ModelFilters } from '@/app/(models)/models/model-filters';
-import { PureModelsToolbar } from '@/app/(models)/models/components/models-toolbar';
-import { PureResultsHeader } from '@/app/(models)/models/components/results-header';
+import { PureModelsHeader } from '@/app/(models)/models/components/models-header';
 import { PureEmptyState } from '@/app/(models)/models/components/empty-state';
 
 type SortOption =
@@ -196,34 +195,19 @@ export default function HomePage() {
         <ScrollArea className="h-full">
           <div className="p-4 lg:p-6">
             <div className="mb-4">
-              <section className="space-y-3">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="space-y-0.5">
-                    <h1 className="text-xl font-semibold tracking-tight">
-                      Models
-                    </h1>
-                    <p className="text-xs text-muted-foreground">
-                      All the models in Vercel AI Gateway
-                    </p>
-                  </div>
-                  <PureResultsHeader
-                    total={allChatModels.length}
-                    filtered={filteredModels.length}
-                    searchQuery={searchQuery}
-                  />
-                </div>
-
-                <div>
-                  <PureModelsToolbar
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                    onClearSearch={clearSearch}
-                    sortBy={sortBy}
-                    onChangeSort={setSortBy}
-                    onClearAll={resetFiltersAndSearch}
-                  />
-                </div>
-              </section>
+              <PureModelsHeader
+                title="Models"
+                total={allChatModels.length}
+                filtered={filteredModels.length}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onClearSearch={clearSearch}
+                sortBy={sortBy}
+                onChangeSort={setSortBy}
+                onClearAll={resetFiltersAndSearch}
+                filters={filters}
+                onFiltersChange={setFilters}
+              />
             </div>
 
             <div className="space-y-4">
