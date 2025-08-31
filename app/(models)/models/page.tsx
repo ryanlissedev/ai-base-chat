@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useTransition } from 'react';
+import { useState, useMemo } from 'react';
 import {
   chatModels as allChatModels,
   type ModelDefinition,
@@ -12,7 +12,6 @@ import type { FilterState } from '@/app/(models)/models/model-filters';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ModelFilters } from '@/app/(models)/models/model-filters';
 import { PureModelsToolbar } from '@/app/(models)/models/components/models-toolbar';
-import { PureSelectedTags } from '@/app/(models)/models/components/selected-tags';
 import { PureResultsHeader } from '@/app/(models)/models/components/results-header';
 import { PureEmptyState } from '@/app/(models)/models/components/empty-state';
 
@@ -25,9 +24,7 @@ type SortOption =
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
-  const [isPending, startTransition] = useTransition();
   const [filters, setFilters] = useState<FilterState>({
     inputModalities: [],
     outputModalities: [],
@@ -156,32 +153,8 @@ export default function HomePage() {
     });
   }, [searchQuery, filters, sortBy]);
 
-  const handleToggleCompare = useCallback((modelId: string) => {
-    startTransition(() => {
-      setSelectedModels((prev) => {
-        if (prev.includes(modelId)) {
-          return prev.filter((id) => id !== modelId);
-        } else if (prev.length < 2) {
-          return [...prev, modelId];
-        } else {
-          return [prev[1], modelId];
-        }
-      });
-    });
-  }, []);
-
-  const handleCompare = () => {
-    if (selectedModels.length > 0) {
-      window.location.href = `/compare?models=${selectedModels.join(',')}`;
-    }
-  };
-
   const clearSearch = () => {
     setSearchQuery('');
-  };
-
-  const removeSelectedModel = (modelId: string) => {
-    setSelectedModels((prev) => prev.filter((id) => id !== modelId));
   };
 
   const resetFiltersAndSearch = () => {
@@ -222,48 +195,44 @@ export default function HomePage() {
       <main className="min-h-0 md:h-full">
         <ScrollArea className="h-full">
           <div className="p-4 lg:p-6">
-            <div className="mb-6 space-y-4 ">
-              <PureModelsToolbar
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                onClearSearch={clearSearch}
-                sortBy={sortBy}
-                onChangeSort={setSortBy}
-                selectedCount={selectedModels.length}
-                onCompare={handleCompare}
-                onClearAll={resetFiltersAndSearch}
-              />
+            <div className="mb-4">
+              <section className="space-y-3">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="space-y-0.5">
+                    <h1 className="text-xl font-semibold tracking-tight">
+                      Models
+                    </h1>
+                    <p className="text-xs text-muted-foreground">
+                      All the models in Vercel AI Gateway
+                    </p>
+                  </div>
+                  <PureResultsHeader
+                    total={allChatModels.length}
+                    filtered={filteredModels.length}
+                    searchQuery={searchQuery}
+                  />
+                </div>
 
-              <PureSelectedTags
-                selectedModelIds={selectedModels}
-                resolveLabel={(id) => {
-                  const model = allChatModels.find((m) => m.id === id);
-                  return model ? `${model.owned_by}: ${model.name}` : null;
-                }}
-                onRemove={removeSelectedModel}
-              />
+                <div>
+                  <PureModelsToolbar
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    onClearSearch={clearSearch}
+                    sortBy={sortBy}
+                    onChangeSort={setSortBy}
+                    onClearAll={resetFiltersAndSearch}
+                  />
+                </div>
+              </section>
             </div>
 
             <div className="space-y-4">
-              <PureResultsHeader
-                total={allChatModels.length}
-                filtered={filteredModels.length}
-                searchQuery={searchQuery}
-                isPending={isPending}
-              />
-
               <div className="grid gap-4">
                 {filteredModels.length === 0 ? (
                   <PureEmptyState onClearAll={resetFiltersAndSearch} />
                 ) : (
                   filteredModels.map((model) => (
-                    <ModelCard
-                      key={model.id}
-                      model={model}
-                      selectedModels={selectedModels}
-                      onToggleCompare={handleToggleCompare}
-                      isLoading={isPending}
-                    />
+                    <ModelCard key={model.id} model={model} isLoading={false} />
                   ))
                 )}
               </div>

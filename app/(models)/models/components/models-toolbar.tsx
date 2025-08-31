@@ -25,8 +25,6 @@ export const PureModelsToolbar = memo(function PureModelsToolbar({
   onClearSearch,
   sortBy,
   onChangeSort,
-  selectedCount,
-  onCompare,
   onClearAll,
 }: {
   searchQuery: string;
@@ -34,8 +32,6 @@ export const PureModelsToolbar = memo(function PureModelsToolbar({
   onClearSearch: () => void;
   sortBy: SortOption;
   onChangeSort: (value: SortOption) => void;
-  selectedCount: number;
-  onCompare: () => void;
   onClearAll: () => void;
 }) {
   return (
@@ -63,25 +59,20 @@ export const PureModelsToolbar = memo(function PureModelsToolbar({
         value={sortBy}
         onValueChange={(value: SortOption) => onChangeSort(value)}
       >
-        <SelectTrigger className="w-full sm:w-48">
-          <SelectValue placeholder="Sort by" />
+        <SelectTrigger className="h-8 w-full sm:w-40 text-xs">
+          <SelectValue placeholder="Sort" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="text-sm">
           <SelectItem value="newest">Newest</SelectItem>
-          <SelectItem value="pricing-low">Pricing: Low to High</SelectItem>
-          <SelectItem value="pricing-high">Pricing: High to Low</SelectItem>
-          <SelectItem value="context-high">Context: High to Low</SelectItem>
-          <SelectItem value="context-low">Context: Low to High</SelectItem>
+          <SelectItem value="pricing-low">$ Low → High</SelectItem>
+          <SelectItem value="pricing-high">$ High → Low</SelectItem>
+          <SelectItem value="context-high">Context High → Low</SelectItem>
+          <SelectItem value="context-low">Context Low → High</SelectItem>
         </SelectContent>
       </Select>
       <Button variant="ghost" className="shrink-0" onClick={onClearAll}>
-        <RotateCcw className="mr-2 h-4 w-4" /> Reset Filters
+        <RotateCcw className="mr-2 h-4 w-4" /> Reset
       </Button>
-      {selectedCount > 0 && (
-        <Button onClick={onCompare} className="shrink-0">
-          Compare {selectedCount} model{selectedCount > 1 ? 's' : ''}
-        </Button>
-      )}
     </div>
   );
 });
