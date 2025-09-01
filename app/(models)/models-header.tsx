@@ -34,7 +34,7 @@ function PureModelsHeader({ className }: { className?: string }) {
   return (
     <header
       className={cn(
-        'border-b border-border bg-background h-11 px-2 sm:px-3 flex items-center size-full justify-between gap-2',
+        'bg-background h-11 px-2 sm:px-3 flex items-center size-full gap-2 relative',
         className,
       )}
     >
@@ -51,7 +51,7 @@ function PureModelsHeader({ className }: { className?: string }) {
         </span>
       </Link>
 
-      <nav className="hidden sm:flex items-center gap-6">
+      <nav className="hidden sm:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
         <Link
           href="/"
           className={cn(

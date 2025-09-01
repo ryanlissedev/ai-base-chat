@@ -70,9 +70,6 @@ export default function ComparePage() {
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
-        <h1 className="mb-3 text-2xl font-semibold text-foreground">
-          Model Comparison
-        </h1>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <ModelSelectorBase
             models={allModels.map((m) => ({
@@ -81,7 +78,7 @@ export default function ComparePage() {
             }))}
             selectedModelId={leftModel?.id as ModelId | undefined}
             onModelChange={(id) => handleModelChange(0, id)}
-            className="w-full"
+            className="w-full border justify-start text-base"
             enableFilters
           />
           <ModelSelectorBase
@@ -91,7 +88,7 @@ export default function ComparePage() {
             }))}
             selectedModelId={rightModel?.id as ModelId | undefined}
             onModelChange={(id) => handleModelChange(1, id)}
-            className="w-full"
+            className="w-full border justify-start text-base"
             enableFilters
           />
         </div>
