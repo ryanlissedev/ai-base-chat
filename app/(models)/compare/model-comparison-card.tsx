@@ -5,17 +5,12 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ChatButton } from '@/components/chat-button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Check, X, ExternalLink, MessageSquare } from 'lucide-react';
 import type { ModelDefinition } from '@/lib/ai/all-models';
-import { allModels } from '@/lib/ai/all-models';
+import { allModels, getModelDefinition } from '@/lib/ai/all-models';
+import { ModelSelectorBase } from '@/components/model-selector-base';
+import type { ModelId } from '@/lib/models/model-id';
 
 interface ModelComparisonCardProps {
   model: ModelDefinition | null;
@@ -52,18 +47,16 @@ export function ModelComparisonCard({
     return (
       <Card className="h-full border-dashed border-2 hover:border-primary/50 transition-colors">
         <CardHeader>
-          <Select onValueChange={onModelChange}>
-            <SelectTrigger className="border-dashed">
-              <SelectValue placeholder="Select a model to compare" />
-            </SelectTrigger>
-            <SelectContent>
-              {allModels.map((m) => (
-                <SelectItem key={m.id} value={m.id}>
-                  {m.owned_by}: {m.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <ModelSelectorBase
+            models={allModels.map((m) => ({
+              id: m.id as ModelId,
+              definition: getModelDefinition(m.id as ModelId),
+            }))}
+            selectedModelId={undefined}
+            onModelChange={(id) => onModelChange(id)}
+            placeholder="Select a model to compare"
+            enableFilters
+          />
         </CardHeader>
         <CardContent className="flex items-center justify-center h-64 text-muted-foreground">
           <div className="text-center">
@@ -78,18 +71,15 @@ export function ModelComparisonCard({
     <Card className="h-full hover:shadow-md transition-shadow">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <Select value={model.id} onValueChange={onModelChange}>
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {allModels.map((m) => (
-                <SelectItem key={m.id} value={m.id}>
-                  {m.owned_by}: {m.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <ModelSelectorBase
+            models={allModels.map((m) => ({
+              id: m.id as ModelId,
+              definition: getModelDefinition(m.id as ModelId),
+            }))}
+            selectedModelId={model.id as ModelId}
+            onModelChange={(id) => onModelChange(id)}
+            enableFilters
+          />
         </div>
       </CardHeader>
 

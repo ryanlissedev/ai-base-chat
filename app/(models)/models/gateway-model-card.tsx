@@ -7,7 +7,6 @@ import {
 } from '@/components/ui/card';
 import { CompareButton } from '@/components/compare-button';
 import { ChatButton } from '@/components/chat-button';
-import { Skeleton } from '@/components/ui/skeleton';
 import type { ModelDefinition } from '@/lib/ai/all-models';
 import type { ProviderId } from '@/lib/models/models.generated';
 import { getProviderIcon } from '@/components/get-provider-icon';
@@ -18,14 +17,46 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import type { ComponentType, SVGProps } from 'react';
+import { memo, type ComponentType, type SVGProps } from 'react';
 import { formatNumberCompact } from '../../../lib/utils/format-number-compact';
 
-interface ModelCardProps {
+const ModalityIcon = ({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <div
+        className={`size-6 rounded-md grid place-items-center border text-foreground/80 bg-muted`}
+        aria-label={label}
+      >
+        {children}
+      </div>
+    </TooltipTrigger>
+    <TooltipContent>{label}</TooltipContent>
+  </Tooltip>
+);
+
+const CapabilityIcon = ({
+  label,
+  Icon,
+}: {
+  label: string;
+  Icon: ComponentType<SVGProps<SVGSVGElement>>;
+}) => (
+  <ModalityIcon label={label}>
+    <Icon className="size-3.5" />
+  </ModalityIcon>
+);
+
+function PureModelCard({
+  model,
+}: {
   model: ModelDefinition;
-  isLoading?: boolean;
-}
-export function ModelCard({ model, isLoading }: ModelCardProps) {
+}) {
   const provider = model.owned_by as ProviderId;
 
   const hasInput = Boolean(
@@ -39,63 +70,6 @@ export function ModelCard({ model, isLoading }: ModelCardProps) {
       model.features?.output?.image ||
       model.features?.output?.audio,
   );
-
-  const ModalityIcon = ({
-    label,
-    children,
-  }: {
-    label: string;
-    children: React.ReactNode;
-  }) => (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div
-          className={`size-6 rounded-md grid place-items-center border text-foreground/80 bg-muted`}
-          aria-label={label}
-        >
-          {children}
-        </div>
-      </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
-    </Tooltip>
-  );
-
-  const CapabilityIcon = ({
-    label,
-    Icon,
-  }: {
-    label: string;
-    Icon: ComponentType<SVGProps<SVGSVGElement>>;
-  }) => (
-    <ModalityIcon label={label}>
-      <Icon className="size-3.5" />
-    </ModalityIcon>
-  );
-
-  // onToggleCompare no-op now; kept for compatibility
-
-  if (isLoading) {
-    return (
-      <Card className="animate-pulse">
-        <CardHeader className="pb-3">
-          <div className="space-y-2">
-            <Skeleton className="h-5 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <Skeleton className="h-12 w-full mb-3" />
-          <div className="flex items-center justify-between">
-            <div className="flex gap-1">
-              <Skeleton className="h-5 w-16" />
-              <Skeleton className="h-5 w-20" />
-            </div>
-            <Skeleton className="h-8 w-20" />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card className="group hover:shadow-lg transition-all duration-200 hover:border-primary/20 cursor-pointer gap-4">
@@ -272,3 +246,8 @@ export function ModelCard({ model, isLoading }: ModelCardProps) {
     </Card>
   );
 }
+
+export const ModelCard = memo(
+  PureModelCard,
+  (prevProps, nextProps) => prevProps.model.id === nextProps.model.id,
+);

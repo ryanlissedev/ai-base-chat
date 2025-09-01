@@ -13,7 +13,6 @@ import type { FilterState } from '@/app/(models)/models/model-filters';
 
 export const PureModelListHeader = memo(function PureModelsHeader({
   title = 'Models',
-  total,
   filtered,
   searchQuery,
   onSearchChange,
@@ -25,7 +24,6 @@ export const PureModelListHeader = memo(function PureModelsHeader({
   onFiltersChange,
 }: {
   title?: string;
-  total: number;
   filtered: number;
   searchQuery: string;
   onSearchChange: (value: string) => void;
