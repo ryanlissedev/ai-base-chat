@@ -318,7 +318,7 @@ export function ModelFilters({
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
             <div className="flex items-center gap-2">
               <CATEGORY_ICONS.features.Icon className="h-4 w-4 text-muted-foreground" />
-              <span>Capabilities</span>
+              <span>Features</span>
             </div>
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${openSections.features ? 'rotate-180' : ''}`}

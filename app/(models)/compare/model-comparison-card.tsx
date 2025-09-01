@@ -96,12 +96,13 @@ export function ModelComparisonCard({
       <CardContent className="space-y-6">
         {/* Author */}
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Author</span>
+          <span className="text-sm text-muted-foreground">Created by</span>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
               {model.owned_by.toLowerCase()}
             </Badge>
-            <ExternalLink className="h-3 w-3 text-muted-foreground" />
+            {/* TODO: This should be a link to the provider page (when that page is built) */}
+            {/* <ExternalLink className="h-3 w-3 text-muted-foreground" /> */}
           </div>
         </div>
 
@@ -255,7 +256,7 @@ export function ModelComparisonCard({
             className="w-full bg-transparent hover:bg-accent transition-colors"
             asChild
           >
-            <Link href={`/model/${model.id}`}>
+            <Link href={`/models/${model.id}`}>
               <span>Go to model</span>
               <ExternalLink className="ml-2 h-4 w-4" />
             </Link>

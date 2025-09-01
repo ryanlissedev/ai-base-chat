@@ -32,5 +32,5 @@ export const CATEGORY_ICONS: Record<CategoryKey, CategoryEntry> = {
   maxTokens: { label: 'Max Output Tokens', Icon: Gauge },
   providers: { label: 'Providers', Icon: Building2 },
   pricing: { label: 'Pricing', Icon: DollarSign },
-  features: { label: 'Capabilities', Icon: Sparkles },
+  features: { label: 'Features', Icon: Sparkles },
 };

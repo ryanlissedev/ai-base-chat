@@ -5,7 +5,6 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
-import { Tag } from '@/components/tag';
 import { CompareButton } from '@/components/compare-button';
 import { ChatButton } from '@/components/chat-button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -19,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
+import type { ComponentType, SVGProps } from 'react';
 
 interface ModelCardProps {
   model: ModelDefinition;
@@ -58,45 +57,36 @@ export function ModelCard({
   );
 
   const ModalityIcon = ({
-    enabled,
     label,
     children,
   }: {
-    enabled: boolean | undefined;
     label: string;
     children: React.ReactNode;
-  }) =>
-    enabled ? (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div
-            className={`size-6 rounded-md grid place-items-center border text-foreground/80 bg-muted`}
-            aria-label={label}
-          >
-            {children}
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>{label}</TooltipContent>
-      </Tooltip>
-    ) : null;
+  }) => (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div
+          className={`size-6 rounded-md grid place-items-center border text-foreground/80 bg-muted`}
+          aria-label={label}
+        >
+          {children}
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
+  );
 
   const CapabilityIcon = ({
-    enabled,
-    capability,
-    direction,
+    label,
+    Icon,
   }: {
-    enabled: boolean | undefined;
-    capability: 'text' | 'image' | 'pdf' | 'audio';
-    direction: 'in' | 'out';
-  }) => {
-    const { Icon, label } = CAPABILITY_ICONS[capability];
-    const computedLabel = `${label} ${direction === 'in' ? 'in' : 'out'}`;
-    return (
-      <ModalityIcon enabled={enabled} label={computedLabel}>
-        <Icon className="size-3.5" />
-      </ModalityIcon>
-    );
-  };
+    label: string;
+    Icon: ComponentType<SVGProps<SVGSVGElement>>;
+  }) => (
+    <ModalityIcon label={label}>
+      <Icon className="size-3.5" />
+    </ModalityIcon>
+  );
 
   // onToggleCompare no-op now; kept for compatibility
 
@@ -181,26 +171,34 @@ export function ModelCard({
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs text-muted-foreground">Input</span>
                   <div className="flex items-center gap-1.5">
-                    <CapabilityIcon
-                      enabled={model.features?.input?.text}
-                      capability="text"
-                      direction="in"
-                    />
-                    <CapabilityIcon
-                      enabled={model.features?.input?.image}
-                      capability="image"
-                      direction="in"
-                    />
-                    <CapabilityIcon
-                      enabled={model.features?.input?.pdf}
-                      capability="pdf"
-                      direction="in"
-                    />
-                    <CapabilityIcon
-                      enabled={model.features?.input?.audio}
-                      capability="audio"
-                      direction="in"
-                    />
+                    {model.features?.input?.text &&
+                      (() => {
+                        const { Icon, label } = CAPABILITY_ICONS.text;
+                        return (
+                          <CapabilityIcon label={`${label} in`} Icon={Icon} />
+                        );
+                      })()}
+                    {model.features?.input?.image &&
+                      (() => {
+                        const { Icon, label } = CAPABILITY_ICONS.image;
+                        return (
+                          <CapabilityIcon label={`${label} in`} Icon={Icon} />
+                        );
+                      })()}
+                    {model.features?.input?.pdf &&
+                      (() => {
+                        const { Icon, label } = CAPABILITY_ICONS.pdf;
+                        return (
+                          <CapabilityIcon label={`${label} in`} Icon={Icon} />
+                        );
+                      })()}
+                    {model.features?.input?.audio &&
+                      (() => {
+                        const { Icon, label } = CAPABILITY_ICONS.audio;
+                        return (
+                          <CapabilityIcon label={`${label} in`} Icon={Icon} />
+                        );
+                      })()}
                   </div>
                 </div>
               )}
@@ -211,55 +209,65 @@ export function ModelCard({
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs text-muted-foreground">Output</span>
                   <div className="flex items-center gap-1.5">
-                    <CapabilityIcon
-                      enabled={model.features?.output?.text}
-                      capability="text"
-                      direction="out"
-                    />
-                    <CapabilityIcon
-                      enabled={model.features?.output?.image}
-                      capability="image"
-                      direction="out"
-                    />
-                    <CapabilityIcon
-                      enabled={model.features?.output?.audio}
-                      capability="audio"
-                      direction="out"
-                    />
+                    {model.features?.output?.text &&
+                      (() => {
+                        const { Icon, label } = CAPABILITY_ICONS.text;
+                        return (
+                          <CapabilityIcon label={`${label} out`} Icon={Icon} />
+                        );
+                      })()}
+                    {model.features?.output?.image &&
+                      (() => {
+                        const { Icon, label } = CAPABILITY_ICONS.image;
+                        return (
+                          <CapabilityIcon label={`${label} out`} Icon={Icon} />
+                        );
+                      })()}
+                    {model.features?.output?.audio &&
+                      (() => {
+                        const { Icon, label } = CAPABILITY_ICONS.audio;
+                        return (
+                          <CapabilityIcon label={`${label} out`} Icon={Icon} />
+                        );
+                      })()}
                   </div>
                 </div>
               )}
             </div>
 
-            {(model.features?.reasoning || model.features?.toolCall) && (
+            {(model.features?.reasoning ||
+              model.features?.toolCall ||
+              model.features?.fixedTemperature !== undefined) && (
               <>
                 <span className="hidden sm:inline text-muted-foreground/40">
-                  •
+                  /
                 </span>
                 <div className="flex items-center gap-1.5">
-                  {model.features?.reasoning &&
-                    (() => {
-                      const { Icon, label } = CAPABILITY_ICONS.reasoning;
-                      return (
-                        <Tag>
-                          <Icon className="size-4 mr-1" />
-                          {label}
-                        </Tag>
-                      );
-                    })()}
-                  {model.features?.toolCall &&
-                    (() => {
-                      const { Icon, label } = CAPABILITY_ICONS.tools;
-                      return (
-                        <Badge
-                          variant="outline"
-                          className="text-muted-foreground"
-                        >
-                          <Icon className="size-4 mr-1" />
-                          {label}
-                        </Badge>
-                      );
-                    })()}
+                  <span className="text-xs text-muted-foreground">
+                    Features
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {model.features?.reasoning &&
+                      (() => {
+                        const { Icon, label } = CAPABILITY_ICONS.reasoning;
+                        return <CapabilityIcon label={label} Icon={Icon} />;
+                      })()}
+                    {model.features?.toolCall &&
+                      (() => {
+                        const { Icon, label } = CAPABILITY_ICONS.tools;
+                        return <CapabilityIcon label={label} Icon={Icon} />;
+                      })()}
+                    {model.features?.fixedTemperature !== undefined &&
+                      (() => {
+                        const { Icon, label } = CAPABILITY_ICONS.temperature;
+                        return (
+                          <CapabilityIcon
+                            label={`${label} ${model.features?.fixedTemperature}`}
+                            Icon={Icon}
+                          />
+                        );
+                      })()}
+                  </div>
                 </div>
               </>
             )}

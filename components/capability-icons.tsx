@@ -8,6 +8,7 @@ import {
   Image as ImageIcon,
   FileText,
   Mic,
+  Thermometer,
 } from 'lucide-react';
 
 export type CapabilityKey =
@@ -16,7 +17,8 @@ export type CapabilityKey =
   | 'pdf'
   | 'audio'
   | 'reasoning'
-  | 'tools';
+  | 'tools'
+  | 'temperature';
 
 export type CapabilityEntry = {
   label: string;
@@ -30,4 +32,5 @@ export const CAPABILITY_ICONS: Record<CapabilityKey, CapabilityEntry> = {
   audio: { label: 'Audio', Icon: Mic },
   reasoning: { label: 'Reasoning', Icon: Brain },
   tools: { label: 'Tools', Icon: PlugZap },
+  temperature: { label: 'Temperature', Icon: Thermometer },
 };
