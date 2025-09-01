@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Check, X, ExternalLink } from 'lucide-react';
+import { CompareButton } from '@/components/compare-button';
 import { allModels } from '@/lib/ai/all-models';
 
 interface ModelPageProps {
@@ -160,12 +161,10 @@ export default function ModelPage({ params }: ModelPageProps) {
         </div>
 
         <div className="flex gap-4">
-          <Button asChild>
-            <a href={`/compare?models=${model.id}`}>
-              <span>Compare with other models</span>
-              <ExternalLink className="ml-2 h-4 w-4" />
-            </a>
-          </Button>
+          <CompareButton modelId={model.id}>
+            <span>Compare with other models</span>
+            <ExternalLink className="ml-2 h-4 w-4" />
+          </CompareButton>
           <Button variant="outline">Try in Chat</Button>
         </div>
       </div>

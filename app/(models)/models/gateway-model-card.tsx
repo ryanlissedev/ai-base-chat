@@ -1,7 +1,7 @@
 'use client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { CompareButton } from '@/components/compare-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ModelDefinition } from '@/lib/ai/all-models';
 import type { ProviderId } from '@/lib/models/models.generated';
@@ -34,8 +34,8 @@ export function ModelCard({
     return `${Math.round(value / 1_000_000_000)}B`;
   };
 
-  const isSelected = selectedModels.includes(model.id);
-  const canAddMore = selectedModels.length < 2;
+  const isSelected = false;
+  const canAddMore = true;
   const provider = model.owned_by as ProviderId;
 
   const hasInput = Boolean(
@@ -91,21 +91,7 @@ export function ModelCard({
     );
   };
 
-  const handleCompareClick = () => {
-    if (onToggleCompare) {
-      onToggleCompare(model.id);
-    } else {
-      // Default behavior - navigate to compare page
-      const currentModels = selectedModels.length > 0 ? selectedModels : [];
-      const newModels = isSelected
-        ? currentModels.filter((id) => id !== model.id)
-        : [...currentModels.slice(0, 1), model.id]; // Keep only first model and add new one
-
-      if (newModels.length > 0) {
-        window.location.href = `/compare?models=${newModels.join(',')}`;
-      }
-    }
-  };
+  // onToggleCompare no-op now; kept for compatibility
 
   if (isLoading) {
     return (
@@ -168,15 +154,12 @@ export function ModelCard({
             </div>
           </div>
           <div className="shrink-0">
-            <Button
-              variant={isSelected ? 'default' : 'outline'}
+            <CompareButton
+              modelId={model.id}
+              variant="outline"
               size="sm"
-              onClick={handleCompareClick}
-              disabled={!canAddMore && !isSelected}
               className="transition-all duration-200"
-            >
-              {isSelected ? 'Remove' : 'Compare'}
-            </Button>
+            />
           </div>
         </div>
       </CardHeader>

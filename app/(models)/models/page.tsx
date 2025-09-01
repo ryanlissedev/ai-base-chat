@@ -9,7 +9,7 @@ import {
 import type { FilterState } from '@/app/(models)/models/model-filters';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ModelFilters } from '@/app/(models)/models/model-filters';
-import { PureModelsHeader } from '@/app/(models)/models/components/models-header';
+import { PureModelListHeader } from '@/app/(models)/models/components/model-list-header';
 import { PureEmptyState } from '@/app/(models)/models/components/empty-state';
 import { ModelCard } from '@/app/(models)/models/gateway-model-card';
 
@@ -190,7 +190,7 @@ export default function HomePage() {
         <ScrollArea className="h-full">
           <div className="p-4 lg:p-6">
             <div className="mb-4">
-              <PureModelsHeader
+              <PureModelListHeader
                 title="Models"
                 total={allChatModels.length}
                 filtered={filteredModels.length}
