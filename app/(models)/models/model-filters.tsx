@@ -11,7 +11,8 @@ import {
 import { ChevronDown } from 'lucide-react';
 import { providers } from '@/lib/models/models.generated';
 import { cn } from '@/lib/utils';
-import { CATEGORY_ICONS } from '@/components/category-icons';
+import { MODEL_CATEGORIES } from '@/lib/models/model-categories';
+import { formatNumberCompact } from '@/lib/utils/format-number-compact';
 
 export type FilterState = {
   inputModalities: string[];
@@ -79,7 +80,7 @@ export function ModelFilters({
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
             <div className="flex items-center gap-2">
-              <CATEGORY_ICONS.inputModalities.Icon className="h-4 w-4 text-muted-foreground" />
+              <MODEL_CATEGORIES.inputModalities.Icon className="h-4 w-4 text-muted-foreground" />
               <span>Input Modalities</span>
             </div>
             <ChevronDown
@@ -113,7 +114,7 @@ export function ModelFilters({
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
             <div className="flex items-center gap-2">
-              <CATEGORY_ICONS.outputModalities.Icon className="h-4 w-4 text-muted-foreground" />
+              <MODEL_CATEGORIES.outputModalities.Icon className="h-4 w-4 text-muted-foreground" />
               <span>Output Modalities</span>
             </div>
             <ChevronDown
@@ -147,7 +148,7 @@ export function ModelFilters({
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
             <div className="flex items-center gap-2">
-              <CATEGORY_ICONS.contextLength.Icon className="h-4 w-4 text-muted-foreground" />
+              <MODEL_CATEGORIES.contextLength.Icon className="h-4 w-4 text-muted-foreground" />
               <span>Context Length</span>
             </div>
             <ChevronDown
@@ -170,8 +171,8 @@ export function ModelFilters({
                 className="w-full"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{(filters.contextLength[0] / 1000).toFixed(0)}K</span>
-                <span>{(filters.contextLength[1] / 1000).toFixed(0)}K</span>
+                <span>{formatNumberCompact(filters.contextLength[0])}</span>
+                <span>{formatNumberCompact(filters.contextLength[1])}</span>
               </div>
             </div>
           </CollapsibleContent>
@@ -183,7 +184,7 @@ export function ModelFilters({
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
             <div className="flex items-center gap-2">
-              <CATEGORY_ICONS.maxTokens.Icon className="h-4 w-4 text-muted-foreground" />
+              <MODEL_CATEGORIES.maxTokens.Icon className="h-4 w-4 text-muted-foreground" />
               <span>Max Output Tokens</span>
             </div>
             <ChevronDown
@@ -206,8 +207,8 @@ export function ModelFilters({
                 className="w-full"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{filters.maxTokens[0].toLocaleString()}</span>
-                <span>{filters.maxTokens[1].toLocaleString()}</span>
+                <span>{formatNumberCompact(filters.maxTokens[0])}</span>
+                <span>{formatNumberCompact(filters.maxTokens[1])}</span>
               </div>
             </div>
           </CollapsibleContent>
@@ -219,7 +220,7 @@ export function ModelFilters({
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
             <div className="flex items-center gap-2">
-              <CATEGORY_ICONS.providers.Icon className="h-4 w-4 text-muted-foreground" />
+              <MODEL_CATEGORIES.providers.Icon className="h-4 w-4 text-muted-foreground" />
               <span>Providers</span>
             </div>
             <ChevronDown
@@ -256,8 +257,8 @@ export function ModelFilters({
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
             <div className="flex items-center gap-2">
-              <CATEGORY_ICONS.pricing.Icon className="h-4 w-4 text-muted-foreground" />
-              <span>{CATEGORY_ICONS.pricing.label}</span>
+              <MODEL_CATEGORIES.pricing.Icon className="h-4 w-4 text-muted-foreground" />
+              <span>{MODEL_CATEGORIES.pricing.label}</span>
             </div>
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${openSections.pricing ? 'rotate-180' : ''}`}
@@ -317,7 +318,7 @@ export function ModelFilters({
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
             <div className="flex items-center gap-2">
-              <CATEGORY_ICONS.features.Icon className="h-4 w-4 text-muted-foreground" />
+              <MODEL_CATEGORIES.features.Icon className="h-4 w-4 text-muted-foreground" />
               <span>Features</span>
             </div>
             <ChevronDown

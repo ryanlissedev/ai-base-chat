@@ -25,7 +25,7 @@ export type CapabilityEntry = {
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
 };
 
-export const CAPABILITY_ICONS: Record<CapabilityKey, CapabilityEntry> = {
+export const MODEL_CAPABILITIES: Record<CapabilityKey, CapabilityEntry> = {
   text: { label: 'Text', Icon: TypeIcon },
   image: { label: 'Image', Icon: ImageIcon },
   pdf: { label: 'PDF', Icon: FileText },

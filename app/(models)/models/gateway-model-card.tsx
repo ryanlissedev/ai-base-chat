@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { ModelDefinition } from '@/lib/ai/all-models';
 import type { ProviderId } from '@/lib/models/models.generated';
 import { getProviderIcon } from '@/components/get-provider-icon';
-import { CAPABILITY_ICONS } from '@/components/capability-icons';
+import { MODEL_CAPABILITIES } from '@/lib/models/model-capabilities';
 import {
   Tooltip,
   TooltipContent,
@@ -19,29 +19,13 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import type { ComponentType, SVGProps } from 'react';
+import { formatNumberCompact } from '../../../lib/utils/format-number-compact';
 
 interface ModelCardProps {
   model: ModelDefinition;
-  selectedModels?: string[];
-  onToggleCompare?: (modelId: string) => void;
   isLoading?: boolean;
 }
-
-export function ModelCard({
-  model,
-  selectedModels = [],
-  onToggleCompare,
-  isLoading,
-}: ModelCardProps) {
-  const formatCompact = (value: number): string => {
-    if (value < 1000) return value.toString();
-    if (value < 1_000_000) return `${Math.round(value / 1_000)}K`;
-    if (value < 1_000_000_000) return `${Math.round(value / 1_000_000)}M`;
-    return `${Math.round(value / 1_000_000_000)}B`;
-  };
-
-  const isSelected = false;
-  const canAddMore = true;
+export function ModelCard({ model, isLoading }: ModelCardProps) {
   const provider = model.owned_by as ProviderId;
 
   const hasInput = Boolean(
@@ -145,9 +129,9 @@ export function ModelCard({
         </div>
         {/* Secondary info row below the header line */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
-          <span>{formatCompact(model.context_window)} context</span>
+          <span>{formatNumberCompact(model.context_window)} context</span>
           <span>•</span>
-          <span>{formatCompact(model.max_tokens)} max out</span>
+          <span>{formatNumberCompact(model.max_tokens)} max out</span>
           <span>•</span>
           <span>
             ${(Number.parseFloat(model.pricing.input) * 1_000_000).toFixed(2)}
@@ -173,28 +157,28 @@ export function ModelCard({
                   <div className="flex items-center gap-1.5">
                     {model.features?.input?.text &&
                       (() => {
-                        const { Icon, label } = CAPABILITY_ICONS.text;
+                        const { Icon, label } = MODEL_CAPABILITIES.text;
                         return (
                           <CapabilityIcon label={`${label} in`} Icon={Icon} />
                         );
                       })()}
                     {model.features?.input?.image &&
                       (() => {
-                        const { Icon, label } = CAPABILITY_ICONS.image;
+                        const { Icon, label } = MODEL_CAPABILITIES.image;
                         return (
                           <CapabilityIcon label={`${label} in`} Icon={Icon} />
                         );
                       })()}
                     {model.features?.input?.pdf &&
                       (() => {
-                        const { Icon, label } = CAPABILITY_ICONS.pdf;
+                        const { Icon, label } = MODEL_CAPABILITIES.pdf;
                         return (
                           <CapabilityIcon label={`${label} in`} Icon={Icon} />
                         );
                       })()}
                     {model.features?.input?.audio &&
                       (() => {
-                        const { Icon, label } = CAPABILITY_ICONS.audio;
+                        const { Icon, label } = MODEL_CAPABILITIES.audio;
                         return (
                           <CapabilityIcon label={`${label} in`} Icon={Icon} />
                         );
@@ -211,21 +195,21 @@ export function ModelCard({
                   <div className="flex items-center gap-1.5">
                     {model.features?.output?.text &&
                       (() => {
-                        const { Icon, label } = CAPABILITY_ICONS.text;
+                        const { Icon, label } = MODEL_CAPABILITIES.text;
                         return (
                           <CapabilityIcon label={`${label} out`} Icon={Icon} />
                         );
                       })()}
                     {model.features?.output?.image &&
                       (() => {
-                        const { Icon, label } = CAPABILITY_ICONS.image;
+                        const { Icon, label } = MODEL_CAPABILITIES.image;
                         return (
                           <CapabilityIcon label={`${label} out`} Icon={Icon} />
                         );
                       })()}
                     {model.features?.output?.audio &&
                       (() => {
-                        const { Icon, label } = CAPABILITY_ICONS.audio;
+                        const { Icon, label } = MODEL_CAPABILITIES.audio;
                         return (
                           <CapabilityIcon label={`${label} out`} Icon={Icon} />
                         );
@@ -249,17 +233,17 @@ export function ModelCard({
                   <div className="flex items-center gap-1.5">
                     {model.features?.reasoning &&
                       (() => {
-                        const { Icon, label } = CAPABILITY_ICONS.reasoning;
+                        const { Icon, label } = MODEL_CAPABILITIES.reasoning;
                         return <CapabilityIcon label={label} Icon={Icon} />;
                       })()}
                     {model.features?.toolCall &&
                       (() => {
-                        const { Icon, label } = CAPABILITY_ICONS.tools;
+                        const { Icon, label } = MODEL_CAPABILITIES.tools;
                         return <CapabilityIcon label={label} Icon={Icon} />;
                       })()}
                     {model.features?.fixedTemperature === undefined &&
                       (() => {
-                        const { Icon, label } = CAPABILITY_ICONS.temperature;
+                        const { Icon, label } = MODEL_CAPABILITIES.temperature;
                         return (
                           <CapabilityIcon label={`${label}`} Icon={Icon} />
                         );

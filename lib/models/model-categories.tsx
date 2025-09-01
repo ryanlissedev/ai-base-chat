@@ -25,7 +25,7 @@ export type CategoryEntry = {
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
 };
 
-export const CATEGORY_ICONS: Record<CategoryKey, CategoryEntry> = {
+export const MODEL_CATEGORIES: Record<CategoryKey, CategoryEntry> = {
   inputModalities: { label: 'Input Modalities', Icon: Keyboard },
   outputModalities: { label: 'Output Modalities', Icon: SquareArrowOutUpRight },
   contextLength: { label: 'Context Length', Icon: Ruler },
