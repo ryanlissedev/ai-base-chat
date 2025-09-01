@@ -116,29 +116,36 @@ export default function HomePage() {
       return true;
     });
 
-    return list.sort((a: ModelDefinition, b: ModelDefinition) => {
-      switch (sortBy) {
-        case 'newest':
-          return b.id.localeCompare(a.id);
-        case 'pricing-low':
-          return (
-            Number.parseFloat(a.pricing.input) * 1_000_000 -
-            Number.parseFloat(b.pricing.input) * 1_000_000
-          );
-        case 'pricing-high':
-          return (
-            Number.parseFloat(b.pricing.input) * 1_000_000 -
-            Number.parseFloat(a.pricing.input) * 1_000_000
-          );
-        case 'context-high':
-          return b.context_window - a.context_window;
-        case 'context-low':
-          return a.context_window - b.context_window;
-        default:
-          return 0;
-      }
-    });
-  }, [filters, sortBy, searchFilteredData]);
+    return list;
+  }, [filters, searchFilteredData]);
+
+  // Sort after filtering
+  const sortedModels: ModelDefinition[] = useMemo(() => {
+    return [...filteredModels].sort(
+      (a: ModelDefinition, b: ModelDefinition) => {
+        switch (sortBy) {
+          case 'newest':
+            return b.id.localeCompare(a.id);
+          case 'pricing-low':
+            return (
+              Number.parseFloat(a.pricing.input) * 1_000_000 -
+              Number.parseFloat(b.pricing.input) * 1_000_000
+            );
+          case 'pricing-high':
+            return (
+              Number.parseFloat(b.pricing.input) * 1_000_000 -
+              Number.parseFloat(a.pricing.input) * 1_000_000
+            );
+          case 'context-high':
+            return b.context_window - a.context_window;
+          case 'context-low':
+            return a.context_window - b.context_window;
+          default:
+            return 0;
+        }
+      },
+    );
+  }, [filteredModels, sortBy]);
 
   const clearSearch = () => {
     setSearchQuery('');
@@ -200,10 +207,10 @@ export default function HomePage() {
 
             <div className="space-y-4">
               <div className="flex flex-col gap-4">
-                {filteredModels.length === 0 ? (
+                {sortedModels.length === 0 ? (
                   <PureEmptyState onClearAll={resetFiltersAndSearch} />
                 ) : (
-                  filteredModels.map((model) => (
+                  sortedModels.map((model) => (
                     <ModelCard key={model.id} model={model} />
                   ))
                 )}

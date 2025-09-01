@@ -62,26 +62,6 @@ export const PureModelsHeader = memo(function PureModelsHeader({
             {filtered} models found
           </span>
         </div>
-
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search models..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10 pr-10"
-          />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClearSearch}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
       </div>
 
       <div className="flex items-center justify-between gap-3">
@@ -90,7 +70,7 @@ export const PureModelsHeader = memo(function PureModelsHeader({
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="secondary" className="md:hidden">
-                <FilterIcon className="mr-2 h-4 w-4" /> + Filter
+                <FilterIcon className="mr-2 h-4 w-4" />
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0">
@@ -117,12 +97,31 @@ export const PureModelsHeader = memo(function PureModelsHeader({
           </Sheet>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 grow">
+          <div className="relative w-full max-w-md">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search models..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-10 pr-10"
+            />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClearSearch}
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
           <Select
             value={sortBy}
             onValueChange={(value: SortOption) => onChangeSort(value)}
           >
-            <SelectTrigger className="h-8 w-full sm:w-40 text-xs">
+            <SelectTrigger className="h-8 max-w-40 text-xs">
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
             <SelectContent className="text-sm">
