@@ -122,16 +122,16 @@ export function ModelCard({
       <CardHeader className="">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2 flex-1">
-            <div className="bg-muted rounded-lg p-1">
-              {getProviderIcon(provider, 24)}
+            <div className="bg-muted rounded-lg size-10 grid place-items-center">
+              {getProviderIcon(provider, 28)}
             </div>
-            <div className="space-y-1">
+            <div className="">
               <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors text-balance">
                 {model.name}
               </h3>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
-                <span>by {model.owned_by.toLowerCase()}</span>
-              </div>
+              <span className="text-sm text-muted-foreground">
+                by {model.owned_by.toLowerCase()}
+              </span>
             </div>
           </div>
           <div className="shrink-0 flex items-center gap-2">
@@ -232,10 +232,10 @@ export function ModelCard({
                         const { Icon, label } = CAPABILITY_ICONS.reasoning;
                         return (
                           <Badge
-                            variant="secondary"
-                            className="text-[10px] gap-1"
+                            variant="outline"
+                            className="gap-1 text-muted-foreground"
                           >
-                            <Icon className="size-3" />
+                            <Icon className="size-4" />
                             {label}
                           </Badge>
                         );
@@ -245,10 +245,10 @@ export function ModelCard({
                         const { Icon, label } = CAPABILITY_ICONS.tools;
                         return (
                           <Badge
-                            variant="secondary"
-                            className="text-[10px] gap-1"
+                            variant="outline"
+                            className="gap-1 text-muted-foreground"
                           >
-                            <Icon className="size-3" />
+                            <Icon className="size-4" />
                             {label}
                           </Badge>
                         );
