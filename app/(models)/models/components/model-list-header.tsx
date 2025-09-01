@@ -141,52 +141,101 @@ export const PureModelListHeader = memo(function PureModelsHeader({
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-baseline gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-          <span className="text-sm text-muted-foreground">
-            {filtered} models found
-          </span>
+          <p className="text-sm text-muted-foreground">
+            {'from '}
+            <a
+              href="https://vercel.com/docs/ai-gateway"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              Vercel AI Gateway
+            </a>
+          </p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3">
-        {/* Mobile filters */}
-        <Sheet>
-          <SheetTrigger asChild>
+      {/* Controls - mobile */}
+      <div className="flex flex-col gap-2 sm:hidden">
+        {/* First row: search bar only */}
+        <div className="relative w-full">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search models..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-10 pr-10"
+          />
+          {searchQuery && (
             <Button
-              variant="secondary"
-              size="icon"
-              className="relative md:hidden"
+              variant="ghost"
+              size="sm"
+              onClick={onClearSearch}
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
             >
-              <FilterIcon className="h-4 w-4" />
-              {activeFiltersCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 min-w-[1rem] rounded-full bg-primary text-primary-foreground text-[10px] leading-4 px-0.5 text-center">
-                  {activeFiltersCount}
-                </span>
-              )}
+              <X className="h-4 w-4" />
             </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0">
-            <SheetHeader className="border-b">
-              <SheetTitle>Filters</SheetTitle>
-            </SheetHeader>
-            <div className="h-full overflow-y-auto">
-              <ModelFilters
-                filters={filters}
-                onFiltersChange={onFiltersChange}
-                className="p-4"
-              />
-            </div>
-            <div className="p-4 border-t">
-              <Button
-                variant="ghost"
-                onClick={onClearAll}
-                className="w-full justify-center"
-              >
-                <RotateCcw className="mr-2 h-4 w-4" /> Clear filters
-              </Button>
-            </div>
-          </SheetContent>
-        </Sheet>
+          )}
+        </div>
 
+        {/* Second row: filter + sort */}
+        <div className="flex items-center gap-2">
+          {/* Mobile filters */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="secondary" size="icon" className="relative">
+                <FilterIcon className="h-4 w-4" />
+                {activeFiltersCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 min-w-[1rem] rounded-full bg-primary text-primary-foreground text-[10px] leading-4 px-0.5 text-center">
+                    {activeFiltersCount}
+                  </span>
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0">
+              <SheetHeader className="border-b">
+                <SheetTitle>Filters</SheetTitle>
+              </SheetHeader>
+              <div className="h-full overflow-y-auto">
+                <ModelFilters
+                  filters={filters}
+                  onFiltersChange={onFiltersChange}
+                  className="p-4"
+                />
+              </div>
+              <div className="p-4 border-t">
+                <Button
+                  variant="ghost"
+                  onClick={onClearAll}
+                  className="w-full justify-center"
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" /> Clear filters
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          <Select
+            value={sortBy}
+            onValueChange={(value: SortOption) => onChangeSort(value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Sort" />
+            </SelectTrigger>
+            <SelectContent className="text-sm">
+              <SelectItem value="newest">Newest</SelectItem>
+              <SelectItem value="pricing-low">$ Low → High</SelectItem>
+              <SelectItem value="pricing-high">$ High → Low</SelectItem>
+              <SelectItem value="context-high">Context High → Low</SelectItem>
+              <SelectItem value="context-low">Context Low → High</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Controls - desktop */}
+      <div className="hidden sm:flex items-center justify-between gap-3">
+        {/* Filters button hidden on desktop because filters are visible elsewhere */}
         <div className="flex items-center gap-2 grow">
           <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -226,13 +275,18 @@ export const PureModelListHeader = memo(function PureModelsHeader({
           {hasActiveFilters && (
             <Button
               variant="ghost"
-              className="hidden md:inline-flex"
+              className="hidden sm:inline-flex"
               onClick={onClearAll}
             >
-              <RotateCcw className="mr-2 h-4 w-4" /> Reset
+              <RotateCcw className="mr-2 h-4 w-4" /> Reset Filters
             </Button>
           )}
         </div>
+      </div>
+
+      {/* Results count row */}
+      <div className="text-sm text-muted-foreground">
+        {filtered} models found
       </div>
     </div>
   );

@@ -1,6 +1,11 @@
 'use client';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '@/components/ui/card';
+import { Tag } from '@/components/tag';
 import { CompareButton } from '@/components/compare-button';
 import { ChatButton } from '@/components/chat-button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,6 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { Badge } from '@/components/ui/badge';
 
 interface ModelCardProps {
   model: ModelDefinition;
@@ -120,7 +126,7 @@ export function ModelCard({
   return (
     <Card className="group hover:shadow-lg transition-all duration-200 hover:border-primary/20 cursor-pointer gap-4">
       <CardHeader className="">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
           <div className="flex items-center gap-2 flex-1">
             <div className="bg-muted rounded-lg size-10 grid place-items-center">
               {getProviderIcon(provider, 28)}
@@ -134,7 +140,7 @@ export function ModelCard({
               </span>
             </div>
           </div>
-          <div className="shrink-0 flex items-center gap-2">
+          <div className="shrink-0 hidden sm:flex items-center gap-2">
             <ChatButton
               modelId={model.id}
               className="transition-all duration-200"
@@ -169,8 +175,8 @@ export function ModelCard({
           {model.description}
         </p>
         <TooltipProvider>
-          <div className="flex items-center justify-start gap-4">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-start gap-3 sm:gap-2">
+            <div className="flex items-center gap-3 min-w-0">
               {hasInput && (
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs text-muted-foreground">Input</span>
@@ -223,43 +229,57 @@ export function ModelCard({
                   </div>
                 </div>
               )}
-              {(model.features?.reasoning || model.features?.toolCall) && (
-                <>
-                  <span className="text-muted-foreground/40">•</span>
-                  <div className="flex items-center gap-1.5">
-                    {model.features?.reasoning &&
-                      (() => {
-                        const { Icon, label } = CAPABILITY_ICONS.reasoning;
-                        return (
-                          <Badge
-                            variant="outline"
-                            className="gap-1 text-muted-foreground"
-                          >
-                            <Icon className="size-4" />
-                            {label}
-                          </Badge>
-                        );
-                      })()}
-                    {model.features?.toolCall &&
-                      (() => {
-                        const { Icon, label } = CAPABILITY_ICONS.tools;
-                        return (
-                          <Badge
-                            variant="outline"
-                            className="gap-1 text-muted-foreground"
-                          >
-                            <Icon className="size-4" />
-                            {label}
-                          </Badge>
-                        );
-                      })()}
-                  </div>
-                </>
-              )}
             </div>
+
+            {(model.features?.reasoning || model.features?.toolCall) && (
+              <>
+                <span className="hidden sm:inline text-muted-foreground/40">
+                  •
+                </span>
+                <div className="flex items-center gap-1.5">
+                  {model.features?.reasoning &&
+                    (() => {
+                      const { Icon, label } = CAPABILITY_ICONS.reasoning;
+                      return (
+                        <Tag>
+                          <Icon className="size-4 mr-1" />
+                          {label}
+                        </Tag>
+                      );
+                    })()}
+                  {model.features?.toolCall &&
+                    (() => {
+                      const { Icon, label } = CAPABILITY_ICONS.tools;
+                      return (
+                        <Badge
+                          variant="outline"
+                          className="text-muted-foreground"
+                        >
+                          <Icon className="size-4 mr-1" />
+                          {label}
+                        </Badge>
+                      );
+                    })()}
+                </div>
+              </>
+            )}
           </div>
         </TooltipProvider>
       </CardContent>
+      <CardFooter className="sm:hidden pt-0">
+        <div className="w-full flex items-center justify-end gap-2">
+          <ChatButton
+            modelId={model.id}
+            className="transition-all duration-200 grow"
+          />
+          <CompareButton
+            modelId={model.id}
+            variant="outline"
+            size="sm"
+            className="transition-all duration-200 grow"
+          />
+        </div>
+      </CardFooter>
     </Card>
   );
 }

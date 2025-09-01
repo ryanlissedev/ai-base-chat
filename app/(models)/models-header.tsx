@@ -8,6 +8,14 @@ import { memo } from 'react';
 import { useSession } from 'next-auth/react';
 import type { User } from 'next-auth';
 import { HeaderActions } from '@/components/header-actions';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Menu } from 'lucide-react';
 
 function PureModelsHeader({ className }: { className?: string }) {
   const pathname = usePathname();
@@ -26,11 +34,11 @@ function PureModelsHeader({ className }: { className?: string }) {
   return (
     <header
       className={cn(
-        'border-b border-border bg-background h-11 px-2 flex items-center size-full justify-between gap-6',
+        'border-b border-border bg-background h-11 px-2 sm:px-3 flex items-center size-full justify-between gap-2',
         className,
       )}
     >
-      <Link href="/" className="py-2">
+      <Link href="/" className="py-2" aria-label="Sparka home">
         <span className="text-lg font-semibold hover:bg-muted rounded-md cursor-pointer flex items-center gap-2 h-9 px-2">
           <Image
             src="/icon.svg"
@@ -39,11 +47,11 @@ function PureModelsHeader({ className }: { className?: string }) {
             height={24}
             className="size-6"
           />
-          Sparka
+          <span className="hidden sm:inline">Sparka</span>
         </span>
       </Link>
 
-      <nav className="flex items-center gap-6">
+      <nav className="hidden sm:flex items-center gap-6">
         <Link
           href="/"
           className={cn(
@@ -73,7 +81,51 @@ function PureModelsHeader({ className }: { className?: string }) {
         </Link>
       </nav>
 
-      <HeaderActions user={user} />
+      {/* Right side: actions + mobile menu */}
+      <div className="ml-auto flex items-center gap-1">
+        <HeaderActions user={user} />
+        <div className="sm:hidden">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Open navigation menu"
+              >
+                <Menu className="size-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              side="bottom"
+              sideOffset={8}
+              className="w-40"
+            >
+              <DropdownMenuItem asChild>
+                <Link href="/" className={cn(isActive('/') && 'font-semibold')}>
+                  Chat
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/models"
+                  className={cn(isActive('/models') && 'font-semibold')}
+                >
+                  Models
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/compare"
+                  className={cn(isActive('/compare') && 'font-semibold')}
+                >
+                  Compare
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
     </header>
   );
 }
