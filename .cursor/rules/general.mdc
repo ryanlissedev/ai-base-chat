@@ -6,7 +6,7 @@ alwaysApply: true
 ## Repo Context
 - The package manager is bun
 - Vercel AI SDK for AI framework and frontend-backend interactions
-- Next.js with server actions
+- Next.js with app directory
 - ORM is Drizzle with the schema at `lib/db/schema.ts`
 - DB queries and mutations are at `lib/db/queries.ts`
 - To test your changes through compilation. Don't run a build. But do `bun test:types`

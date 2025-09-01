@@ -124,7 +124,7 @@ function PureModelCard({
         </p>
         <TooltipProvider>
           <div className="flex flex-col sm:flex-row sm:items-center justify-start gap-3 sm:gap-2">
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2 min-w-0">
               {hasInput && (
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs text-muted-foreground">Input</span>
@@ -161,7 +161,9 @@ function PureModelCard({
                 </div>
               )}
               {hasInput && hasOutput && (
-                <span className="text-muted-foreground/40">/</span>
+                <span className="hidden sm:inline text-muted-foreground/40">
+                  /
+                </span>
               )}
               {hasOutput && (
                 <div className="flex items-center gap-1.5">

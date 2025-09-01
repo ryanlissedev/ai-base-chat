@@ -13,6 +13,7 @@ import { providers } from '@/lib/models/models.generated';
 import { cn } from '@/lib/utils';
 import { MODEL_CATEGORIES } from '@/lib/models/model-categories';
 import { formatNumberCompact } from '@/lib/utils/format-number-compact';
+import { useModels } from '@/app/(models)/models/models-store-context';
 
 export type FilterState = {
   inputModalities: string[];
@@ -33,15 +34,237 @@ export type FilterState = {
   supportedParameters: string[];
 };
 
-export function ModelFilters({
-  filters,
-  onFiltersChange,
-  className,
-}: {
-  filters: FilterState;
-  onFiltersChange: (filters: FilterState) => void;
-  className?: string;
-}) {
+function InputModalitiesFilter() {
+  const inputModalities = useModels((s) => s.filters.inputModalities);
+  const updateFilters = useModels((s) => s.updateFilters);
+
+  const toggle = (modality: string, checked: boolean) => {
+    const next = checked
+      ? [...inputModalities, modality]
+      : inputModalities.filter((m) => m !== modality);
+    updateFilters({ inputModalities: next });
+  };
+
+  return (
+    <CollapsibleContent className="pt-3 pb-2 space-y-2">
+      {['text', 'image', 'audio', 'pdf', 'video'].map((modality) => (
+        <div key={modality} className="flex items-center space-x-2">
+          <Checkbox
+            id={`input-${modality}`}
+            checked={inputModalities.includes(modality)}
+            onCheckedChange={(checked) => toggle(modality, !!checked)}
+          />
+          <label
+            htmlFor={`input-${modality}`}
+            className="text-sm capitalize cursor-pointer"
+          >
+            {modality}
+          </label>
+        </div>
+      ))}
+    </CollapsibleContent>
+  );
+}
+
+function OutputModalitiesFilter() {
+  const outputModalities = useModels((s) => s.filters.outputModalities);
+  const updateFilters = useModels((s) => s.updateFilters);
+
+  const toggle = (modality: string, checked: boolean) => {
+    const next = checked
+      ? [...outputModalities, modality]
+      : outputModalities.filter((m) => m !== modality);
+    updateFilters({ outputModalities: next });
+  };
+
+  return (
+    <CollapsibleContent className="pt-3 pb-2 space-y-2">
+      {['text', 'image', 'audio'].map((modality) => (
+        <div key={modality} className="flex items-center space-x-2">
+          <Checkbox
+            id={`output-${modality}`}
+            checked={outputModalities.includes(modality)}
+            onCheckedChange={(checked) => toggle(modality, !!checked)}
+          />
+          <label
+            htmlFor={`output-${modality}`}
+            className="text-sm capitalize cursor-pointer"
+          >
+            {modality}
+          </label>
+        </div>
+      ))}
+    </CollapsibleContent>
+  );
+}
+
+function ContextLengthFilter() {
+  const contextLength = useModels((s) => s.filters.contextLength);
+  const updateFilters = useModels((s) => s.updateFilters);
+  return (
+    <CollapsibleContent className="pt-3 pb-2">
+      <div className="space-y-2">
+        <Slider
+          value={contextLength}
+          onValueChange={(value) =>
+            updateFilters({ contextLength: value as [number, number] })
+          }
+          max={1000000}
+          min={1000}
+          step={1000}
+          className="w-full"
+        />
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>{formatNumberCompact(contextLength[0])}</span>
+          <span>{formatNumberCompact(contextLength[1])}</span>
+        </div>
+      </div>
+    </CollapsibleContent>
+  );
+}
+
+function MaxTokensFilter() {
+  const maxTokens = useModels((s) => s.filters.maxTokens);
+  const updateFilters = useModels((s) => s.updateFilters);
+  return (
+    <CollapsibleContent className="pt-3 pb-2">
+      <div className="space-y-2">
+        <Slider
+          value={maxTokens}
+          onValueChange={(value) =>
+            updateFilters({ maxTokens: value as [number, number] })
+          }
+          max={300000}
+          min={0}
+          step={512}
+          className="w-full"
+        />
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>{formatNumberCompact(maxTokens[0])}</span>
+          <span>{formatNumberCompact(maxTokens[1])}</span>
+        </div>
+      </div>
+    </CollapsibleContent>
+  );
+}
+
+function ProvidersFilter() {
+  const selectedProviders = useModels((s) => s.filters.providers);
+  const updateFilters = useModels((s) => s.updateFilters);
+  return (
+    <CollapsibleContent className="pt-3 pb-2 space-y-2">
+      {providers.map((provider) => (
+        <div key={provider} className="flex items-center space-x-2">
+          <Checkbox
+            id={`provider-${provider}`}
+            checked={selectedProviders.includes(provider)}
+            onCheckedChange={(checked) => {
+              const next = checked
+                ? [...selectedProviders, provider]
+                : selectedProviders.filter((p) => p !== provider);
+              updateFilters({ providers: next });
+            }}
+          />
+          <label
+            htmlFor={`provider-${provider}`}
+            className="text-sm capitalize cursor-pointer"
+          >
+            {provider}
+          </label>
+        </div>
+      ))}
+    </CollapsibleContent>
+  );
+}
+
+function PricingFilter() {
+  const inputPricing = useModels((s) => s.filters.inputPricing);
+  const outputPricing = useModels((s) => s.filters.outputPricing);
+  const updateFilters = useModels((s) => s.updateFilters);
+  return (
+    <CollapsibleContent className="pt-3 pb-2 space-y-4">
+      <div className="space-y-2">
+        <div className="text-xs text-muted-foreground">Input price ($/1M)</div>
+        <Slider
+          value={inputPricing}
+          onValueChange={(value) =>
+            updateFilters({ inputPricing: value as [number, number] })
+          }
+          max={20}
+          min={0}
+          step={0.01}
+          className="w-full"
+        />
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>${inputPricing[0].toFixed(2)}</span>
+          <span>${inputPricing[1].toFixed(2)}</span>
+        </div>
+      </div>
+      <div className="space-y-2">
+        <div className="text-xs text-muted-foreground">Output price ($/1M)</div>
+        <Slider
+          value={outputPricing}
+          onValueChange={(value) =>
+            updateFilters({ outputPricing: value as [number, number] })
+          }
+          max={20}
+          min={0}
+          step={0.01}
+          className="w-full"
+        />
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>${outputPricing[0].toFixed(2)}</span>
+          <span>${outputPricing[1].toFixed(2)}</span>
+        </div>
+      </div>
+    </CollapsibleContent>
+  );
+}
+
+function FeaturesFilter() {
+  const features = useModels((s) => s.filters.features);
+  const updateFilters = useModels((s) => s.updateFilters);
+  const toggle = (
+    key: 'reasoning' | 'toolCall' | 'temperatureControl',
+    checked: boolean,
+  ) => {
+    updateFilters({ features: { ...features, [key]: !!checked } });
+  };
+  return (
+    <CollapsibleContent className="pt-3 pb-2 space-y-2">
+      {[
+        { key: 'reasoning', label: 'Reasoning' },
+        { key: 'toolCall', label: 'Tools' },
+        { key: 'temperatureControl', label: 'Temperature control' },
+      ].map((f) => (
+        <div key={f.key} className="flex items-center space-x-2">
+          <Checkbox
+            id={`feature-${f.key}`}
+            checked={
+              !!features[
+                f.key as 'reasoning' | 'toolCall' | 'temperatureControl'
+              ]
+            }
+            onCheckedChange={(checked) =>
+              toggle(
+                f.key as 'reasoning' | 'toolCall' | 'temperatureControl',
+                !!checked,
+              )
+            }
+          />
+          <label
+            htmlFor={`feature-${f.key}`}
+            className="text-sm cursor-pointer"
+          >
+            {f.label}
+          </label>
+        </div>
+      ))}
+    </CollapsibleContent>
+  );
+}
+
+export function ModelFilters({ className }: { className?: string }) {
   const [openSections, setOpenSections] = useState({
     inputModalities: true,
     outputModalities: true,
@@ -55,20 +278,6 @@ export function ModelFilters({
 
   const toggleSection = (section: keyof typeof openSections) => {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
-  };
-
-  const handleModalityChange = (
-    modality: string,
-    type: 'input' | 'output',
-    checked: boolean,
-  ) => {
-    const key = type === 'input' ? 'inputModalities' : 'outputModalities';
-    const current = filters[key];
-    const updated = checked
-      ? [...current, modality]
-      : current.filter((m) => m !== modality);
-
-    onFiltersChange({ ...filters, [key]: updated });
   };
 
   return (
@@ -87,25 +296,7 @@ export function ModelFilters({
               className={`h-4 w-4 transition-transform duration-200 ${openSections.inputModalities ? 'rotate-180' : ''}`}
             />
           </CollapsibleTrigger>
-          <CollapsibleContent className="pt-3 pb-2 space-y-2">
-            {['text', 'image', 'audio', 'pdf', 'video'].map((modality) => (
-              <div key={modality} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`input-${modality}`}
-                  checked={filters.inputModalities.includes(modality)}
-                  onCheckedChange={(checked) =>
-                    handleModalityChange(modality, 'input', !!checked)
-                  }
-                />
-                <label
-                  htmlFor={`input-${modality}`}
-                  className="text-sm capitalize cursor-pointer"
-                >
-                  {modality}
-                </label>
-              </div>
-            ))}
-          </CollapsibleContent>
+          <InputModalitiesFilter />
         </Collapsible>
 
         <Collapsible
@@ -121,25 +312,7 @@ export function ModelFilters({
               className={`h-4 w-4 transition-transform duration-200 ${openSections.outputModalities ? 'rotate-180' : ''}`}
             />
           </CollapsibleTrigger>
-          <CollapsibleContent className="pt-3 pb-2 space-y-2">
-            {['text', 'image', 'audio'].map((modality) => (
-              <div key={modality} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`output-${modality}`}
-                  checked={filters.outputModalities.includes(modality)}
-                  onCheckedChange={(checked) =>
-                    handleModalityChange(modality, 'output', !!checked)
-                  }
-                />
-                <label
-                  htmlFor={`output-${modality}`}
-                  className="text-sm capitalize cursor-pointer"
-                >
-                  {modality}
-                </label>
-              </div>
-            ))}
-          </CollapsibleContent>
+          <OutputModalitiesFilter />
         </Collapsible>
 
         <Collapsible
@@ -155,27 +328,7 @@ export function ModelFilters({
               className={`h-4 w-4 transition-transform duration-200 ${openSections.contextLength ? 'rotate-180' : ''}`}
             />
           </CollapsibleTrigger>
-          <CollapsibleContent className="pt-3 pb-2">
-            <div className="space-y-2">
-              <Slider
-                value={filters.contextLength}
-                onValueChange={(value) =>
-                  onFiltersChange({
-                    ...filters,
-                    contextLength: value as [number, number],
-                  })
-                }
-                max={1000000}
-                min={1000}
-                step={1000}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{formatNumberCompact(filters.contextLength[0])}</span>
-                <span>{formatNumberCompact(filters.contextLength[1])}</span>
-              </div>
-            </div>
-          </CollapsibleContent>
+          <ContextLengthFilter />
         </Collapsible>
 
         <Collapsible
@@ -191,27 +344,7 @@ export function ModelFilters({
               className={`h-4 w-4 transition-transform duration-200 ${openSections.maxTokens ? 'rotate-180' : ''}`}
             />
           </CollapsibleTrigger>
-          <CollapsibleContent className="pt-3 pb-2">
-            <div className="space-y-2">
-              <Slider
-                value={filters.maxTokens}
-                onValueChange={(value) =>
-                  onFiltersChange({
-                    ...filters,
-                    maxTokens: value as [number, number],
-                  })
-                }
-                max={300000}
-                min={0}
-                step={512}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{formatNumberCompact(filters.maxTokens[0])}</span>
-                <span>{formatNumberCompact(filters.maxTokens[1])}</span>
-              </div>
-            </div>
-          </CollapsibleContent>
+          <MaxTokensFilter />
         </Collapsible>
 
         <Collapsible
@@ -227,28 +360,7 @@ export function ModelFilters({
               className={`h-4 w-4 transition-transform duration-200 ${openSections.providers ? 'rotate-180' : ''}`}
             />
           </CollapsibleTrigger>
-          <CollapsibleContent className="pt-3 pb-2 space-y-2">
-            {providers.map((provider) => (
-              <div key={provider} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`provider-${provider}`}
-                  checked={filters.providers.includes(provider)}
-                  onCheckedChange={(checked) => {
-                    const updated = checked
-                      ? [...filters.providers, provider]
-                      : filters.providers.filter((p) => p !== provider);
-                    onFiltersChange({ ...filters, providers: updated });
-                  }}
-                />
-                <label
-                  htmlFor={`provider-${provider}`}
-                  className="text-sm capitalize cursor-pointer"
-                >
-                  {provider}
-                </label>
-              </div>
-            ))}
-          </CollapsibleContent>
+          <ProvidersFilter />
         </Collapsible>
 
         <Collapsible
@@ -264,52 +376,7 @@ export function ModelFilters({
               className={`h-4 w-4 transition-transform duration-200 ${openSections.pricing ? 'rotate-180' : ''}`}
             />
           </CollapsibleTrigger>
-          <CollapsibleContent className="pt-3 pb-2 space-y-4">
-            <div className="space-y-2">
-              <div className="text-xs text-muted-foreground">
-                Input price ($/1M)
-              </div>
-              <Slider
-                value={filters.inputPricing}
-                onValueChange={(value) =>
-                  onFiltersChange({
-                    ...filters,
-                    inputPricing: value as [number, number],
-                  })
-                }
-                max={20}
-                min={0}
-                step={0.01}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>${filters.inputPricing[0].toFixed(2)}</span>
-                <span>${filters.inputPricing[1].toFixed(2)}</span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-xs text-muted-foreground">
-                Output price ($/1M)
-              </div>
-              <Slider
-                value={filters.outputPricing}
-                onValueChange={(value) =>
-                  onFiltersChange({
-                    ...filters,
-                    outputPricing: value as [number, number],
-                  })
-                }
-                max={20}
-                min={0}
-                step={0.01}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>${filters.outputPricing[0].toFixed(2)}</span>
-                <span>${filters.outputPricing[1].toFixed(2)}</span>
-              </div>
-            </div>
-          </CollapsibleContent>
+          <PricingFilter />
         </Collapsible>
 
         <Collapsible
@@ -325,39 +392,7 @@ export function ModelFilters({
               className={`h-4 w-4 transition-transform duration-200 ${openSections.features ? 'rotate-180' : ''}`}
             />
           </CollapsibleTrigger>
-          <CollapsibleContent className="pt-3 pb-2 space-y-2">
-            {[
-              { key: 'reasoning', label: 'Reasoning' },
-              { key: 'toolCall', label: 'Tools' },
-              { key: 'temperatureControl', label: 'Temperature control' },
-            ].map((f) => (
-              <div key={f.key} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`feature-${f.key}`}
-                  checked={
-                    !!filters.features[
-                      f.key as 'reasoning' | 'toolCall' | 'temperatureControl'
-                    ]
-                  }
-                  onCheckedChange={(checked) =>
-                    onFiltersChange({
-                      ...filters,
-                      features: {
-                        ...filters.features,
-                        [f.key]: !!checked,
-                      },
-                    })
-                  }
-                />
-                <label
-                  htmlFor={`feature-${f.key}`}
-                  className="text-sm cursor-pointer"
-                >
-                  {f.label}
-                </label>
-              </div>
-            ))}
-          </CollapsibleContent>
+          <FeaturesFilter />
         </Collapsible>
       </div>
     </div>
