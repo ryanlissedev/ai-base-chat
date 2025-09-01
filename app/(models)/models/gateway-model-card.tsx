@@ -237,7 +237,7 @@ export function ModelCard({
 
             {(model.features?.reasoning ||
               model.features?.toolCall ||
-              model.features?.fixedTemperature !== undefined) && (
+              model.features?.fixedTemperature === undefined) && (
               <>
                 <span className="hidden sm:inline text-muted-foreground/40">
                   /
@@ -257,14 +257,11 @@ export function ModelCard({
                         const { Icon, label } = CAPABILITY_ICONS.tools;
                         return <CapabilityIcon label={label} Icon={Icon} />;
                       })()}
-                    {model.features?.fixedTemperature !== undefined &&
+                    {model.features?.fixedTemperature === undefined &&
                       (() => {
                         const { Icon, label } = CAPABILITY_ICONS.temperature;
                         return (
-                          <CapabilityIcon
-                            label={`${label} ${model.features?.fixedTemperature}`}
-                            Icon={Icon}
-                          />
+                          <CapabilityIcon label={`${label}`} Icon={Icon} />
                         );
                       })()}
                   </div>
