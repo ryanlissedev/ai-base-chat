@@ -1,4 +1,5 @@
-import type { ImageModelId, ModelId } from '@/lib/models/model-id';
+import type { ImageModelId } from '@/lib/models/model-id';
+import type { ModelId } from '@/lib/models/model-id';
 import { generatedModelFeatures } from '../models/model-features.generated';
 
 export interface ModelFeatures {
@@ -25,7 +26,8 @@ export interface ModelFeatures {
 }
 
 // Base, hand-curated features. Do not remove entries unless truly wrong.
-const customModelFeatures: Record<ModelId, ModelFeatures> = {
+// This is partial to allow overriding only a subset of models; the rest come from generatedModelFeatures.
+const customModelFeatures = {
   'amazon/nova-lite': {
     reasoning: false,
     toolCall: true,
@@ -1450,7 +1452,7 @@ const customModelFeatures: Record<ModelId, ModelFeatures> = {
       audio: false,
     },
   },
-};
+} satisfies Partial<Record<ModelId, ModelFeatures>>;
 
 export const modelFeatures = {
   ...generatedModelFeatures,

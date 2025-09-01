@@ -76,22 +76,16 @@ export function ModelCard({
   const CapabilityIcon = ({
     enabled,
     capability,
+    direction,
   }: {
     enabled: boolean | undefined;
-    capability:
-      | 'input.text'
-      | 'input.image'
-      | 'input.pdf'
-      | 'input.audio'
-      | 'output.text'
-      | 'output.image'
-      | 'output.audio'
-      | 'reasoning'
-      | 'tools';
+    capability: 'text' | 'image' | 'pdf' | 'audio';
+    direction: 'in' | 'out';
   }) => {
     const { Icon, label } = CAPABILITY_ICONS[capability];
+    const computedLabel = `${label} ${direction === 'in' ? 'in' : 'out'}`;
     return (
-      <ModalityIcon enabled={enabled} label={label}>
+      <ModalityIcon enabled={enabled} label={computedLabel}>
         <Icon className="size-3.5" />
       </ModalityIcon>
     );
@@ -141,7 +135,7 @@ export function ModelCard({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2 flex-1">
-            <div className="transition-transform bg-muted rounded-lg p-1 group-hover:rotate-12">
+            <div className="bg-muted rounded-lg p-1">
               {getProviderIcon(provider, 24)}
             </div>
             <div className="space-y-1">
@@ -199,19 +193,23 @@ export function ModelCard({
                   <div className="flex items-center gap-1.5">
                     <CapabilityIcon
                       enabled={model.features?.input?.text}
-                      capability="input.text"
+                      capability="text"
+                      direction="in"
                     />
                     <CapabilityIcon
                       enabled={model.features?.input?.image}
-                      capability="input.image"
+                      capability="image"
+                      direction="in"
                     />
                     <CapabilityIcon
                       enabled={model.features?.input?.pdf}
-                      capability="input.pdf"
+                      capability="pdf"
+                      direction="in"
                     />
                     <CapabilityIcon
                       enabled={model.features?.input?.audio}
-                      capability="input.audio"
+                      capability="audio"
+                      direction="in"
                     />
                   </div>
                 </div>
@@ -225,15 +223,18 @@ export function ModelCard({
                   <div className="flex items-center gap-1.5">
                     <CapabilityIcon
                       enabled={model.features?.output?.text}
-                      capability="output.text"
+                      capability="text"
+                      direction="out"
                     />
                     <CapabilityIcon
                       enabled={model.features?.output?.image}
-                      capability="output.image"
+                      capability="image"
+                      direction="out"
                     />
                     <CapabilityIcon
                       enabled={model.features?.output?.audio}
-                      capability="output.audio"
+                      capability="audio"
+                      direction="out"
                     />
                   </div>
                 </div>

@@ -11,6 +11,7 @@ import {
 import { ChevronDown } from 'lucide-react';
 import { providers } from '@/lib/models/models.generated';
 import { cn } from '@/lib/utils';
+import { CATEGORY_ICONS } from '@/components/category-icons';
 
 export type FilterState = {
   inputModalities: string[];
@@ -77,7 +78,10 @@ export function ModelFilters({
           onOpenChange={() => toggleSection('inputModalities')}
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
-            Input Modalities
+            <div className="flex items-center gap-2">
+              <CATEGORY_ICONS.inputModalities.Icon className="h-4 w-4 text-muted-foreground" />
+              <span>Input Modalities</span>
+            </div>
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${openSections.inputModalities ? 'rotate-180' : ''}`}
             />
@@ -108,7 +112,10 @@ export function ModelFilters({
           onOpenChange={() => toggleSection('outputModalities')}
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
-            Output Modalities
+            <div className="flex items-center gap-2">
+              <CATEGORY_ICONS.outputModalities.Icon className="h-4 w-4 text-muted-foreground" />
+              <span>Output Modalities</span>
+            </div>
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${openSections.outputModalities ? 'rotate-180' : ''}`}
             />
@@ -139,7 +146,10 @@ export function ModelFilters({
           onOpenChange={() => toggleSection('contextLength')}
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
-            Context Length
+            <div className="flex items-center gap-2">
+              <CATEGORY_ICONS.contextLength.Icon className="h-4 w-4 text-muted-foreground" />
+              <span>Context Length</span>
+            </div>
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${openSections.contextLength ? 'rotate-180' : ''}`}
             />
@@ -172,7 +182,10 @@ export function ModelFilters({
           onOpenChange={() => toggleSection('maxTokens')}
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
-            Max Output Tokens
+            <div className="flex items-center gap-2">
+              <CATEGORY_ICONS.maxTokens.Icon className="h-4 w-4 text-muted-foreground" />
+              <span>Max Output Tokens</span>
+            </div>
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${openSections.maxTokens ? 'rotate-180' : ''}`}
             />
@@ -205,7 +218,10 @@ export function ModelFilters({
           onOpenChange={() => toggleSection('providers')}
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
-            Providers
+            <div className="flex items-center gap-2">
+              <CATEGORY_ICONS.providers.Icon className="h-4 w-4 text-muted-foreground" />
+              <span>Providers</span>
+            </div>
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${openSections.providers ? 'rotate-180' : ''}`}
             />
@@ -239,7 +255,10 @@ export function ModelFilters({
           onOpenChange={() => toggleSection('pricing')}
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
-            Pricing ($ / 1M tokens)
+            <div className="flex items-center gap-2">
+              <CATEGORY_ICONS.pricing.Icon className="h-4 w-4 text-muted-foreground" />
+              <span>{CATEGORY_ICONS.pricing.label}</span>
+            </div>
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${openSections.pricing ? 'rotate-180' : ''}`}
             />
@@ -297,7 +316,10 @@ export function ModelFilters({
           onOpenChange={() => toggleSection('features')}
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
-            Features
+            <div className="flex items-center gap-2">
+              <CATEGORY_ICONS.features.Icon className="h-4 w-4 text-muted-foreground" />
+              <span>Capabilities</span>
+            </div>
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${openSections.features ? 'rotate-180' : ''}`}
             />

@@ -3,8 +3,6 @@
 import { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ModelComparisonCard } from '@/app/(models)/compare/model-comparison-card';
-import { Button } from '@/components/ui/button';
-import { MessageSquare } from 'lucide-react';
 import { allModels } from '@/lib/ai/all-models';
 import type { ModelDefinition } from '@/lib/ai/all-models';
 
@@ -57,10 +55,6 @@ function ComparePageContent() {
         <h1 className="text-2xl font-semibold text-foreground">
           Model Comparison
         </h1>
-        <Button className="gap-2">
-          <MessageSquare className="h-4 w-4" />
-          Chat
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ChatButton } from '@/components/chat-button';
 import {
   Select,
   SelectContent,
@@ -12,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Check, X, ExternalLink } from 'lucide-react';
+import { Check, X, ExternalLink, MessageSquare } from 'lucide-react';
 import type { ModelDefinition } from '@/lib/ai/all-models';
 import { allModels } from '@/lib/ai/all-models';
 
@@ -259,6 +260,12 @@ export function ModelComparisonCard({
               <ExternalLink className="ml-2 h-4 w-4" />
             </Link>
           </Button>
+          <div className="mt-2">
+            <ChatButton className="w-full gap-2" modelId={model.id}>
+              <MessageSquare className="h-4 w-4" />
+              Chat
+            </ChatButton>
+          </div>
         </div>
       </CardContent>
     </Card>

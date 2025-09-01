@@ -1,18 +1,17 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   chatModels as allChatModels,
   type ModelDefinition,
 } from '@/lib/ai/all-models';
-
-import { ModelCard } from '@/app/(models)/models/gateway-model-card';
 
 import type { FilterState } from '@/app/(models)/models/model-filters';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ModelFilters } from '@/app/(models)/models/model-filters';
 import { PureModelsHeader } from '@/app/(models)/models/components/models-header';
 import { PureEmptyState } from '@/app/(models)/models/components/empty-state';
+import { ModelCard } from '@/app/(models)/models/gateway-model-card';
 
 type SortOption =
   | 'newest'
@@ -38,99 +37,88 @@ export default function HomePage() {
     supportedParameters: [],
   });
 
+  // 1) Apply simple search pre-filtering (name/provider/description)
+  const searchFilteredData = useMemo(() => {
+    if (!searchQuery) return allChatModels;
+    const q = searchQuery.toLowerCase();
+    return allChatModels.filter(
+      (m) =>
+        m.name.toLowerCase().includes(q) ||
+        m.owned_by.toLowerCase().includes(q) ||
+        m.description.toLowerCase().includes(q),
+    );
+  }, [searchQuery]);
+
+  // Apply filters directly (no table)
   const filteredModels: ModelDefinition[] = useMemo(() => {
-    const filtered = allChatModels.filter((model) => {
-      if (
-        searchQuery &&
-        !model.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !model.owned_by.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !model.description.toLowerCase().includes(searchQuery.toLowerCase())
-      ) {
-        return false;
-      }
-
-      if (filters.inputModalities.length > 0) {
-        const inputs = model.features?.input;
-        const hasAny = filters.inputModalities.some((modality) => {
-          if (modality === 'text') return inputs?.text;
-          if (modality === 'image') return inputs?.image;
-          if (modality === 'audio') return inputs?.audio;
-          if (modality === 'pdf') return inputs?.pdf;
-          if (modality === 'video') return inputs?.video;
-          return false;
-        });
-        if (!hasAny) return false;
-      }
-
-      if (filters.outputModalities.length > 0) {
-        const outputs = model.features?.output;
-        const hasAny = filters.outputModalities.some((modality) => {
-          if (modality === 'text') return outputs?.text;
-          if (modality === 'image') return outputs?.image;
-          if (modality === 'audio') return outputs?.audio;
-          return false;
-        });
-        if (!hasAny) return false;
-      }
-
-      if (
-        model.context_window < filters.contextLength[0] ||
-        model.context_window > filters.contextLength[1]
-      ) {
-        return false;
-      }
-
-      // Providers
+    const list = searchFilteredData.filter((m) => {
+      // Provider
       if (
         filters.providers.length > 0 &&
-        !filters.providers.includes(model.owned_by)
-      ) {
+        !filters.providers.includes(m.owned_by)
+      )
         return false;
+      // Input modalities
+      if (filters.inputModalities.length > 0) {
+        const f = m.features?.input;
+        const set = new Set<string>(
+          [
+            f?.text ? 'text' : '',
+            f?.image ? 'image' : '',
+            f?.audio ? 'audio' : '',
+            f?.pdf ? 'pdf' : '',
+            f?.video ? 'video' : '',
+          ].filter(Boolean),
+        );
+        if (!filters.inputModalities.some((val) => set.has(val))) return false;
       }
-
-      // Features
-      if (filters.features?.reasoning) {
-        if (!model.features?.reasoning) return false;
+      // Output modalities
+      if (filters.outputModalities.length > 0) {
+        const f = m.features?.output;
+        const set = new Set<string>(
+          [
+            f?.text ? 'text' : '',
+            f?.image ? 'image' : '',
+            f?.audio ? 'audio' : '',
+          ].filter(Boolean),
+        );
+        if (!filters.outputModalities.some((val) => set.has(val))) return false;
       }
-      if (filters.features?.toolCall) {
-        if (!model.features?.toolCall) return false;
-      }
-      if (filters.features?.temperatureControl) {
-        // Temperature control means temperature is adjustable (not fixed)
-        if (model.features?.fixedTemperature !== undefined) return false;
-      }
-
-      // Output tokens
-      if (
-        model.max_tokens < filters.maxTokens[0] ||
-        model.max_tokens > filters.maxTokens[1]
-      ) {
-        return false;
-      }
-
-      // Pricing ranges (filters are in $/1M tokens; model pricing is $/token)
-      const inputPrice = Number.parseFloat(model.pricing.input) * 1_000_000;
-      const outputPrice = Number.parseFloat(model.pricing.output) * 1_000_000;
+      // Numeric ranges
+      const contextOk =
+        m.context_window >= filters.contextLength[0] &&
+        m.context_window <= filters.contextLength[1];
+      if (!contextOk) return false;
+      const maxTokensOk =
+        (m.max_tokens ?? 0) >= filters.maxTokens[0] &&
+        (m.max_tokens ?? 0) <= filters.maxTokens[1];
+      if (!maxTokensOk) return false;
+      const inputPrice = Number.parseFloat(m.pricing.input) * 1_000_000;
+      const outputPrice = Number.parseFloat(m.pricing.output) * 1_000_000;
       if (
         inputPrice < filters.inputPricing[0] ||
         inputPrice > filters.inputPricing[1]
-      ) {
+      )
         return false;
-      }
       if (
         outputPrice < filters.outputPricing[0] ||
         outputPrice > filters.outputPricing[1]
-      ) {
+      )
         return false;
-      }
-
+      // Feature flags
+      if (filters.features.reasoning && !m.features?.reasoning) return false;
+      if (filters.features.toolCall && !m.features?.toolCall) return false;
+      if (
+        filters.features.temperatureControl &&
+        m.features?.fixedTemperature !== undefined
+      )
+        return false;
       return true;
     });
 
-    return filtered.sort((a, b) => {
+    return list.sort((a: ModelDefinition, b: ModelDefinition) => {
       switch (sortBy) {
         case 'newest':
-          // No releaseDate field; use id as a stable proxy for recency
           return b.id.localeCompare(a.id);
         case 'pricing-low':
           return (
@@ -150,7 +138,7 @@ export default function HomePage() {
           return 0;
       }
     });
-  }, [searchQuery, filters, sortBy]);
+  }, [filters, sortBy, searchFilteredData]);
 
   const clearSearch = () => {
     setSearchQuery('');
@@ -211,12 +199,12 @@ export default function HomePage() {
             </div>
 
             <div className="space-y-4">
-              <div className="grid gap-4">
+              <div className="flex flex-col gap-4">
                 {filteredModels.length === 0 ? (
                   <PureEmptyState onClearAll={resetFiltersAndSearch} />
                 ) : (
                   filteredModels.map((model) => (
-                    <ModelCard key={model.id} model={model} isLoading={false} />
+                    <ModelCard key={model.id} model={model} />
                   ))
                 )}
               </div>
