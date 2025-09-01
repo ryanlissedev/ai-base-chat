@@ -118,8 +118,8 @@ export function ModelCard({
   }
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-200 hover:border-primary/20 cursor-pointer">
-      <CardHeader className="pb-3">
+    <Card className="group hover:shadow-lg transition-all duration-200 hover:border-primary/20 cursor-pointer gap-4">
+      <CardHeader className="">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2 flex-1">
             <div className="bg-muted rounded-lg p-1">
@@ -131,26 +131,6 @@ export function ModelCard({
               </h3>
               <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
                 <span>by {model.owned_by.toLowerCase()}</span>
-                <span>•</span>
-                <span>{formatCompact(model.context_window)} context</span>
-                <span>•</span>
-                <span>{formatCompact(model.max_tokens)} max out</span>
-                <span>•</span>
-                <span>
-                  $
-                  {(Number.parseFloat(model.pricing.input) * 1_000_000).toFixed(
-                    2,
-                  )}
-                  /M input
-                </span>
-                <span>•</span>
-                <span>
-                  $
-                  {(
-                    Number.parseFloat(model.pricing.output) * 1_000_000
-                  ).toFixed(2)}
-                  /M output
-                </span>
               </div>
             </div>
           </div>
@@ -167,9 +147,25 @@ export function ModelCard({
             />
           </div>
         </div>
+        {/* Secondary info row below the header line */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
+          <span>{formatCompact(model.context_window)} context</span>
+          <span>•</span>
+          <span>{formatCompact(model.max_tokens)} max out</span>
+          <span>•</span>
+          <span>
+            ${(Number.parseFloat(model.pricing.input) * 1_000_000).toFixed(2)}
+            /M input
+          </span>
+          <span>•</span>
+          <span>
+            ${(Number.parseFloat(model.pricing.output) * 1_000_000).toFixed(2)}
+            /M output
+          </span>
+        </div>
       </CardHeader>
-      <CardContent className="pt-0">
-        <p className="text-sm text-muted-foreground mb-3 line-clamp-2 text-pretty leading-relaxed">
+      <CardContent className="gap-3 flex flex-col">
+        <p className="text-sm text-muted-foreground line-clamp-2 text-pretty leading-relaxed">
           {model.description}
         </p>
         <TooltipProvider>

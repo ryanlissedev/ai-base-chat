@@ -188,7 +188,7 @@ export default function HomePage() {
 
       <main className="min-h-0 md:h-full">
         <ScrollArea className="h-full">
-          <div className="p-4 lg:p-6">
+          <div className="p-4 lg:p-6 max-w-4xl mx-auto">
             <div className="mb-4">
               <PureModelListHeader
                 title="Models"
