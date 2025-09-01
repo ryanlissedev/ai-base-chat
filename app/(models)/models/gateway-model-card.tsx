@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CompareButton } from '@/components/compare-button';
+import { ChatButton } from '@/components/chat-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ModelDefinition } from '@/lib/ai/all-models';
 import type { ProviderId } from '@/lib/models/models.generated';
@@ -153,7 +154,11 @@ export function ModelCard({
               </div>
             </div>
           </div>
-          <div className="shrink-0">
+          <div className="shrink-0 flex items-center gap-2">
+            <ChatButton
+              modelId={model.id}
+              className="transition-all duration-200"
+            />
             <CompareButton
               modelId={model.id}
               variant="outline"
