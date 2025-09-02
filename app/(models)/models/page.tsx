@@ -9,6 +9,7 @@ import { ModelListHeaderFilters } from '@/app/(models)/models/components/model-l
 import { ModelResults } from '@/app/(models)/models/components/model-results';
 import { ModelResultsCount } from '@/app/(models)/models/components/model-results-count';
 import { ModelsProvider } from '@/app/(models)/models/models-store-context';
+import { Container } from '@/components/container';
 
 export default function HomePage() {
   return (
@@ -31,7 +32,7 @@ function ModelsPageContent() {
 
       <main className="min-h-0 md:h-full">
         <ScrollArea ref={viewportRef} className="h-full">
-          <div className="p-4 lg:p-6 max-w-4xl mx-auto">
+          <Container className="p-4 lg:p-6">
             <div className="mb-4 flex flex-col gap-2">
               <ModelListHeaders />
               <ModelListHeaderFilters />
@@ -39,7 +40,7 @@ function ModelsPageContent() {
             </div>
 
             <ModelResults scrollParentRef={viewportRef} />
-          </div>
+          </Container>
         </ScrollArea>
       </main>
     </div>

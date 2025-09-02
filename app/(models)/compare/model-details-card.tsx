@@ -4,8 +4,14 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChatButton } from '@/components/chat-button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ExternalLink, MessageSquare, Check, X, Minus } from 'lucide-react';
+import {
+  ExternalLink,
+  MessageSquare,
+  Check,
+  X,
+  Minus,
+  ChevronDown,
+} from 'lucide-react';
 import type { ModelDefinition } from '@/lib/ai/all-models';
 import type { ProviderId } from '@/lib/models/models.generated';
 import { getProviderIcon } from '@/components/get-provider-icon';
@@ -18,14 +24,23 @@ import {
 } from '@/components/ui/tooltip';
 import { Separator } from '@/components/ui/separator';
 import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { formatNumberCompact } from '../../../lib/utils/format-number-compact';
 import { MODEL_CATEGORIES } from '@/lib/models/model-categories';
 
 interface ModelComparisonCardProps {
   model: ModelDefinition | null;
-  onModelChange: (modelId: string) => void;
-  position: number;
-  isLoading?: boolean;
+
+  enabledActions?: {
+    goToModel?: boolean;
+    chat?: boolean;
+    compare?: boolean;
+  };
 }
 
 const ModalityIcon = ({
@@ -89,27 +104,30 @@ const Section = ({
   </div>
 );
 
-export function ModelComparisonCard({
+export function ModelDetailsCard({
   model,
-  isLoading,
+  enabledActions,
 }: ModelComparisonCardProps) {
-  if (isLoading) {
-    return (
-      <Card className="h-full animate-pulse">
-        <CardHeader>
-          <Skeleton className="h-10 w-full" />
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="flex justify-between">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-16" />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-    );
-  }
+  const [isDescriptionOverflowing, setIsDescriptionOverflowing] =
+    useState(false);
+  const clampedRef = useRef<HTMLParagraphElement | null>(null);
+
+  useEffect(() => {
+    const el = clampedRef.current;
+    if (!el) return;
+    const measure = () => {
+      const overflowing = el.scrollHeight > el.clientHeight + 1;
+      setIsDescriptionOverflowing(overflowing);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [model?.id, model?.description]);
 
   if (!model) {
     return (
@@ -130,10 +148,16 @@ export function ModelComparisonCard({
 
   const provider = model.owned_by as ProviderId;
   const contextCompact = formatNumberCompact(model.context_window);
+  const actions = {
+    goToModel: true,
+    chat: true,
+    compare: true,
+    ...(enabledActions ?? {}),
+  };
 
   return (
-    <Card className="group h-full hover:shadow-lg transition-all duration-200 hover:border-primary/20">
-      <CardHeader className="pb-3">
+    <Card className="group h-full hover:shadow-lg transition-all duration-200 hover:border-primary/20 gap-2 p">
+      <CardHeader className="">
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">Created by</span>
           <div className="flex items-center gap-2 text-sm font-medium">
@@ -142,15 +166,41 @@ export function ModelComparisonCard({
           </div>
         </div>
         <Separator className="my-2" />
-        <p className="text-sm text-muted-foreground text-pretty leading-relaxed mt-2">
-          {model.description}
-        </p>
-        <Separator className="mt-3" />
+        <Collapsible className="w-full [&[data-state=open]_.clamped]:hidden [&[data-state=open]_.trigger-closed]:hidden [&[data-state=closed]_.trigger-open]:hidden">
+          <p
+            ref={clampedRef}
+            className="clamped text-sm text-muted-foreground text-pretty leading-relaxed mt-2 line-clamp-2"
+          >
+            {model.description}
+          </p>
+          <CollapsibleContent className="pb-0">
+            <p className="text-sm text-muted-foreground text-pretty leading-relaxed mt-2">
+              {model.description}
+            </p>
+          </CollapsibleContent>
+          <div className="mt-1 min-h-[1.25rem] flex justify-end gap-1">
+            {isDescriptionOverflowing && (
+              <CollapsibleTrigger
+                className="trigger-closed h-5 w-5 rounded-md grid place-items-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                aria-label="Expand description"
+              >
+                <ChevronDown className="h-4 w-4" />
+              </CollapsibleTrigger>
+            )}
+            <CollapsibleTrigger
+              className="trigger-open h-6 w-6 rounded-md grid place-items-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              aria-label="Collapse description"
+            >
+              <ChevronDown className="h-4 w-4 rotate-180 transition-transform duration-200" />
+            </CollapsibleTrigger>
+          </div>
+        </Collapsible>
       </CardHeader>
 
       <CardContent className="gap-4 flex flex-col">
         <TooltipProvider>
           <div className="flex flex-col gap-4">
+            <Separator />
             <Section
               title={MODEL_CATEGORIES.limits.label}
               Icon={MODEL_CATEGORIES.limits.Icon}
@@ -394,22 +444,40 @@ export function ModelComparisonCard({
 
         {/* Bottom actions */}
         <div className="pt-2">
-          <Button
-            variant="outline"
-            className="w-full bg-transparent hover:bg-accent transition-colors"
-            asChild
-          >
-            <Link href={`/models/${model.id}`}>
-              <span>Go to model</span>
-              <ExternalLink className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <div className="mt-2">
-            <ChatButton className="w-full gap-2" modelId={model.id}>
-              <MessageSquare className="h-4 w-4" />
-              Chat
-            </ChatButton>
-          </div>
+          {actions.goToModel ? (
+            <Button
+              variant="outline"
+              className="w-full bg-transparent hover:bg-accent transition-colors"
+              asChild
+            >
+              <Link href={`/models/${model.id}`}>
+                <span>Go to model</span>
+                <ExternalLink className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          ) : null}
+          {actions.compare ? (
+            <div className={actions.goToModel ? 'mt-2' : ''}>
+              <Button
+                variant="outline"
+                className="w-full bg-transparent hover:bg-accent transition-colors"
+                asChild
+              >
+                <Link href={`/compare/${model.id}`}>
+                  <span>Compare</span>
+                  <ExternalLink className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          ) : null}
+          {actions.chat ? (
+            <div className={actions.goToModel || actions.compare ? 'mt-2' : ''}>
+              <ChatButton className="w-full gap-2" modelId={model.id}>
+                <MessageSquare className="h-4 w-4" />
+                Chat
+              </ChatButton>
+            </div>
+          ) : null}
         </div>
       </CardContent>
     </Card>

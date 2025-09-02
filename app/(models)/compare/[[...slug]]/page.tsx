@@ -1,17 +1,14 @@
 'use client';
 
-import { useMemo } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { ModelComparisonCard } from '@/app/(models)/compare/model-comparison-card';
+import { useMemo, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { allModels } from '@/lib/ai/all-models';
 import type { ModelDefinition } from '@/lib/ai/all-models';
-import { ModelSelectorBase } from '@/components/model-selector-base';
-import type { ModelId } from '@/lib/models/model-id';
-import { getModelDefinition } from '@/lib/ai/all-models';
+import { Container } from '@/components/container';
+import { ModelDetails } from '@/app/(models)/models/model-details';
 
 export default function ComparePage() {
   const params = useParams<{ slug?: string[] | string }>();
-  const router = useRouter();
 
   const segments = useMemo(() => {
     const raw = params?.slug;
@@ -20,91 +17,67 @@ export default function ComparePage() {
     return [raw];
   }, [params]);
 
-  const [leftModel, rightModel] = useMemo(() => {
-    const getModelById = (id: string): ModelDefinition | null =>
-      allModels.find((m) => m.id === id) || null;
+  const [leftModelId, setLeftModelId] = useState<string | null>(() => {
+    return segments.length >= 2 ? `${segments[0]}/${segments[1]}` : null;
+  });
 
-    const leftId =
-      segments.length >= 2 ? `${segments[0]}/${segments[1]}` : null;
-    const rightId =
-      segments.length >= 4 ? `${segments[2]}/${segments[3]}` : null;
+  const [rightModelId, setRightModelId] = useState<string | null>(() => {
+    return segments.length >= 4 ? `${segments[2]}/${segments[3]}` : null;
+  });
 
-    return [
-      leftId ? getModelById(leftId) : null,
-      rightId ? getModelById(rightId) : null,
-    ];
-  }, [segments]);
+  const leftModel: ModelDefinition | null = useMemo(() => {
+    if (!leftModelId) return null;
+    return allModels.find((m) => m.id === leftModelId) || null;
+  }, [leftModelId]);
 
-  function updateUrl(leftId: string | null, rightId: string | null) {
+  const rightModel: ModelDefinition | null = useMemo(() => {
+    if (!rightModelId) return null;
+    return allModels.find((m) => m.id === rightModelId) || null;
+  }, [rightModelId]);
+
+  function pushCompareUrl(leftId: string | null, rightId: string | null) {
     const parts: string[] = [];
     const pushId = (id: string) => {
       const [a, b] = id.split('/');
-      if (a && b) {
-        parts.push(a, b);
-      }
+      if (a && b) parts.push(a, b);
     };
     if (leftId) pushId(leftId);
     if (rightId) pushId(rightId);
     const path = parts.length > 0 ? `/compare/${parts.join('/')}` : '/compare';
-    router.replace(path);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', path);
+    }
   }
 
-  function handleModelChange(position: number, modelId: string) {
-    const currentLeftId = leftModel?.id ?? null;
-    const currentRightId = rightModel?.id ?? null;
+  function handleLeftChange(nextId: string) {
+    setLeftModelId(nextId);
+    pushCompareUrl(nextId, rightModelId);
+  }
 
-    if (position === 0) {
-      updateUrl(modelId, currentRightId);
-      return;
-    }
-
-    if (!currentLeftId) {
-      // If no left selected yet, promote right selection to left
-      updateUrl(modelId, null);
-      return;
-    }
-
-    updateUrl(currentLeftId, modelId);
+  function handleRightChange(nextId: string) {
+    setRightModelId(nextId);
+    pushCompareUrl(leftModelId, nextId);
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-6">
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <ModelSelectorBase
-            models={allModels.map((m) => ({
-              id: m.id as ModelId,
-              definition: getModelDefinition(m.id as ModelId),
-            }))}
-            selectedModelId={leftModel?.id as ModelId | undefined}
-            onModelChange={(id) => handleModelChange(0, id)}
-            className="w-full border justify-start text-base"
-            enableFilters
-          />
-          <ModelSelectorBase
-            models={allModels.map((m) => ({
-              id: m.id as ModelId,
-              definition: getModelDefinition(m.id as ModelId),
-            }))}
-            selectedModelId={rightModel?.id as ModelId | undefined}
-            onModelChange={(id) => handleModelChange(1, id)}
-            className="w-full border justify-start text-base"
-            enableFilters
-          />
-        </div>
+    <Container className="p-6">
+      <div className="mb-6 flex flex-col gap-4 max-w-[450px] lg:max-w-none mx-auto">
+        <h1 className="text-2xl font-semibold ">Compare Models</h1>
       </div>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <ModelComparisonCard
-          model={leftModel}
-          position={0}
-          onModelChange={() => {}}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mx-auto ">
+        <ModelDetails
+          className="mx-auto"
+          modelDefinition={leftModel}
+          onModelChangeAction={handleLeftChange}
+          enabledActions={{ goToModel: true, chat: true, compare: false }}
         />
-        <ModelComparisonCard
-          model={rightModel}
-          position={1}
-          onModelChange={() => {}}
+        <ModelDetails
+          className="mx-auto"
+          modelDefinition={rightModel}
+          onModelChangeAction={handleRightChange}
+          enabledActions={{ goToModel: true, chat: true, compare: false }}
         />
       </div>
-    </div>
+    </Container>
   );
 }
