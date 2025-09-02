@@ -2,10 +2,9 @@
 
 import type { ComponentType, SVGProps } from 'react';
 import {
-  Keyboard,
-  SquareArrowOutUpRight,
+  LogIn,
+  LogOut,
   Ruler,
-  Gauge,
   Building2,
   DollarSign,
   Sparkles,
@@ -14,8 +13,7 @@ import {
 export type CategoryKey =
   | 'inputModalities'
   | 'outputModalities'
-  | 'contextLength'
-  | 'maxTokens'
+  | 'limits'
   | 'providers'
   | 'pricing'
   | 'features';
@@ -26,11 +24,18 @@ export type CategoryEntry = {
 };
 
 export const MODEL_CATEGORIES: Record<CategoryKey, CategoryEntry> = {
-  inputModalities: { label: 'Input Modalities', Icon: Keyboard },
-  outputModalities: { label: 'Output Modalities', Icon: SquareArrowOutUpRight },
-  contextLength: { label: 'Context Length', Icon: Ruler },
-  maxTokens: { label: 'Max Output Tokens', Icon: Gauge },
+  inputModalities: { label: 'Input Modalities', Icon: LogIn },
+  outputModalities: { label: 'Output Modalities', Icon: LogOut },
+  limits: { label: 'Limits', Icon: Ruler },
   providers: { label: 'Providers', Icon: Building2 },
   pricing: { label: 'Pricing', Icon: DollarSign },
   features: { label: 'Features', Icon: Sparkles },
+};
+
+export const MODEL_CATEGORIES_LIMITS: Record<
+  'contextLength' | 'maxTokens',
+  CategoryEntry
+> = {
+  contextLength: { label: 'Context Length', Icon: Ruler },
+  maxTokens: { label: 'Max Output Tokens', Icon: Ruler },
 };

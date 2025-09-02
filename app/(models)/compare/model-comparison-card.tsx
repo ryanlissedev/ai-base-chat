@@ -152,8 +152,8 @@ export function ModelComparisonCard({
         <TooltipProvider>
           <div className="flex flex-col gap-4">
             <Section
-              title="Context & Limits"
-              Icon={MODEL_CATEGORIES.contextLength.Icon}
+              title={MODEL_CATEGORIES.limits.label}
+              Icon={MODEL_CATEGORIES.limits.Icon}
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">

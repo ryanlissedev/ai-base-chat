@@ -98,12 +98,16 @@ function OutputModalitiesFilter() {
   );
 }
 
-function ContextLengthFilter() {
+function LimitsFilter() {
   const contextLength = useModels((s) => s.filters.contextLength);
+  const maxTokens = useModels((s) => s.filters.maxTokens);
   const updateFilters = useModels((s) => s.updateFilters);
   return (
-    <CollapsibleContent className="pt-3 pb-2">
+    <CollapsibleContent className="pt-3 pb-2 space-y-4">
       <div className="space-y-2">
+        <div className="text-xs text-muted-foreground">
+          Context length (tokens)
+        </div>
         <Slider
           value={contextLength}
           onValueChange={(value) =>
@@ -119,16 +123,10 @@ function ContextLengthFilter() {
           <span>{formatNumberCompact(contextLength[1])}</span>
         </div>
       </div>
-    </CollapsibleContent>
-  );
-}
-
-function MaxTokensFilter() {
-  const maxTokens = useModels((s) => s.filters.maxTokens);
-  const updateFilters = useModels((s) => s.updateFilters);
-  return (
-    <CollapsibleContent className="pt-3 pb-2">
       <div className="space-y-2">
+        <div className="text-xs text-muted-foreground">
+          Max output tokens (tokens)
+        </div>
         <Slider
           value={maxTokens}
           onValueChange={(value) =>
@@ -184,7 +182,9 @@ function PricingFilter() {
   return (
     <CollapsibleContent className="pt-3 pb-2 space-y-4">
       <div className="space-y-2">
-        <div className="text-xs text-muted-foreground">Input price ($/1M)</div>
+        <div className="text-xs text-muted-foreground">
+          Input price ($/1M tokens)
+        </div>
         <Slider
           value={inputPricing}
           onValueChange={(value) =>
@@ -201,7 +201,9 @@ function PricingFilter() {
         </div>
       </div>
       <div className="space-y-2">
-        <div className="text-xs text-muted-foreground">Output price ($/1M)</div>
+        <div className="text-xs text-muted-foreground">
+          Output price ($/1M tokens)
+        </div>
         <Slider
           value={outputPricing}
           onValueChange={(value) =>
@@ -268,11 +270,10 @@ export function ModelFilters({ className }: { className?: string }) {
   const [openSections, setOpenSections] = useState({
     inputModalities: true,
     outputModalities: true,
-    contextLength: true,
+    limits: true,
     pricing: true,
     providers: true,
     features: true,
-    maxTokens: true,
     supportedParameters: true,
   });
 
@@ -316,35 +317,19 @@ export function ModelFilters({ className }: { className?: string }) {
         </Collapsible>
 
         <Collapsible
-          open={openSections.contextLength}
-          onOpenChange={() => toggleSection('contextLength')}
+          open={openSections.limits}
+          onOpenChange={() => toggleSection('limits')}
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
             <div className="flex items-center gap-2">
-              <MODEL_CATEGORIES.contextLength.Icon className="h-4 w-4 text-muted-foreground" />
-              <span>Context Length</span>
+              <MODEL_CATEGORIES.limits.Icon className="h-4 w-4 text-muted-foreground" />
+              <span>Limits</span>
             </div>
             <ChevronDown
-              className={`h-4 w-4 transition-transform duration-200 ${openSections.contextLength ? 'rotate-180' : ''}`}
+              className={`h-4 w-4 transition-transform duration-200 ${openSections.limits ? 'rotate-180' : ''}`}
             />
           </CollapsibleTrigger>
-          <ContextLengthFilter />
-        </Collapsible>
-
-        <Collapsible
-          open={openSections.maxTokens}
-          onOpenChange={() => toggleSection('maxTokens')}
-        >
-          <CollapsibleTrigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:text-primary transition-colors border-b">
-            <div className="flex items-center gap-2">
-              <MODEL_CATEGORIES.maxTokens.Icon className="h-4 w-4 text-muted-foreground" />
-              <span>Max Output Tokens</span>
-            </div>
-            <ChevronDown
-              className={`h-4 w-4 transition-transform duration-200 ${openSections.maxTokens ? 'rotate-180' : ''}`}
-            />
-          </CollapsibleTrigger>
-          <MaxTokensFilter />
+          <LimitsFilter />
         </Collapsible>
 
         <Collapsible
