@@ -10,21 +10,16 @@ export function ModelCardList({
   scrollParentRef,
   className,
   estimateItemSize = 240,
-  overscan = 8,
 }: {
   scrollParentRef: React.RefObject<HTMLDivElement | null>;
   className?: string;
   estimateItemSize?: number;
-  overscan?: number;
 }) {
   const models = useModels((s) => s.resultModels());
   const virtualizer = useVirtualizer({
     count: models.length,
     getScrollElement: () => scrollParentRef.current,
     estimateSize: () => estimateItemSize,
-    overscan,
-    getItemKey: (index) => models[index]?.id ?? String(index),
-    initialRect: { width: 0, height: 600 },
   });
 
   const items = virtualizer.getVirtualItems();
@@ -39,20 +34,18 @@ export function ModelCardList({
         if (!model) return null;
         return (
           <div
-            key={model.id}
-            ref={virtualizer.measureElement}
+            key={item.key}
             data-index={item.index}
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
               width: '100%',
+              height: `${item.size}px`,
               transform: `translateY(${item.start}px)`,
             }}
           >
-            <div className="pb-4">
-              <ModelCard model={model} />
-            </div>
+            <ModelCard model={model} />
           </div>
         );
       })}

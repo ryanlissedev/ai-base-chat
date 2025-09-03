@@ -7,6 +7,7 @@ import {
   useState,
   memo,
   type ComponentProps,
+  useCallback,
 } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,22 +15,16 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
+  CommandItem as UICommandItem,
 } from '@/components/ui/command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider,
-} from '@/components/ui/tooltip';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ModelCard } from '@/components/model-card';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -97,6 +92,61 @@ function getFeatureIcons(modelDefinition: ModelDefinition) {
   return icons;
 }
 
+function PureCommandItem({
+  id,
+  definition,
+  disabled,
+  isSelected,
+  onSelectModel,
+}: {
+  id: ModelId;
+  definition: ModelDefinition;
+  disabled?: boolean;
+  isSelected: boolean;
+  onSelectModel: (id: ModelId) => void;
+}) {
+  const provider = definition.owned_by as ProviderId;
+  const featureIcons = useMemo(() => getFeatureIcons(definition), [definition]);
+  const searchValue = useMemo(
+    () => `${definition.name} ${definition.owned_by}`.toLowerCase(),
+    [definition],
+  );
+
+  return (
+    <UICommandItem
+      value={searchValue}
+      onSelect={() => {
+        if (disabled) return;
+        onSelectModel(id);
+      }}
+      className={cn(
+        'flex items-center justify-between px-3 py-1.5 cursor-pointer transition-all h-9',
+        isSelected && 'bg-primary/10 border-l-2 border-l-primary',
+        disabled && 'opacity-50 cursor-not-allowed',
+      )}
+    >
+      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        <div className="shrink-0">{getProviderIcon(provider)}</div>
+        <span className="font-medium text-sm truncate">{definition.name}</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        {featureIcons.length > 0 && (
+          <div className="flex items-center gap-1 shrink-0">{featureIcons}</div>
+        )}
+      </div>
+    </UICommandItem>
+  );
+}
+
+const CommandItem = memo(
+  PureCommandItem,
+  (prevProps, nextProps) =>
+    prevProps.id === nextProps.id &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.definition === nextProps.definition,
+);
+
 export type ModelSelectorBaseItem = {
   id: ModelId;
   definition: ModelDefinition;
@@ -111,6 +161,7 @@ export function PureModelSelectorBase({
   placeholder,
   topContent,
   enableFilters = true,
+  initialChevronDirection = 'up',
 }: {
   models: Array<ModelSelectorBaseItem>;
   selectedModelId?: ModelId;
@@ -118,6 +169,7 @@ export function PureModelSelectorBase({
   placeholder?: string;
   topContent?: React.ReactNode;
   enableFilters?: boolean;
+  initialChevronDirection?: 'up' | 'down';
 } & ComponentProps<typeof Button>) {
   const [open, setOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -175,6 +227,17 @@ export function PureModelSelectorBase({
   );
 
   const clearFilters = () => setFeatureFilters(initialFilters);
+
+  const selectModel = useCallback(
+    (id: ModelId) => {
+      startTransition(() => {
+        setOptimisticModelId(id);
+        onModelChange?.(id);
+        setOpen(false);
+      });
+    },
+    [onModelChange],
+  );
 
   const popoverContent = useMemo(() => {
     if (!open) return null;
@@ -270,69 +333,17 @@ export function PureModelSelectorBase({
               <TooltipProvider delayDuration={300}>
                 {filteredModels.map((item) => {
                   const { id, definition, disabled } = item;
-                  const provider = definition.owned_by as ProviderId;
                   const isSelected = id === optimisticModelId;
-                  const featureIcons = getFeatureIcons(definition);
-                  const searchValue =
-                    `${definition.name} ${definition.owned_by}`.toLowerCase();
 
                   return (
-                    <Tooltip key={id}>
-                      <TooltipTrigger asChild>
-                        <div>
-                          <CommandItem
-                            value={searchValue}
-                            onSelect={() => {
-                              if (disabled) return;
-                              startTransition(() => {
-                                setOptimisticModelId(id);
-                                onModelChange?.(id);
-                                setOpen(false);
-                              });
-                            }}
-                            className={cn(
-                              'flex items-center justify-between px-3 py-1.5 cursor-pointer transition-all h-9',
-                              isSelected &&
-                                'bg-primary/10 border-l-2 border-l-primary',
-                              disabled && 'opacity-50 cursor-not-allowed',
-                            )}
-                          >
-                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                              <div className="shrink-0">
-                                {getProviderIcon(provider)}
-                              </div>
-                              <span className="font-medium text-sm truncate">
-                                {definition.name}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              {featureIcons.length > 0 && (
-                                <div className="flex items-center gap-1 shrink-0">
-                                  {featureIcons}
-                                </div>
-                              )}
-                            </div>
-                          </CommandItem>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side="right"
-                        align="start"
-                        className="p-0"
-                        variant="base"
-                        sideOffset={8}
-                      >
-                        <ModelCard
-                          model={definition}
-                          isSelected={isSelected}
-                          isDisabled={Boolean(disabled)}
-                          disabledReason={
-                            disabled ? 'Not available' : undefined
-                          }
-                          className="w-[280px] shadow-lg border border-none"
-                        />
-                      </TooltipContent>
-                    </Tooltip>
+                    <CommandItem
+                      key={id}
+                      id={id}
+                      definition={definition}
+                      disabled={disabled}
+                      isSelected={isSelected}
+                      onSelectModel={selectModel}
+                    />
                   );
                 })}
               </TooltipProvider>
@@ -348,7 +359,7 @@ export function PureModelSelectorBase({
     featureFilters,
     filteredModels,
     optimisticModelId,
-    onModelChange,
+    selectModel,
     topContent,
   ]);
 
@@ -360,7 +371,7 @@ export function PureModelSelectorBase({
           variant="ghost"
           role="combobox"
           aria-expanded={open}
-          className={cn('w-fit md:px-2 gap-0', className)}
+          className={cn('md:px-2 gap-2 flex justify-between', className)}
         >
           <div className="flex items-center gap-2">
             {selectedProviderIcon && (
@@ -370,7 +381,12 @@ export function PureModelSelectorBase({
               {selectedItem?.definition.name || placeholder || 'Select model'}
             </p>
           </div>
-          <ChevronUpIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronUpIcon
+            className={cn(
+              'h-4 w-4 shrink-0 opacity-50 transition-transform',
+              (initialChevronDirection === 'up') === open && 'rotate-180',
+            )}
+          />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[350px] p-0" align="start">

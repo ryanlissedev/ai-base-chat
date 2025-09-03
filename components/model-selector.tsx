@@ -40,7 +40,7 @@ export function PureModelSelector({
 
   return (
     <ModelSelectorBase
-      className={cn('w-fit md:px-2 gap-0', className)}
+      className={cn('w-fit md:px-2', className)}
       models={models}
       selectedModelId={selectedModelId}
       onModelChange={onModelChange}

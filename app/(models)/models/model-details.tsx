@@ -38,8 +38,9 @@ export function ModelDetails({
             }))}
             selectedModelId={modelDefinition?.id}
             onModelChange={onModelChangeAction}
-            className="grow border justify-start text-base bg-card"
+            className="grow border text-base bg-card h-9 "
             enableFilters
+            initialChevronDirection="down"
           />
           {enabledActions?.chat ? (
             <ChatModelButton
