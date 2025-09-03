@@ -23,7 +23,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { TooltipProvider } from '@/components/ui/tooltip';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -276,22 +275,20 @@ function PureModelSelectorPopoverContent({
         <CommandEmpty>No model found.</CommandEmpty>
         <CommandGroup>
           <ScrollArea className="*:data-radix-scroll-area-viewport:max-h-[350px]">
-            <TooltipProvider delayDuration={300}>
-              {filteredModels.map((item) => {
-                const { id, definition, disabled } = item;
-                const isSelected = id === optimisticModelId;
-                return (
-                  <CommandItemComponent
-                    key={id}
-                    id={id}
-                    definition={definition}
-                    disabled={disabled}
-                    isSelected={isSelected}
-                    onSelectModel={onSelectModel}
-                  />
-                );
-              })}
-            </TooltipProvider>
+            {filteredModels.map((item) => {
+              const { id, definition, disabled } = item;
+              const isSelected = id === optimisticModelId;
+              return (
+                <CommandItemComponent
+                  key={id}
+                  id={id}
+                  definition={definition}
+                  disabled={disabled}
+                  isSelected={isSelected}
+                  onSelectModel={onSelectModel}
+                />
+              );
+            })}
           </ScrollArea>
         </CommandGroup>
       </CommandList>

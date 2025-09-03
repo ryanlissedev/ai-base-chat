@@ -87,6 +87,7 @@ export interface ModelData {
   name: string;
   description: string;
   type: 'language' | 'embedding';
+  tags?: 'image-generation'[];
   context_window: number; // Max input tokens
   max_tokens: number; // Max output tokens
   pricing: {
