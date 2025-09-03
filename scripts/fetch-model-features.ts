@@ -134,6 +134,7 @@ function buildTS({
     const textIn = toBoolModal(m.modalities, 'input', 'text');
     const pdfIn = toBoolModal(m.modalities, 'input', 'pdf');
     const audioIn = toBoolModal(m.modalities, 'input', 'audio');
+    const videoIn = toBoolModal(m.modalities, 'input', 'video');
     const imageOut = toBoolModal(m.modalities, 'output', 'image');
     const textOut = toBoolModal(m.modalities, 'output', 'text');
     const audioOut = toBoolModal(m.modalities, 'output', 'audio');
@@ -148,6 +149,7 @@ function buildTS({
     entry.push(`      text: ${textIn},`);
     entry.push(`      pdf: ${pdfIn},`);
     entry.push(`      audio: ${audioIn},`);
+    entry.push(`      video: ${videoIn},`);
     entry.push('    },');
     entry.push('    output: {');
     entry.push(`      image: ${imageOut},`);

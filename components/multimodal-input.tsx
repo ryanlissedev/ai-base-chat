@@ -127,6 +127,41 @@ function PureMultimodalInput({
     imageName: undefined,
   });
 
+  // Centralized submission gating
+  const selectedModelDef = getModelDefinition(selectedModelId);
+  const isImageOutputModel = Boolean(selectedModelDef?.features?.output?.image);
+  const submission: { enabled: false; message: string } | { enabled: true } =
+    (() => {
+      if (isImageOutputModel) {
+        return {
+          enabled: false,
+          message: 'Image models are not supported yet',
+        };
+      }
+      if (isModelDisallowedForAnonymous) {
+        return { enabled: false, message: 'Log in to use this model' };
+      }
+      if (status !== 'ready' && status !== 'error') {
+        return {
+          enabled: false,
+          message: 'Please wait for the model to finish its response!',
+        };
+      }
+      if (uploadQueue.length > 0) {
+        return {
+          enabled: false,
+          message: 'Please wait for files to finish uploading!',
+        };
+      }
+      if (isEmpty) {
+        return {
+          enabled: false,
+          message: 'Please enter a message before sending!',
+        };
+      }
+      return { enabled: true };
+    })();
+
   // Helper function to process and validate files
   const processFiles = useCallback(
     (files: File[]) => {
@@ -472,19 +507,11 @@ function PureMultimodalInput({
           }`}
           onSubmit={(e) => {
             e.preventDefault();
-            if (isModelDisallowedForAnonymous) {
-              toast.error('Log in to use this model');
+            if (!submission.enabled) {
+              if (submission.message) toast.error(submission.message);
               return;
             }
-            if (status !== 'ready' && status !== 'error') {
-              toast.error('Please wait for the model to finish its response!');
-            } else if (uploadQueue.length > 0) {
-              toast.error('Please wait for files to finish uploading!');
-            } else if (isEmpty) {
-              toast.error('Please enter a message before sending!');
-            } else {
-              submitForm();
-            }
+            submitForm();
           }}
           {...getRootProps()}
         >
@@ -500,7 +527,13 @@ function PureMultimodalInput({
 
           {!isEditMode && (
             <LimitDisplay
-              forceVariant={isModelDisallowedForAnonymous ? 'model' : 'credits'}
+              forceVariant={
+                isImageOutputModel
+                  ? 'image'
+                  : isModelDisallowedForAnonymous
+                    ? 'model'
+                    : 'credits'
+              }
               className="p-2"
             />
           )}
@@ -547,21 +580,11 @@ function PureMultimodalInput({
                 : !event.shiftKey && !event.isComposing;
 
               if (shouldSubmit) {
-                if (isModelDisallowedForAnonymous) {
-                  toast.error('Log in to use this model');
+                if (!submission.enabled) {
+                  if (submission.message) toast.error(submission.message);
                   return true;
                 }
-                if (status !== 'ready' && status !== 'error') {
-                  toast.error(
-                    'Please wait for the model to finish its response!',
-                  );
-                } else if (uploadQueue.length > 0) {
-                  toast.error('Please wait for files to finish uploading!');
-                } else if (isEmpty) {
-                  toast.error('Please enter a message before sending!');
-                } else {
-                  submitForm();
-                }
+                submitForm();
                 return true;
               }
 
@@ -579,7 +602,7 @@ function PureMultimodalInput({
             isEmpty={isEmpty}
             submitForm={submitForm}
             uploadQueue={uploadQueue}
-            modelBlockedForAnonymous={isModelDisallowedForAnonymous}
+            submission={submission}
           />
         </PromptInput>
       </div>
@@ -656,7 +679,7 @@ function PureChatInputBottomControls({
   isEmpty,
   submitForm,
   uploadQueue,
-  modelBlockedForAnonymous,
+  submission,
 }: {
   selectedModelId: ModelId;
   onModelChange: (modelId: ModelId) => void;
@@ -667,7 +690,7 @@ function PureChatInputBottomControls({
   isEmpty: boolean;
   submitForm: () => void;
   uploadQueue: Array<string>;
-  modelBlockedForAnonymous: boolean;
+  submission: { enabled: boolean; message?: string };
 }) {
   return (
     <PromptInputToolbar className="flex flex-row justify-between min-w-0 w-full gap-1 @[400px]:gap-2 border-t">
@@ -687,17 +710,14 @@ function PureChatInputBottomControls({
       <PromptInputSubmit
         className={'shrink-0 size-8 @[400px]:size-10'}
         status={status}
-        disabled={
-          status === 'ready' &&
-          (isEmpty || uploadQueue.length > 0 || modelBlockedForAnonymous)
-        }
+        disabled={status === 'ready' && !submission.enabled}
         onClick={(e) => {
           e.preventDefault();
           if (status === 'streaming' || status === 'submitted') {
             void chatStore.getState().currentChatHelpers?.stop?.();
           } else if (status === 'ready' || status === 'error') {
-            if (modelBlockedForAnonymous) {
-              toast.error('Log in to use this model');
+            if (!submission.enabled) {
+              if (submission.message) toast.error(submission.message);
               return;
             }
             submitForm();
@@ -721,9 +741,9 @@ const ChatInputBottomControls = memo(
     if (prevProps.submitForm !== nextProps.submitForm) return false;
     if (prevProps.uploadQueue.length !== nextProps.uploadQueue.length)
       return false;
-    if (
-      prevProps.modelBlockedForAnonymous !== nextProps.modelBlockedForAnonymous
-    )
+    if (prevProps.submission.enabled !== nextProps.submission.enabled)
+      return false;
+    if (prevProps.submission.message !== nextProps.submission.message)
       return false;
     return true;
   },

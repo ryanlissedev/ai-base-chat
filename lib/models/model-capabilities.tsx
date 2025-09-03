@@ -6,6 +6,7 @@ import {
   PlugZap,
   Type as TypeIcon,
   Image as ImageIcon,
+  Video as VideoIcon,
   FileText,
   Mic,
   Thermometer,
@@ -16,6 +17,7 @@ export type CapabilityKey =
   | 'image'
   | 'pdf'
   | 'audio'
+  | 'video'
   | 'reasoning'
   | 'tools'
   | 'temperature';
@@ -30,6 +32,7 @@ export const MODEL_CAPABILITIES: Record<CapabilityKey, CapabilityEntry> = {
   image: { label: 'Image', Icon: ImageIcon },
   pdf: { label: 'PDF', Icon: FileText },
   audio: { label: 'Audio', Icon: Mic },
+  video: { label: 'Video', Icon: VideoIcon },
   reasoning: { label: 'Reasoning', Icon: Brain },
   tools: { label: 'Tools', Icon: PlugZap },
   temperature: { label: 'Temperature', Icon: Thermometer },

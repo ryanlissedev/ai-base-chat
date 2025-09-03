@@ -1,4 +1,5 @@
-import type { ImageModelId, ModelId } from '@/lib/models/model-id';
+import type { ImageModelId } from '@/lib/models/model-id';
+import type { ModelId } from '@/lib/models/model-id';
 import { generatedModelFeatures } from './model-features.generated';
 
 export interface ModelFeatures {
@@ -9,7 +10,7 @@ export interface ModelFeatures {
     image: boolean;
     text: boolean;
     pdf: boolean;
-    video?: boolean;
+    video: boolean;
     audio: boolean;
   };
   output: {
@@ -24,224 +25,15 @@ export interface ModelFeatures {
   fixedTemperature?: number;
 }
 
+// All the literals in ModelId that are not keys of generatedModelFeatures
+type GeneratedModelFeaturesModelId = keyof typeof generatedModelFeatures;
+type CustomModelFeaturesModelId = Exclude<
+  ModelId,
+  GeneratedModelFeaturesModelId
+>;
+
 // Base, hand-curated features. Do not remove entries unless truly wrong.
-const customModelFeatures = {
-  'amazon/nova-lite': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: true,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'amazon/nova-micro': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'amazon/nova-pro': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: true,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'anthropic/claude-3-opus': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'anthropic/claude-3.5-sonnet': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'anthropic/claude-3.5-haiku': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'anthropic/claude-3.7-sonnet': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'anthropic/claude-opus-4': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'anthropic/claude-sonnet-4': {
-    reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2025-03-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'anthropic/claude-opus-4.1': {
-    reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-04-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'google/gemini-2.5-flash': {
-    reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2025-01-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: true,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'google/gemini-2.5-pro': {
-    reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2025-01-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: true,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'google/gemini-2.0-flash': {
-    reasoning: false,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-08-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: true,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'google/gemini-2.0-flash-lite': {
-    reasoning: false,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-08-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: true,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
+const customModelFeatures: Record<CustomModelFeaturesModelId, ModelFeatures> = {
   'google/gemini-2.5-flash-lite': {
     reasoning: false,
     toolCall: true,
@@ -250,201 +42,8 @@ const customModelFeatures = {
       image: true,
       text: true,
       pdf: true,
+      video: false,
       audio: true,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-
-  'openai/o3-mini': {
-    reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2023-10-01'),
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'openai/o3': {
-    reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2025-03-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'openai/o4-mini': {
-    reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-05-31'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-    fixedTemperature: 1,
-  },
-  'openai/gpt-4.1': {
-    reasoning: false,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-06-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'openai/gpt-4.1-mini': {
-    reasoning: false,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-06-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'openai/gpt-4.1-nano': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'openai/gpt-4o': {
-    reasoning: false,
-    toolCall: true,
-    knowledgeCutoff: new Date('2023-10-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'openai/gpt-4o-mini': {
-    reasoning: false,
-    toolCall: true,
-    knowledgeCutoff: new Date('2023-10-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-
-  'openai/gpt-5': {
-    reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-10-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'openai/gpt-5-mini': {
-    reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-05-31'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'openai/gpt-5-nano': {
-    reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-05-31'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'openai/gpt-4-turbo': {
-    reasoning: false,
-    toolCall: true,
-    knowledgeCutoff: new Date('2023-12-01'),
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
     },
     output: {
       image: false,
@@ -461,6 +60,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -477,128 +77,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'openai/gpt-oss-120b': {
-    reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-04-01'),
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'openai/gpt-oss-20b': {
-    reasoning: false,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-04-01'),
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'xai/grok-2': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'xai/grok-2-vision': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: true,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'xai/grok-3': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'xai/grok-3-fast': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'xai/grok-3-mini': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'xai/grok-3-mini-fast': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -615,6 +94,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -631,6 +111,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -647,6 +128,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -659,6 +141,7 @@ const customModelFeatures = {
     toolCall: true,
     input: {
       image: false,
+      video: false,
       text: true,
       pdf: false,
       audio: false,
@@ -677,6 +160,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -684,39 +168,6 @@ const customModelFeatures = {
       audio: false,
     },
   },
-
-  // Mistral Pixtral (official: mistral.ai)
-  'mistral/pixtral-12b': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: true,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'mistral/pixtral-large': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: true,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-
   // Meta Llama 3.2 Vision Instruct (official: ai.meta.com)
   'meta/llama-3.2-11b': {
     reasoning: false,
@@ -726,6 +177,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -741,6 +193,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -758,6 +211,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -773,6 +227,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -788,6 +243,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -803,54 +259,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  // Anthropic legacy 3-series
-  'anthropic/claude-3-haiku': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: true,
-      text: true,
-      pdf: true,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-
-  // DeepSeek
-  'deepseek/deepseek-r1': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'deepseek/deepseek-r1-distill-llama-70b': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -866,6 +275,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -881,6 +291,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -896,6 +307,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -911,6 +323,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -928,6 +341,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -945,6 +359,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -962,6 +377,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -977,6 +393,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -992,6 +409,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1007,6 +425,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1022,6 +441,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1037,51 +457,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'meta/llama-3.3-70b': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'meta/llama-4-maverick': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'meta/llama-4-scout': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1090,22 +466,6 @@ const customModelFeatures = {
     },
   },
 
-  // Mistral family (text-only unless noted)
-  'mistral/codestral': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
   'mistral/devstral-small': {
     reasoning: false,
     toolCall: true,
@@ -1114,241 +474,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'mistral/magistral-medium': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'mistral/magistral-small': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'mistral/ministral-3b': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'mistral/ministral-8b': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'mistral/mistral-large': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'mistral/mistral-saba-24b': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'mistral/mistral-small': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'mistral/mixtral-8x22b-instruct': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-
-  // Moonshot AI
-  'moonshotai/kimi-k2': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-
-  // Morph
-  'morph/morph-v3-fast': {
-    reasoning: false,
-    toolCall: false,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'morph/morph-v3-large': {
-    reasoning: false,
-    toolCall: false,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-
-  // OpenAI o-series legacy
-  'openai/o1': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-
-  // Vercel v0
-  'vercel/v0-1.0-md': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-  'vercel/v0-1.5-md': {
-    reasoning: false,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
-    },
-    output: {
-      image: false,
-      text: true,
-      audio: false,
-    },
-  },
-
-  // xAI
-  'xai/grok-4': {
-    reasoning: true,
-    toolCall: true,
-    input: {
-      image: false,
-      text: true,
-      pdf: false,
-      audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1366,6 +492,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1383,6 +510,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1398,6 +526,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1413,6 +542,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1428,6 +558,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1443,6 +574,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1450,18 +582,20 @@ const customModelFeatures = {
       audio: false,
     },
   },
-  // Missing models to satisfy full Record typing
+
   'google/gemini-2.5-flash-image-preview': {
-    reasoning: true,
-    toolCall: true,
+    reasoning: false,
+    toolCall: false,
+    knowledgeCutoff: new Date('2025-06-01'),
     input: {
       image: true,
       text: true,
-      pdf: true,
+      pdf: false,
       audio: false,
+      video: false,
     },
     output: {
-      image: false,
+      image: true,
       text: true,
       audio: false,
     },
@@ -1474,6 +608,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1489,6 +624,7 @@ const customModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -1496,12 +632,12 @@ const customModelFeatures = {
       audio: false,
     },
   },
-} satisfies Partial<Record<ModelId, ModelFeatures>>;
+};
 
 export const modelFeatures = {
   ...generatedModelFeatures,
   ...customModelFeatures,
-} as Record<ModelId, ModelFeatures>;
+};
 
 export const imageModelsFeatures: Partial<Record<ImageModelId, ModelFeatures>> =
   {
@@ -1510,6 +646,7 @@ export const imageModelsFeatures: Partial<Record<ImageModelId, ModelFeatures>> =
       toolCall: false,
       knowledgeCutoff: new Date('2025-04-01'),
       input: {
+        video: false,
         image: true,
         text: true,
         pdf: false,

@@ -10,7 +10,7 @@ import { useSession } from 'next-auth/react';
 import { useGetCredits } from '@/hooks/chat-sync-hooks';
 
 const VARIANT_CONFIG: Record<
-  'credits' | 'model',
+  'credits' | 'model' | 'image',
   {
     dismissible: boolean;
     getMessage: ({
@@ -72,6 +72,12 @@ const VARIANT_CONFIG: Record<
     getClasses: () =>
       'bg-amber-100 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200',
   },
+  image: {
+    dismissible: false,
+    getMessage: () => <span>Image models are not supported here yet.</span>,
+    getClasses: () =>
+      'bg-amber-100 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200',
+  },
 };
 
 export function LimitDisplay({
@@ -79,7 +85,7 @@ export function LimitDisplay({
   forceVariant,
 }: {
   className?: string;
-  forceVariant?: 'credits' | 'model';
+  forceVariant?: 'credits' | 'model' | 'image';
 }) {
   const { credits, isLoadingCredits } = useGetCredits();
   const { data: session } = useSession();

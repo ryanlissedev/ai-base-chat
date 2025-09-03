@@ -106,18 +106,35 @@ function PureModelCard({
         </div>
         {/* Secondary info row below the header line */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
-          <span>{formatNumberCompact(model.context_window)} context</span>
-          <span>•</span>
-          <span>{formatNumberCompact(model.max_tokens)} max out</span>
-          <span>•</span>
           <span>
-            ${(Number.parseFloat(model.pricing.input) * 1_000_000).toFixed(2)}
-            /M input
+            Context{' '}
+            <span className="font-medium text-foreground">
+              {formatNumberCompact(model.context_window)}
+            </span>
           </span>
           <span>•</span>
           <span>
-            ${(Number.parseFloat(model.pricing.output) * 1_000_000).toFixed(2)}
-            /M output
+            Max out{' '}
+            <span className="font-medium text-foreground">
+              {formatNumberCompact(model.max_tokens)}
+            </span>
+          </span>
+          <span>•</span>
+          <span>
+            Input{' '}
+            <span className="font-medium text-foreground">
+              ${(Number.parseFloat(model.pricing.input) * 1_000_000).toFixed(2)}
+              /M
+            </span>
+          </span>
+          <span>•</span>
+          <span>
+            Output{' '}
+            <span className="font-medium text-foreground">
+              $
+              {(Number.parseFloat(model.pricing.output) * 1_000_000).toFixed(2)}
+              /M
+            </span>
           </span>
         </div>
       </CardHeader>

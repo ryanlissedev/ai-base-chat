@@ -1,5 +1,5 @@
 import type { ModelId } from '@/lib/models/model-id';
-import type { ModelFeatures } from '../ai/model-features';
+import type { ModelFeatures } from './model-features';
 
 export const generatedModelFeatures = {
   'amazon/nova-lite': {
@@ -11,6 +11,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: true,
     },
     output: {
       image: false,
@@ -27,6 +28,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -43,6 +45,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: true,
     },
     output: {
       image: false,
@@ -59,6 +62,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -75,6 +79,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -91,6 +96,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -107,6 +113,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -123,6 +130,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -139,6 +147,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -155,6 +164,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -171,6 +181,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -187,6 +198,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -203,6 +215,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -219,6 +232,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: true,
       audio: true,
+      video: true,
     },
     output: {
       image: false,
@@ -235,6 +249,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: true,
       audio: true,
+      video: true,
     },
     output: {
       image: false,
@@ -251,6 +266,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: true,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -267,6 +283,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: true,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -283,6 +300,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -299,6 +317,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -315,6 +334,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -331,6 +351,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -347,6 +368,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -363,6 +385,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -379,6 +402,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -395,6 +419,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -411,6 +436,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -427,6 +453,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -443,6 +470,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -459,6 +487,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -475,6 +504,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -491,6 +521,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -506,6 +537,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -521,6 +553,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -537,6 +570,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -553,6 +587,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -569,6 +604,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -585,6 +621,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -601,6 +638,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: true,
+      video: false,
     },
     output: {
       image: false,
@@ -617,6 +655,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: true,
+      video: false,
     },
     output: {
       image: false,
@@ -633,6 +672,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -649,6 +689,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -665,6 +706,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -680,6 +722,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -695,6 +738,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -711,6 +755,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -727,6 +772,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -743,6 +789,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -759,6 +806,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -774,6 +822,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -789,6 +838,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -805,6 +855,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -821,6 +872,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -837,6 +889,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -853,6 +906,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -869,6 +923,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -885,6 +940,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
@@ -901,6 +957,7 @@ export const generatedModelFeatures = {
       text: true,
       pdf: false,
       audio: false,
+      video: false,
     },
     output: {
       image: false,
