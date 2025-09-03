@@ -91,14 +91,14 @@ function PureModelCard({
             </div>
           </div>
           <div className="shrink-0 hidden sm:flex items-center gap-2">
-            <ChatModelButton
-              modelId={model.id}
-              size="sm"
-              className="transition-all duration-200"
-            />
             <CompareModelButton
               modelId={model.id}
               variant="outline"
+              size="sm"
+              className="transition-all duration-200"
+            />
+            <ChatModelButton
+              modelId={model.id}
               size="sm"
               className="transition-all duration-200"
             />
@@ -236,14 +236,14 @@ function PureModelCard({
       </CardContent>
       <CardFooter className="sm:hidden pt-0">
         <div className="w-full flex items-center justify-end gap-2">
-          <ChatModelButton
-            modelId={model.id}
-            className="transition-all duration-200 grow"
-          />
           <CompareModelButton
             modelId={model.id}
             variant="outline"
             size="sm"
+            className="transition-all duration-200 grow"
+          />
+          <ChatModelButton
+            modelId={model.id}
             className="transition-all duration-200 grow"
           />
         </div>
