@@ -1,17 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ChatButton } from '@/components/chat-button';
 import {
-  ExternalLink,
-  MessageSquare,
-  Check,
-  X,
-  Minus,
-  ChevronDown,
-} from 'lucide-react';
+  ChatModelButton,
+  CompareModelButton,
+  GoToModelButton,
+} from '@/components/model-action-buttons';
+import { Check, X, Minus, ChevronDown } from 'lucide-react';
 import type { ModelDefinition } from '@/lib/ai/all-models';
 import type { ProviderId } from '@/lib/models/models.generated';
 import { getProviderIcon } from '@/components/get-provider-icon';
@@ -445,37 +440,23 @@ export function ModelDetailsCard({
         {/* Bottom actions */}
         <div className="pt-2">
           {actions.goToModel ? (
-            <Button
-              variant="outline"
+            <GoToModelButton
+              modelId={model.id}
               className="w-full bg-transparent hover:bg-accent transition-colors"
-              asChild
-            >
-              <Link href={`/models/${model.id}`}>
-                <span>Go to model</span>
-                <ExternalLink className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+            />
           ) : null}
           {actions.compare ? (
             <div className={actions.goToModel ? 'mt-2' : ''}>
-              <Button
+              <CompareModelButton
+                modelId={model.id}
                 variant="outline"
                 className="w-full bg-transparent hover:bg-accent transition-colors"
-                asChild
-              >
-                <Link href={`/compare/${model.id}`}>
-                  <span>Compare</span>
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+              />
             </div>
           ) : null}
           {actions.chat ? (
             <div className={actions.goToModel || actions.compare ? 'mt-2' : ''}>
-              <ChatButton className="w-full gap-2" modelId={model.id}>
-                <MessageSquare className="h-4 w-4" />
-                Chat
-              </ChatButton>
+              <ChatModelButton modelId={model.id} className="w-full" />
             </div>
           ) : null}
         </div>

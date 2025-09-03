@@ -69,7 +69,7 @@ export function ResponsiveTools({
   };
 
   return (
-    <div className="flex items-center gap-1 @[400px]:gap-2 ">
+    <div className="flex items-center gap-1 @[400px]:gap-2">
       {isAnonymous ? (
         <Popover open={showLoginPopover} onOpenChange={setShowLoginPopover}>
           <Tooltip>
@@ -77,7 +77,6 @@ export function ResponsiveTools({
               <PopoverTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon"
                   className="gap-1 @[400px]:gap-2 p-1.5 h-8 @[400px]:h-10"
                 >
                   <Settings2 size={14} />

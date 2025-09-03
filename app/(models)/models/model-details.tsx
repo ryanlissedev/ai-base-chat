@@ -5,7 +5,7 @@ import { allModels, getModelDefinition } from '@/lib/ai/all-models';
 import type { ModelDefinition } from '@/lib/ai/all-models';
 import { ModelSelectorBase } from '@/components/model-selector-base';
 import type { ModelId } from '@/lib/models/model-id';
-import { ChatButton } from '@/components/chat-button';
+import { ChatModelButton } from '@/components/model-action-buttons';
 
 export function ModelDetails({
   className,
@@ -36,19 +36,20 @@ export function ModelDetails({
               id: m.id as ModelId,
               definition: getModelDefinition(m.id as ModelId),
             }))}
-            selectedModelId={modelDefinition?.id as ModelId | undefined}
+            selectedModelId={modelDefinition?.id}
             onModelChange={onModelChangeAction}
             className="grow border justify-start text-base bg-card"
             enableFilters
           />
           {enabledActions?.chat ? (
-            <ChatButton
-              modelId={modelDefinition?.id as ModelId | undefined}
+            <ChatModelButton
+              modelId={modelDefinition?.id}
               className="h-9 px-3 whitespace-nowrap"
               variant="default"
+              size="sm"
             >
               Chat
-            </ChatButton>
+            </ChatModelButton>
           ) : null}
         </div>
         <ModelDetailsCard

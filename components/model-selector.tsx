@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, memo, type ComponentProps } from 'react';
+import { useMemo, memo } from 'react';
 import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import { chatModels, getModelDefinition } from '@/lib/ai/all-models';
@@ -19,7 +19,8 @@ export function PureModelSelector({
 }: {
   selectedModelId: ModelId;
   onModelChange?: (modelId: ModelId) => void;
-} & ComponentProps<typeof ModelSelectorBase>) {
+  className?: string;
+}) {
   const { data: session } = useSession();
   const isAnonymous = !session?.user;
 

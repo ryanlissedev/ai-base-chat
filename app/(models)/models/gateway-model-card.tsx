@@ -5,8 +5,10 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
-import { CompareButton } from '@/components/compare-button';
-import { ChatButton } from '@/components/chat-button';
+import {
+  ChatModelButton,
+  CompareModelButton,
+} from '@/components/model-action-buttons';
 import type { ModelDefinition } from '@/lib/ai/all-models';
 import type { ProviderId } from '@/lib/models/models.generated';
 import { getProviderIcon } from '@/components/get-provider-icon';
@@ -89,11 +91,12 @@ function PureModelCard({
             </div>
           </div>
           <div className="shrink-0 hidden sm:flex items-center gap-2">
-            <ChatButton
+            <ChatModelButton
               modelId={model.id}
+              size="sm"
               className="transition-all duration-200"
             />
-            <CompareButton
+            <CompareModelButton
               modelId={model.id}
               variant="outline"
               size="sm"
@@ -233,11 +236,11 @@ function PureModelCard({
       </CardContent>
       <CardFooter className="sm:hidden pt-0">
         <div className="w-full flex items-center justify-end gap-2">
-          <ChatButton
+          <ChatModelButton
             modelId={model.id}
             className="transition-all duration-200 grow"
           />
-          <CompareButton
+          <CompareModelButton
             modelId={model.id}
             variant="outline"
             size="sm"

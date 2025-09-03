@@ -46,12 +46,13 @@ import {
   DEFAULT_PDF_MODEL,
   DEFAULT_CHAT_IMAGE_COMPATIBLE_MODEL,
 } from '@/lib/ai/all-models';
-import { CreditLimitDisplay } from './upgrade-cta/credit-limit-display';
+import { LimitDisplay } from './upgrade-cta/limit-display';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { LoginPrompt } from './upgrade-cta/login-prompt';
 import { generateUUID } from '@/lib/utils';
 import { useSaveMessageMutation } from '@/hooks/chat-sync-hooks';
+import { ANONYMOUS_LIMITS } from '@/lib/types/anonymous';
 
 function PureMultimodalInput({
   chatId,
@@ -91,6 +92,10 @@ function PureMultimodalInput({
   } = useChatInput();
 
   const sendMessage = useSendMessage();
+  const isAnonymous = !session?.user;
+  const isModelDisallowedForAnonymous =
+    isAnonymous &&
+    !ANONYMOUS_LIMITS.AVAILABLE_MODELS.includes(selectedModelId as any);
 
   // Helper function to auto-switch to PDF-compatible model
   const switchToPdfCompatibleModel = useCallback(() => {
@@ -450,8 +455,6 @@ function PureMultimodalInput({
           />
         )}
 
-      {!isEditMode && <CreditLimitDisplay />}
-
       <input
         type="file"
         className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
@@ -469,6 +472,10 @@ function PureMultimodalInput({
           }`}
           onSubmit={(e) => {
             e.preventDefault();
+            if (isModelDisallowedForAnonymous) {
+              toast.error('Log in to use this model');
+              return;
+            }
             if (status !== 'ready' && status !== 'error') {
               toast.error('Please wait for the model to finish its response!');
             } else if (uploadQueue.length > 0) {
@@ -489,6 +496,13 @@ function PureMultimodalInput({
                 Drop images or PDFs here to attach
               </div>
             </div>
+          )}
+
+          {!isEditMode && (
+            <LimitDisplay
+              forceVariant={isModelDisallowedForAnonymous ? 'model' : 'credits'}
+              className="p-2"
+            />
           )}
 
           <motion.div
@@ -533,6 +547,10 @@ function PureMultimodalInput({
                 : !event.shiftKey && !event.isComposing;
 
               if (shouldSubmit) {
+                if (isModelDisallowedForAnonymous) {
+                  toast.error('Log in to use this model');
+                  return true;
+                }
                 if (status !== 'ready' && status !== 'error') {
                   toast.error(
                     'Please wait for the model to finish its response!',
@@ -561,6 +579,7 @@ function PureMultimodalInput({
             isEmpty={isEmpty}
             submitForm={submitForm}
             uploadQueue={uploadQueue}
+            modelBlockedForAnonymous={isModelDisallowedForAnonymous}
           />
         </PromptInput>
       </div>
@@ -637,6 +656,7 @@ function PureChatInputBottomControls({
   isEmpty,
   submitForm,
   uploadQueue,
+  modelBlockedForAnonymous,
 }: {
   selectedModelId: ModelId;
   onModelChange: (modelId: ModelId) => void;
@@ -647,6 +667,7 @@ function PureChatInputBottomControls({
   isEmpty: boolean;
   submitForm: () => void;
   uploadQueue: Array<string>;
+  modelBlockedForAnonymous: boolean;
 }) {
   return (
     <PromptInputToolbar className="flex flex-row justify-between min-w-0 w-full gap-1 @[400px]:gap-2 border-t">
@@ -666,12 +687,19 @@ function PureChatInputBottomControls({
       <PromptInputSubmit
         className={'shrink-0 size-8 @[400px]:size-10'}
         status={status}
-        disabled={status === 'ready' && (isEmpty || uploadQueue.length > 0)}
+        disabled={
+          status === 'ready' &&
+          (isEmpty || uploadQueue.length > 0 || modelBlockedForAnonymous)
+        }
         onClick={(e) => {
           e.preventDefault();
           if (status === 'streaming' || status === 'submitted') {
             void chatStore.getState().currentChatHelpers?.stop?.();
           } else if (status === 'ready' || status === 'error') {
+            if (modelBlockedForAnonymous) {
+              toast.error('Log in to use this model');
+              return;
+            }
             submitForm();
           }
         }}
@@ -692,6 +720,10 @@ const ChatInputBottomControls = memo(
     if (prevProps.isEmpty !== nextProps.isEmpty) return false;
     if (prevProps.submitForm !== nextProps.submitForm) return false;
     if (prevProps.uploadQueue.length !== nextProps.uploadQueue.length)
+      return false;
+    if (
+      prevProps.modelBlockedForAnonymous !== nextProps.modelBlockedForAnonymous
+    )
       return false;
     return true;
   },

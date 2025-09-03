@@ -32,6 +32,8 @@ export const authConfig = {
       }
 
       const isOnChat = nextUrl.pathname.startsWith('/');
+      const isOnModels = nextUrl.pathname.startsWith('/models');
+      const isOnCompare = nextUrl.pathname.startsWith('/compare');
       const isOnLoginPage = nextUrl.pathname.startsWith('/login');
       const isOnRegisterPage = nextUrl.pathname.startsWith('/register');
       const isOnSharePage = nextUrl.pathname.startsWith('/share/');
@@ -46,6 +48,11 @@ export const authConfig = {
 
       // Allow anonymous access to shared chat pages
       if (isOnSharePage) {
+        return true;
+      }
+
+      // Public routes: models, compare
+      if (isOnModels || isOnCompare) {
         return true;
       }
 
