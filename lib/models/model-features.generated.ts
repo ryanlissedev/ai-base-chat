@@ -181,7 +181,7 @@ export const generatedModelFeatures = {
   'deepseek/deepseek-r1': {
     reasoning: true,
     toolCall: true,
-    knowledgeCutoff: new Date('2024-07-01'),
+    knowledgeCutoff: new Date('2024-06-01'),
     input: {
       image: false,
       text: true,
@@ -250,7 +250,7 @@ export const generatedModelFeatures = {
       image: true,
       text: true,
       pdf: true,
-      audio: true,
+      audio: false,
     },
     output: {
       image: false,
@@ -266,7 +266,7 @@ export const generatedModelFeatures = {
       image: true,
       text: true,
       pdf: true,
-      audio: true,
+      audio: false,
     },
     output: {
       image: false,
@@ -595,12 +595,12 @@ export const generatedModelFeatures = {
   'openai/gpt-4o': {
     reasoning: false,
     toolCall: true,
-    knowledgeCutoff: new Date('2023-09-01'),
+    knowledgeCutoff: new Date('2023-10-01'),
     input: {
       image: true,
       text: true,
       pdf: false,
-      audio: false,
+      audio: true,
     },
     output: {
       image: false,
@@ -611,12 +611,12 @@ export const generatedModelFeatures = {
   'openai/gpt-4o-mini': {
     reasoning: false,
     toolCall: true,
-    knowledgeCutoff: new Date('2023-09-01'),
+    knowledgeCutoff: new Date('2023-10-01'),
     input: {
       image: true,
       text: true,
       pdf: false,
-      audio: false,
+      audio: true,
     },
     output: {
       image: false,
@@ -627,7 +627,7 @@ export const generatedModelFeatures = {
   'openai/gpt-5': {
     reasoning: true,
     toolCall: true,
-    knowledgeCutoff: new Date('2024-09-30'),
+    knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: true,
       text: true,
@@ -643,7 +643,7 @@ export const generatedModelFeatures = {
   'openai/gpt-5-mini': {
     reasoning: true,
     toolCall: true,
-    knowledgeCutoff: new Date('2024-05-30'),
+    knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: true,
       text: true,
@@ -659,7 +659,7 @@ export const generatedModelFeatures = {
   'openai/gpt-5-nano': {
     reasoning: true,
     toolCall: true,
-    knowledgeCutoff: new Date('2024-05-30'),
+    knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: true,
       text: true,
@@ -704,8 +704,8 @@ export const generatedModelFeatures = {
   },
   'openai/o1': {
     reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2023-09-01'),
+    toolCall: false,
+    knowledgeCutoff: new Date('2023-10-01'),
     input: {
       image: true,
       text: true,
@@ -720,8 +720,8 @@ export const generatedModelFeatures = {
   },
   'openai/o3': {
     reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-05-01'),
+    toolCall: false,
+    knowledgeCutoff: new Date('2024-04-01'),
     input: {
       image: true,
       text: true,
@@ -736,8 +736,8 @@ export const generatedModelFeatures = {
   },
   'openai/o3-mini': {
     reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-05-01'),
+    toolCall: false,
+    knowledgeCutoff: new Date('2024-04-01'),
     input: {
       image: false,
       text: true,
@@ -752,8 +752,8 @@ export const generatedModelFeatures = {
   },
   'openai/o4-mini': {
     reasoning: true,
-    toolCall: true,
-    knowledgeCutoff: new Date('2024-05-01'),
+    toolCall: false,
+    knowledgeCutoff: new Date('2024-04-01'),
     input: {
       image: true,
       text: true,
@@ -829,9 +829,9 @@ export const generatedModelFeatures = {
     },
   },
   'xai/grok-3': {
-    reasoning: false,
+    reasoning: true,
     toolCall: true,
-    knowledgeCutoff: new Date('2024-11-01'),
+    knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: false,
       text: true,
@@ -863,7 +863,7 @@ export const generatedModelFeatures = {
   'xai/grok-3-mini': {
     reasoning: true,
     toolCall: true,
-    knowledgeCutoff: new Date('2024-11-01'),
+    knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: false,
       text: true,

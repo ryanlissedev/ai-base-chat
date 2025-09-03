@@ -74,7 +74,6 @@ export const models = [
   'mistral/ministral-8b',
   'mistral/mistral-large',
   'mistral/mistral-medium',
-  'mistral/mistral-saba-24b',
   'mistral/mistral-small',
   'mistral/mixtral-8x22b-instruct',
   'mistral/pixtral-12b',
@@ -129,7 +128,6 @@ export interface ModelData {
   type: 'language' | 'embedding';
   context_window: number; // Max input tokens
   max_tokens: number; // Max output tokens
-  tags?: 'image-generation'[];
   pricing: {
     input: string; // Input price per token
     output: string; // Output price per token
@@ -581,7 +579,7 @@ export const modelsData: ModelData[] = [
     id: 'google/gemini-2.5-flash-image-preview',
     object: 'model',
     owned_by: 'google',
-    name: 'Gemini 2.5 Flash Image Preview',
+    name: 'Gemini 2.5 Flash Image Preview (Code name: Nano Banana)',
     description:
       'Gemini 2.5 Flash Image Preview is our first fully hybrid reasoning model, letting developers turn thinking on or off and set thinking budgets to balance quality, cost, and latency. Upgraded for rapid creative workflows, it can generate interleaved text and images and supports conversational, multi‑turn image editing in natural language. It’s also locale‑aware, enabling culturally and linguistically appropriate image generation for audiences worldwide.',
     context_window: 1048576,
@@ -936,21 +934,6 @@ export const modelsData: ModelData[] = [
     pricing: {
       input: '0.0000004',
       output: '0.000002',
-    },
-  },
-  {
-    id: 'mistral/mistral-saba-24b',
-    object: 'model',
-    owned_by: 'mistral',
-    name: 'Mistral Saba 24B',
-    description:
-      'Mistral Saba 24B is a 24 billion parameter open source model by Mistral.ai. Saba is a specialized model trained to excel in Arabic, Farsi, Urdu, Hebrew, and Indic languages. Served by Groq with their custom Language Processing Units (LPUs) hardware to provide fast and efficient inference.',
-    context_window: 32768,
-    max_tokens: 32768,
-    type: 'language',
-    pricing: {
-      input: '0.00000079',
-      output: '0.00000079',
     },
   },
   {

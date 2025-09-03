@@ -146,6 +146,162 @@ const CommandItem = memo(
     prevProps.isSelected === nextProps.isSelected &&
     prevProps.definition === nextProps.definition,
 );
+function PureModelSelectorPopoverContent({
+  enableFilters,
+  filterOpen,
+  onFilterOpenChange,
+  activeFilterCount,
+  clearFilters,
+  featureFilters,
+  onUpdateFeatureFilters,
+  topContent,
+  filteredModels,
+  optimisticModelId,
+  onSelectModel,
+  commandItemComponent: CommandItemComponent,
+}: {
+  enableFilters: boolean;
+  filterOpen: boolean;
+  onFilterOpenChange: (open: boolean) => void;
+  activeFilterCount: number;
+  clearFilters: () => void;
+  featureFilters: FeatureFilter;
+  onUpdateFeatureFilters: (
+    updater: (prev: FeatureFilter) => FeatureFilter,
+  ) => void;
+  topContent?: React.ReactNode;
+  filteredModels: Array<{
+    id: ModelId;
+    definition: ModelDefinition;
+    disabled?: boolean;
+  }>;
+  optimisticModelId?: ModelId;
+  onSelectModel: (id: ModelId) => void;
+  commandItemComponent: (props: {
+    id: ModelId;
+    definition: ModelDefinition;
+    disabled?: boolean;
+    isSelected: boolean;
+    onSelectModel: (id: ModelId) => void;
+  }) => React.ReactNode;
+}) {
+  const enabledFeatures = getEnabledFeatures();
+
+  return (
+    <Command>
+      <div className="flex items-center border-b">
+        <CommandInput
+          placeholder="Search models..."
+          className="px-3"
+          containerClassName="w-full border-0 h-11"
+        />
+        {enableFilters && (
+          <Popover open={filterOpen} onOpenChange={onFilterOpenChange}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'mr-3 h-8 w-8 p-0 relative',
+                  activeFilterCount > 0 && 'text-primary',
+                )}
+              >
+                <FilterIcon className="h-4 w-4" />
+                {activeFilterCount > 0 && (
+                  <Badge
+                    variant="secondary"
+                    className="absolute -top-1 -right-1 text-xs min-w-[16px] h-4 flex items-center justify-center p-0"
+                  >
+                    {activeFilterCount}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="p-0" align="end">
+              <div className="p-4">
+                <div className="mb-3 h-7 flex items-center justify-between">
+                  <div className="text-sm font-medium">Filter by Tools</div>
+                  {activeFilterCount > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="text-xs h-6"
+                    >
+                      Clear filters
+                    </Button>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  {enabledFeatures.map((feature) => {
+                    const IconComponent = feature.icon;
+                    return (
+                      <div
+                        key={feature.key}
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox
+                          id={feature.key}
+                          checked={featureFilters[feature.key] || false}
+                          onCheckedChange={(checked) =>
+                            onUpdateFeatureFilters((prev) => ({
+                              ...prev,
+                              [feature.key]: Boolean(checked),
+                            }))
+                          }
+                        />
+                        <Label
+                          htmlFor={feature.key}
+                          className="text-sm flex items-center gap-1.5"
+                        >
+                          <IconComponent className="w-3.5 h-3.5" />
+                          {feature.name}
+                        </Label>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
+      </div>
+      {topContent}
+      <CommandList
+        className="max-h[400px] max-h-[400px]"
+        onMouseDown={(event) => {
+          event.stopPropagation();
+        }}
+      >
+        <CommandEmpty>No model found.</CommandEmpty>
+        <CommandGroup>
+          <ScrollArea className="*:data-radix-scroll-area-viewport:max-h-[350px]">
+            <TooltipProvider delayDuration={300}>
+              {filteredModels.map((item) => {
+                const { id, definition, disabled } = item;
+                const isSelected = id === optimisticModelId;
+                return (
+                  <CommandItemComponent
+                    key={id}
+                    id={id}
+                    definition={definition}
+                    disabled={disabled}
+                    isSelected={isSelected}
+                    onSelectModel={onSelectModel}
+                  />
+                );
+              })}
+            </TooltipProvider>
+          </ScrollArea>
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  );
+}
+
+export const ModelSelectorPopoverContent = memo(
+  PureModelSelectorPopoverContent,
+);
 
 export type ModelSelectorBaseItem = {
   id: ModelId;
@@ -239,130 +395,6 @@ export function PureModelSelectorBase({
     [onModelChange],
   );
 
-  const popoverContent = useMemo(() => {
-    if (!open) return null;
-    return (
-      <Command>
-        <div className="flex items-center border-b">
-          <CommandInput
-            placeholder="Search models..."
-            className="px-3"
-            containerClassName="w-full border-0 h-11"
-          />
-          {enableFilters && (
-            <Popover open={filterOpen} onOpenChange={setFilterOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    'mr-3 h-8 w-8 p-0 relative',
-                    activeFilterCount > 0 && 'text-primary',
-                  )}
-                >
-                  <FilterIcon className="h-4 w-4" />
-                  {activeFilterCount > 0 && (
-                    <Badge
-                      variant="secondary"
-                      className="absolute -top-1 -right-1 text-xs min-w-[16px] h-4 flex items-center justify-center p-0"
-                    >
-                      {activeFilterCount}
-                    </Badge>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0" align="end">
-                <div className="p-4">
-                  <div className="mb-3 h-7 flex items-center justify-between">
-                    <div className="text-sm font-medium">Filter by Tools</div>
-                    {activeFilterCount > 0 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={clearFilters}
-                        className="text-xs h-6"
-                      >
-                        Clear filters
-                      </Button>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-1 gap-2">
-                    {enabledFeatures.map((feature) => {
-                      const IconComponent = feature.icon;
-                      return (
-                        <div
-                          key={feature.key}
-                          className="flex items-center space-x-2"
-                        >
-                          <Checkbox
-                            id={feature.key}
-                            checked={featureFilters[feature.key] || false}
-                            onCheckedChange={(checked) =>
-                              setFeatureFilters((prev) => ({
-                                ...prev,
-                                [feature.key]: Boolean(checked),
-                              }))
-                            }
-                          />
-                          <Label
-                            htmlFor={feature.key}
-                            className="text-sm flex items-center gap-1.5"
-                          >
-                            <IconComponent className="w-3.5 h-3.5" />
-                            {feature.name}
-                          </Label>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          )}
-        </div>
-        {topContent}
-        <CommandList
-          className="max-h[400px] max-h-[400px]"
-          onMouseDown={(event) => {
-            event.stopPropagation();
-          }}
-        >
-          <CommandEmpty>No model found.</CommandEmpty>
-          <CommandGroup>
-            <ScrollArea className="*:data-radix-scroll-area-viewport:max-h-[350px]">
-              <TooltipProvider delayDuration={300}>
-                {filteredModels.map((item) => {
-                  const { id, definition, disabled } = item;
-                  const isSelected = id === optimisticModelId;
-
-                  return (
-                    <CommandItem
-                      key={id}
-                      id={id}
-                      definition={definition}
-                      disabled={disabled}
-                      isSelected={isSelected}
-                      onSelectModel={selectModel}
-                    />
-                  );
-                })}
-              </TooltipProvider>
-            </ScrollArea>
-          </CommandGroup>
-        </CommandList>
-      </Command>
-    );
-  }, [
-    open,
-    filterOpen,
-    activeFilterCount,
-    featureFilters,
-    filteredModels,
-    optimisticModelId,
-    selectModel,
-    topContent,
-  ]);
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -390,7 +422,22 @@ export function PureModelSelectorBase({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[350px] p-0" align="start">
-        {popoverContent}
+        {open ? (
+          <ModelSelectorPopoverContent
+            enableFilters={enableFilters}
+            filterOpen={filterOpen}
+            onFilterOpenChange={setFilterOpen}
+            activeFilterCount={activeFilterCount}
+            clearFilters={clearFilters}
+            featureFilters={featureFilters}
+            onUpdateFeatureFilters={setFeatureFilters}
+            topContent={topContent}
+            filteredModels={filteredModels}
+            optimisticModelId={optimisticModelId}
+            onSelectModel={selectModel}
+            commandItemComponent={CommandItem}
+          />
+        ) : null}
       </PopoverContent>
     </Popover>
   );

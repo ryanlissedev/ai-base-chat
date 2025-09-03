@@ -1,30 +1,46 @@
 #!/usr/bin/env node
 
-const fs = require('node:fs');
-const path = require('node:path');
-const { execSync } = require('node:child_process');
+import { readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { execSync } from 'node:child_process';
 
 const MODELS_DEV_URL = 'https://models.dev/api.json';
-const ROOT = path.join(__dirname, '..');
-const MODELS_GENERATED_TS = path.join(
+const ROOT = join(__dirname, '..');
+const MODELS_GENERATED_TS = join(ROOT, 'lib', 'models', 'models.generated.ts');
+const OUTPUT_TS = join(ROOT, 'lib', 'models', 'model-features.generated.ts');
+
+const MODELS_DEV_RESPONSE_JSON = join(
   ROOT,
   'lib',
   'models',
-  'models.generated.ts',
+  'models-dev-response.json',
 );
-const OUTPUT_TS = path.join(
-  ROOT,
-  'lib',
-  'models',
-  'model-features.generated.ts',
-);
+
+type ModelsDevModalities = {
+  input?: string[];
+  output?: string[];
+};
+
+type ModelsDevModel = {
+  id: string;
+  knowledge?: string;
+  reasoning?: boolean;
+  tool_call?: boolean;
+  modalities?: ModelsDevModalities;
+};
+
+type ModelsDevProvider = {
+  models?: Record<string, ModelsDevModel>;
+};
+
+type ModelsDevResponse = Record<string, ModelsDevProvider>;
 
 /**
  * Extracts the array of supported model ids from providers/models-generated.ts
  * by parsing the `export const models = [ ... ] as const;` section.
  */
-function readSupportedModelIds() {
-  const content = fs.readFileSync(MODELS_GENERATED_TS, 'utf8');
+function readSupportedModelIds(): string[] {
+  const content = readFileSync(MODELS_GENERATED_TS, 'utf8');
   const startToken = 'export const models = [';
   const endToken = '] as const;';
   const startIdx = content.indexOf(startToken);
@@ -43,38 +59,44 @@ function readSupportedModelIds() {
   if (!Array.isArray(parsed)) {
     throw new Error('Parsed models is not an array');
   }
-  return parsed;
+  return parsed as string[];
 }
 
 /**
  * Fetch and flatten models.dev JSON into a map of id -> model meta
  */
-async function fetchModelsDev() {
+async function fetchModelsDev(): Promise<{
+  raw: ModelsDevResponse;
+  byId: Record<string, ModelsDevModel>;
+}> {
   const res = await fetch(MODELS_DEV_URL);
   if (!res.ok) {
     throw new Error(`Failed to fetch ${MODELS_DEV_URL}: ${res.status}`);
   }
-  const data = await res.json();
-  /** @type {Record<string, any>} */
-  const byId = {};
+  const data = (await res.json()) as ModelsDevResponse;
+  const byId: Record<string, ModelsDevModel> = {};
   for (const providerKey of Object.keys(data)) {
     const provider = data[providerKey];
-    const models = provider?.models || {};
+    const models = provider?.models ?? {};
     for (const id of Object.keys(models)) {
-      const m = models[id];
+      const m = models[id] as ModelsDevModel;
       // Prefer canonical ids like "openai/gpt-5" etc. Some entries already include provider prefix in id.
       byId[m.id] = m;
     }
   }
-  return byId;
+  return { raw: data, byId };
 }
 
-function toBoolModal(modalities, kind, value) {
+function toBoolModal(
+  modalities: ModelsDevModalities | undefined,
+  kind: 'input' | 'output',
+  value: string,
+): boolean {
   const list = modalities?.[kind];
   return Array.isArray(list) ? list.includes(value) : false;
 }
 
-function formatKnowledgeDate(knowledge) {
+function formatKnowledgeDate(knowledge: unknown): string | null {
   if (!knowledge || typeof knowledge !== 'string') return null;
   // Accept formats: YYYY, YYYY-MM, YYYY-MM-DD
   if (/^\d{4}$/.test(knowledge)) return `new Date('${knowledge}-01-01')`;
@@ -86,7 +108,13 @@ function formatKnowledgeDate(knowledge) {
   return null;
 }
 
-function buildTS({ supportedIds, modelsById }) {
+function buildTS({
+  supportedIds,
+  modelsById,
+}: {
+  supportedIds: string[];
+  modelsById: Record<string, ModelsDevModel>;
+}): string {
   const lines = [];
   lines.push("import type { ModelId } from '@/lib/models/model-id';");
   lines.push("import type { ModelFeatures } from '../ai/model-features';");
@@ -143,14 +171,18 @@ async function main() {
     console.log(`Found ${supportedIds.length} supported ids`);
 
     console.log('Fetching models.dev catalog...');
-    const modelsById = await fetchModelsDev();
+    const { raw, byId: modelsById } = await fetchModelsDev();
     console.log(
       `Fetched ${Object.keys(modelsById).length} entries from models.dev`,
     );
 
+    // Save raw models.dev response for reference/debugging
+    writeFileSync(MODELS_DEV_RESPONSE_JSON, JSON.stringify(raw, null, 2));
+    console.log('Saved models.dev response:', MODELS_DEV_RESPONSE_JSON);
+
     console.log('Building TypeScript file...');
     const ts = buildTS({ supportedIds, modelsById });
-    fs.writeFileSync(OUTPUT_TS, ts);
+    writeFileSync(OUTPUT_TS, ts);
     console.log('Wrote', OUTPUT_TS);
 
     try {
@@ -159,14 +191,19 @@ async function main() {
         cwd: ROOT,
         stdio: 'inherit',
       });
-    } catch (err) {
-      console.warn(
-        'Warning: biome format failed:',
-        err?.message || String(err),
-      );
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.warn('Warning: biome format failed:', err.message);
+      } else {
+        console.warn('Warning: biome format failed:', err);
+      }
     }
-  } catch (err) {
-    console.error('Error generating model-features.ts:', err);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error('Error generating model-features.ts:', err.message);
+    } else {
+      console.error('Error generating model-features.ts:', err);
+    }
     process.exit(1);
   }
 }
