@@ -1,7 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export function LazyTooltip({
   children,
