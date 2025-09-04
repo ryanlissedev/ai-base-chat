@@ -18,10 +18,29 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { LazyTooltip } from '@/components/lazy-tooltip';
 import { memo, type ComponentType, type SVGProps } from 'react';
 import { formatNumberCompact } from '../../../lib/utils/format-number-compact';
 
 function ModalityIcon({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <LazyTooltip content={label}>
+      <div
+        className={`size-6 rounded-md grid place-items-center border text-foreground/80 bg-muted`}
+      >
+        {children}
+      </div>
+    </LazyTooltip>
+  );
+}
+
+function ModalityIconLegacy({
   label,
   children,
 }: {
