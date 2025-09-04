@@ -1,15 +1,9 @@
 'use client';
 
-import { useRef } from 'react';
-
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ModelFilters } from '@/app/(models)/models/model-filters';
-import { ModelListHeaders } from '@/app/(models)/models/components/model-list-header';
-import { ModelListHeaderFilters } from '@/app/(models)/models/components/model-list-header-filters';
-import { ModelResults } from '@/app/(models)/models/components/model-results';
-import { ModelResultsCount } from '@/app/(models)/models/components/model-results-count';
 import { ModelsProvider } from '@/app/(models)/models/models-store-context';
-import { Container } from '@/components/container';
+import { ModelsResults } from './models-results';
 
 export default function HomePage() {
   return (
@@ -20,8 +14,6 @@ export default function HomePage() {
 }
 
 function ModelsPageContent() {
-  const viewportRef = useRef<HTMLDivElement | null>(null);
-
   return (
     <div className="grid h-full min-h-0 grid-cols-1 md:grid-cols-[auto_1fr] ">
       <aside className="hidden md:block md:h-full min-h-0 w-full md:w-64 bg-sidebar">
@@ -30,18 +22,8 @@ function ModelsPageContent() {
         </ScrollArea>
       </aside>
 
-      <main className="min-h-0 md:h-full">
-        <ScrollArea ref={viewportRef} className="h-full">
-          <Container className="p-4 lg:p-6">
-            <div className="mb-4 flex flex-col gap-2">
-              <ModelListHeaders />
-              <ModelListHeaderFilters />
-              <ModelResultsCount />
-            </div>
-
-            <ModelResults scrollParentRef={viewportRef} />
-          </Container>
-        </ScrollArea>
+      <main className="min-h-0 h-full">
+        <ModelsResults />
       </main>
     </div>
   );

@@ -34,7 +34,7 @@ function PureModelsHeader({ className }: { className?: string }) {
   return (
     <header
       className={cn(
-        'bg-background h-11 px-2 sm:px-3 flex items-center size-full gap-2 relative',
+        'bg-background h-(--header-height) px-2 sm:px-3 flex items-center w-full gap-2 relative',
         className,
       )}
     >
