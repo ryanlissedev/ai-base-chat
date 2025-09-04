@@ -71,16 +71,12 @@ function ResetFiltersButton() {
 }
 
 function ConnectedFilterSheet() {
-  const filters = useModels((s) => s.filters);
-  const setFilters = useModels((s) => s.setFilters);
   const activeFiltersCount = useModels((s) => s.activeFiltersCount());
   const resetFiltersAndSearch = useModels((s) => s.resetFiltersAndSearch);
   return (
     <FilterSheet
-      filters={filters}
-      onFiltersChange={setFilters}
-      onClearAll={resetFiltersAndSearch}
       activeFiltersCount={activeFiltersCount}
+      onClearAll={resetFiltersAndSearch}
     />
   );
 }

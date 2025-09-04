@@ -1,5 +1,3 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -9,17 +7,12 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { RotateCcw, Filter as FilterIcon } from 'lucide-react';
-import type { FilterState } from '@/app/(models)/models/model-filters';
 import { ModelFilters } from '@/app/(models)/models/model-filters';
 
 export function FilterSheet({
-  filters,
-  onFiltersChange,
   onClearAll,
   activeFiltersCount,
 }: {
-  filters: FilterState;
-  onFiltersChange: (filters: FilterState) => void;
   onClearAll: () => void;
   activeFiltersCount: number;
 }) {
@@ -40,11 +33,7 @@ export function FilterSheet({
           <SheetTitle>Filters</SheetTitle>
         </SheetHeader>
         <div className="h-full overflow-y-auto">
-          <ModelFilters
-            filters={filters}
-            onFiltersChange={onFiltersChange}
-            className="p-4"
-          />
+          <ModelFilters className="p-4" />
         </div>
         <div className="p-4 border-t">
           <Button

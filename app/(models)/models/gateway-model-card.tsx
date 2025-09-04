@@ -21,6 +21,7 @@ import {
 import { LazyTooltip } from '@/components/lazy-tooltip';
 import { memo, type ComponentType, type SVGProps } from 'react';
 import { formatNumberCompact } from '../../../lib/utils/format-number-compact';
+import { useRouter } from 'next/navigation';
 
 function ModalityIcon({
   label,
@@ -82,7 +83,7 @@ function PureModelCard({
   model: ModelDefinition;
 }) {
   const provider = model.owned_by as ProviderId;
-
+  const router = useRouter();
   const hasInput = Boolean(
     model.features?.input?.text ||
       model.features?.input?.image ||
@@ -96,7 +97,12 @@ function PureModelCard({
   );
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-200 hover:border-primary/20 cursor-pointer gap-4">
+    <Card
+      className="group hover:shadow-lg transition-all duration-200 hover:border-primary/20 cursor-pointer gap-4"
+      onClick={() => {
+        router.push(`/models/${model.id}`);
+      }}
+    >
       <CardHeader className="">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
           <div className="flex items-center gap-2 flex-1">
