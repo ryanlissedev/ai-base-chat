@@ -21,7 +21,7 @@ import {
 import { LazyTooltip } from '@/components/lazy-tooltip';
 import { memo, type ComponentType, type SVGProps } from 'react';
 import { formatNumberCompact } from '../../../lib/utils/format-number-compact';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 function ModalityIcon({
   label,
@@ -83,7 +83,6 @@ function PureModelCard({
   model: ModelDefinition;
 }) {
   const provider = model.owned_by as ProviderId;
-  const router = useRouter();
   const hasInput = Boolean(
     model.features?.input?.text ||
       model.features?.input?.image ||
@@ -97,12 +96,15 @@ function PureModelCard({
   );
 
   return (
-    <Card
-      className="group hover:shadow-lg transition-all duration-200 hover:border-primary/20 cursor-pointer gap-4"
-      onClick={() => {
-        router.push(`/models/${model.id}`);
-      }}
-    >
+    <Card className="group hover:shadow-lg transition-all duration-200 hover:border-primary/20 cursor-pointer gap-4 relative">
+      <Link
+        href={`/models/${model.id}`}
+        className="absolute inset-0 z-10"
+        aria-label={`Open ${model.name}`}
+        tabIndex={-1}
+      >
+        <span className="sr-only">Open {model.name}</span>
+      </Link>
       <CardHeader className="">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
           <div className="flex items-center gap-2 flex-1">
@@ -118,7 +120,7 @@ function PureModelCard({
               </span>
             </div>
           </div>
-          <div className="shrink-0 hidden sm:flex items-center gap-2">
+          <div className="shrink-0 hidden sm:flex items-center gap-2 relative z-20">
             <CompareModelButton
               modelId={model.id}
               variant="outline"
@@ -270,7 +272,7 @@ function PureModelCard({
         </div>
       </CardContent>
       <CardFooter className="sm:hidden pt-0">
-        <div className="w-full flex items-center justify-end gap-2">
+        <div className="w-full flex items-center justify-end gap-2 relative z-20">
           <CompareModelButton
             modelId={model.id}
             variant="outline"
