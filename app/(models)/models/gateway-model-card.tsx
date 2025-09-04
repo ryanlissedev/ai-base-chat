@@ -16,43 +16,46 @@ import { MODEL_CAPABILITIES } from '@/lib/models/model-capabilities';
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { memo, type ComponentType, type SVGProps } from 'react';
 import { formatNumberCompact } from '../../../lib/utils/format-number-compact';
 
-const ModalityIcon = ({
+function ModalityIcon({
   label,
   children,
 }: {
   label: string;
   children: React.ReactNode;
-}) => (
-  <Tooltip>
-    <TooltipTrigger asChild>
-      <div
-        className={`size-6 rounded-md grid place-items-center border text-foreground/80 bg-muted`}
-        aria-label={label}
-      >
-        {children}
-      </div>
-    </TooltipTrigger>
-    <TooltipContent>{label}</TooltipContent>
-  </Tooltip>
-);
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div
+          className={`size-6 rounded-md grid place-items-center border text-foreground/80 bg-muted`}
+          aria-label={label}
+        >
+          {children}
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
+  );
+}
 
-const CapabilityIcon = ({
+function CapabilityIcon({
   label,
   Icon,
 }: {
   label: string;
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
-}) => (
-  <ModalityIcon label={label}>
-    <Icon className="size-3.5" />
-  </ModalityIcon>
-);
+}) {
+  return (
+    <ModalityIcon label={label}>
+      <Icon className="size-3.5" />
+    </ModalityIcon>
+  );
+}
 
 function PureModelCard({
   model,
@@ -142,114 +145,104 @@ function PureModelCard({
         <p className="text-sm text-muted-foreground line-clamp-2 text-pretty leading-relaxed">
           {model.description}
         </p>
-        <TooltipProvider>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-start gap-3 sm:gap-2">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2 min-w-0">
-              {hasInput && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-start gap-3 sm:gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2 min-w-0">
+            {hasInput && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-muted-foreground">Input</span>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-muted-foreground">Input</span>
-                  <div className="flex items-center gap-1.5">
-                    {model.features?.input?.text &&
-                      (() => {
-                        const { Icon, label } = MODEL_CAPABILITIES.text;
-                        return (
-                          <CapabilityIcon label={`${label} in`} Icon={Icon} />
-                        );
-                      })()}
-                    {model.features?.input?.image &&
-                      (() => {
-                        const { Icon, label } = MODEL_CAPABILITIES.image;
-                        return (
-                          <CapabilityIcon label={`${label} in`} Icon={Icon} />
-                        );
-                      })()}
-                    {model.features?.input?.pdf &&
-                      (() => {
-                        const { Icon, label } = MODEL_CAPABILITIES.pdf;
-                        return (
-                          <CapabilityIcon label={`${label} in`} Icon={Icon} />
-                        );
-                      })()}
-                    {model.features?.input?.audio &&
-                      (() => {
-                        const { Icon, label } = MODEL_CAPABILITIES.audio;
-                        return (
-                          <CapabilityIcon label={`${label} in`} Icon={Icon} />
-                        );
-                      })()}
-                  </div>
+                  {model.features?.input?.text && (
+                    <CapabilityIcon
+                      label={`${MODEL_CAPABILITIES.text.label} in`}
+                      Icon={MODEL_CAPABILITIES.text.Icon}
+                    />
+                  )}
+                  {model.features?.input?.image && (
+                    <CapabilityIcon
+                      label={`${MODEL_CAPABILITIES.image.label} in`}
+                      Icon={MODEL_CAPABILITIES.image.Icon}
+                    />
+                  )}
+                  {model.features?.input?.pdf && (
+                    <CapabilityIcon
+                      label={`${MODEL_CAPABILITIES.pdf.label} in`}
+                      Icon={MODEL_CAPABILITIES.pdf.Icon}
+                    />
+                  )}
+                  {model.features?.input?.audio && (
+                    <CapabilityIcon
+                      label={`${MODEL_CAPABILITIES.audio.label} in`}
+                      Icon={MODEL_CAPABILITIES.audio.Icon}
+                    />
+                  )}
                 </div>
-              )}
-              {hasInput && hasOutput && (
-                <span className="hidden sm:inline text-muted-foreground/40">
-                  /
-                </span>
-              )}
-              {hasOutput && (
+              </div>
+            )}
+            {hasInput && hasOutput && (
+              <span className="hidden sm:inline text-muted-foreground/40">
+                /
+              </span>
+            )}
+            {hasOutput && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-muted-foreground">Output</span>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-muted-foreground">Output</span>
-                  <div className="flex items-center gap-1.5">
-                    {model.features?.output?.text &&
-                      (() => {
-                        const { Icon, label } = MODEL_CAPABILITIES.text;
-                        return (
-                          <CapabilityIcon label={`${label} out`} Icon={Icon} />
-                        );
-                      })()}
-                    {model.features?.output?.image &&
-                      (() => {
-                        const { Icon, label } = MODEL_CAPABILITIES.image;
-                        return (
-                          <CapabilityIcon label={`${label} out`} Icon={Icon} />
-                        );
-                      })()}
-                    {model.features?.output?.audio &&
-                      (() => {
-                        const { Icon, label } = MODEL_CAPABILITIES.audio;
-                        return (
-                          <CapabilityIcon label={`${label} out`} Icon={Icon} />
-                        );
-                      })()}
-                  </div>
+                  {model.features?.output?.text && (
+                    <CapabilityIcon
+                      label={`${MODEL_CAPABILITIES.text.label} out`}
+                      Icon={MODEL_CAPABILITIES.text.Icon}
+                    />
+                  )}
+                  {model.features?.output?.image && (
+                    <CapabilityIcon
+                      label={`${MODEL_CAPABILITIES.image.label} out`}
+                      Icon={MODEL_CAPABILITIES.image.Icon}
+                    />
+                  )}
+                  {model.features?.output?.audio && (
+                    <CapabilityIcon
+                      label={`${MODEL_CAPABILITIES.audio.label} out`}
+                      Icon={MODEL_CAPABILITIES.audio.Icon}
+                    />
+                  )}
                 </div>
-              )}
-            </div>
-
-            {(model.features?.reasoning ||
-              model.features?.toolCall ||
-              model.features?.fixedTemperature === undefined) && (
-              <>
-                <span className="hidden sm:inline text-muted-foreground/40">
-                  /
-                </span>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-muted-foreground">
-                    Features
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    {model.features?.reasoning &&
-                      (() => {
-                        const { Icon, label } = MODEL_CAPABILITIES.reasoning;
-                        return <CapabilityIcon label={label} Icon={Icon} />;
-                      })()}
-                    {model.features?.toolCall &&
-                      (() => {
-                        const { Icon, label } = MODEL_CAPABILITIES.tools;
-                        return <CapabilityIcon label={label} Icon={Icon} />;
-                      })()}
-                    {model.features?.fixedTemperature === undefined &&
-                      (() => {
-                        const { Icon, label } = MODEL_CAPABILITIES.temperature;
-                        return (
-                          <CapabilityIcon label={`${label}`} Icon={Icon} />
-                        );
-                      })()}
-                  </div>
-                </div>
-              </>
+              </div>
             )}
           </div>
-        </TooltipProvider>
+
+          {(model.features?.reasoning ||
+            model.features?.toolCall ||
+            model.features?.fixedTemperature === undefined) && (
+            <>
+              <span className="hidden sm:inline text-muted-foreground/40">
+                /
+              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-muted-foreground">Features</span>
+                <div className="flex items-center gap-1.5">
+                  {model.features?.reasoning && (
+                    <CapabilityIcon
+                      label={MODEL_CAPABILITIES.reasoning.label}
+                      Icon={MODEL_CAPABILITIES.reasoning.Icon}
+                    />
+                  )}
+                  {model.features?.toolCall && (
+                    <CapabilityIcon
+                      label={MODEL_CAPABILITIES.tools.label}
+                      Icon={MODEL_CAPABILITIES.tools.Icon}
+                    />
+                  )}
+                  {model.features?.fixedTemperature === undefined && (
+                    <CapabilityIcon
+                      label={MODEL_CAPABILITIES.temperature.label}
+                      Icon={MODEL_CAPABILITIES.temperature.Icon}
+                    />
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </CardContent>
       <CardFooter className="sm:hidden pt-0">
         <div className="w-full flex items-center justify-end gap-2">
