@@ -5,6 +5,7 @@ export const generatedModelFeatures = {
   'amazon/nova-lite': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-12-03'),
     knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: true,
@@ -22,6 +23,7 @@ export const generatedModelFeatures = {
   'amazon/nova-micro': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-12-03'),
     knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: false,
@@ -39,6 +41,7 @@ export const generatedModelFeatures = {
   'amazon/nova-pro': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-12-03'),
     knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: true,
@@ -56,6 +59,7 @@ export const generatedModelFeatures = {
   'anthropic/claude-3-haiku': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-03-13'),
     knowledgeCutoff: new Date('2023-08-31'),
     input: {
       image: true,
@@ -73,6 +77,7 @@ export const generatedModelFeatures = {
   'anthropic/claude-3-opus': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-02-29'),
     knowledgeCutoff: new Date('2023-08-31'),
     input: {
       image: true,
@@ -90,6 +95,7 @@ export const generatedModelFeatures = {
   'anthropic/claude-3.5-haiku': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-10-22'),
     knowledgeCutoff: new Date('2024-07-31'),
     input: {
       image: true,
@@ -107,6 +113,7 @@ export const generatedModelFeatures = {
   'anthropic/claude-3.5-sonnet': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-10-22'),
     knowledgeCutoff: new Date('2024-04-30'),
     input: {
       image: true,
@@ -124,6 +131,7 @@ export const generatedModelFeatures = {
   'anthropic/claude-3.7-sonnet': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-02-19'),
     knowledgeCutoff: new Date('2024-10-31'),
     input: {
       image: true,
@@ -141,6 +149,7 @@ export const generatedModelFeatures = {
   'anthropic/claude-opus-4': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-05-22'),
     knowledgeCutoff: new Date('2025-03-31'),
     input: {
       image: true,
@@ -158,6 +167,7 @@ export const generatedModelFeatures = {
   'anthropic/claude-opus-4.1': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-08-05'),
     knowledgeCutoff: new Date('2025-03-31'),
     input: {
       image: true,
@@ -175,6 +185,7 @@ export const generatedModelFeatures = {
   'anthropic/claude-sonnet-4': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-05-22'),
     knowledgeCutoff: new Date('2025-03-31'),
     input: {
       image: true,
@@ -192,6 +203,7 @@ export const generatedModelFeatures = {
   'deepseek/deepseek-r1': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-01-20'),
     knowledgeCutoff: new Date('2024-06-01'),
     input: {
       image: false,
@@ -209,6 +221,7 @@ export const generatedModelFeatures = {
   'deepseek/deepseek-r1-distill-llama-70b': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-01-20'),
     knowledgeCutoff: new Date('2024-07-01'),
     input: {
       image: false,
@@ -226,6 +239,7 @@ export const generatedModelFeatures = {
   'google/gemini-2.0-flash': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-12-11'),
     knowledgeCutoff: new Date('2024-06-01'),
     input: {
       image: true,
@@ -243,6 +257,7 @@ export const generatedModelFeatures = {
   'google/gemini-2.0-flash-lite': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-12-11'),
     knowledgeCutoff: new Date('2024-06-01'),
     input: {
       image: true,
@@ -260,6 +275,7 @@ export const generatedModelFeatures = {
   'google/gemini-2.5-flash': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-06-17'),
     knowledgeCutoff: new Date('2025-01-01'),
     input: {
       image: true,
@@ -277,6 +293,7 @@ export const generatedModelFeatures = {
   'google/gemini-2.5-pro': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-06-17'),
     knowledgeCutoff: new Date('2025-01-01'),
     input: {
       image: true,
@@ -294,6 +311,7 @@ export const generatedModelFeatures = {
   'meta/llama-3.3-70b': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-12-06'),
     knowledgeCutoff: new Date('2023-12-01'),
     input: {
       image: false,
@@ -311,6 +329,7 @@ export const generatedModelFeatures = {
   'meta/llama-4-maverick': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2025-04-05'),
     knowledgeCutoff: new Date('2024-08-01'),
     input: {
       image: true,
@@ -328,6 +347,7 @@ export const generatedModelFeatures = {
   'meta/llama-4-scout': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2025-04-05'),
     knowledgeCutoff: new Date('2024-08-01'),
     input: {
       image: true,
@@ -345,6 +365,7 @@ export const generatedModelFeatures = {
   'mistral/codestral': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-05-29'),
     knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: false,
@@ -362,6 +383,7 @@ export const generatedModelFeatures = {
   'mistral/magistral-medium': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-03-17'),
     knowledgeCutoff: new Date('2025-06-01'),
     input: {
       image: false,
@@ -379,6 +401,7 @@ export const generatedModelFeatures = {
   'mistral/magistral-small': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-03-17'),
     knowledgeCutoff: new Date('2025-06-01'),
     input: {
       image: false,
@@ -396,6 +419,7 @@ export const generatedModelFeatures = {
   'mistral/ministral-3b': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-10-01'),
     knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: false,
@@ -413,6 +437,7 @@ export const generatedModelFeatures = {
   'mistral/ministral-8b': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-10-01'),
     knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: false,
@@ -430,6 +455,7 @@ export const generatedModelFeatures = {
   'mistral/mistral-large': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-11-01'),
     knowledgeCutoff: new Date('2024-11-01'),
     input: {
       image: false,
@@ -447,6 +473,7 @@ export const generatedModelFeatures = {
   'mistral/mistral-small': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-09-01'),
     knowledgeCutoff: new Date('2025-03-01'),
     input: {
       image: true,
@@ -464,6 +491,7 @@ export const generatedModelFeatures = {
   'mistral/mixtral-8x22b-instruct': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-04-17'),
     knowledgeCutoff: new Date('2024-04-01'),
     input: {
       image: false,
@@ -481,6 +509,7 @@ export const generatedModelFeatures = {
   'mistral/pixtral-12b': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-09-01'),
     knowledgeCutoff: new Date('2024-09-01'),
     input: {
       image: true,
@@ -498,6 +527,7 @@ export const generatedModelFeatures = {
   'mistral/pixtral-large': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-11-01'),
     knowledgeCutoff: new Date('2024-11-01'),
     input: {
       image: true,
@@ -515,6 +545,7 @@ export const generatedModelFeatures = {
   'moonshotai/kimi-k2': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2025-07-11'),
     knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: false,
@@ -532,6 +563,7 @@ export const generatedModelFeatures = {
   'morph/morph-v3-fast': {
     reasoning: false,
     toolCall: false,
+    releaseDate: new Date('2024-08-15'),
     input: {
       image: false,
       text: true,
@@ -548,6 +580,7 @@ export const generatedModelFeatures = {
   'morph/morph-v3-large': {
     reasoning: false,
     toolCall: false,
+    releaseDate: new Date('2024-08-15'),
     input: {
       image: false,
       text: true,
@@ -564,6 +597,7 @@ export const generatedModelFeatures = {
   'openai/gpt-4-turbo': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2023-11-06'),
     knowledgeCutoff: new Date('2023-12-01'),
     input: {
       image: true,
@@ -581,6 +615,7 @@ export const generatedModelFeatures = {
   'openai/gpt-4.1': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2025-04-14'),
     knowledgeCutoff: new Date('2024-04-01'),
     input: {
       image: true,
@@ -598,6 +633,7 @@ export const generatedModelFeatures = {
   'openai/gpt-4.1-mini': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2025-04-14'),
     knowledgeCutoff: new Date('2024-04-01'),
     input: {
       image: true,
@@ -615,6 +651,7 @@ export const generatedModelFeatures = {
   'openai/gpt-4.1-nano': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2025-04-14'),
     knowledgeCutoff: new Date('2024-04-01'),
     input: {
       image: true,
@@ -632,6 +669,7 @@ export const generatedModelFeatures = {
   'openai/gpt-4o': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-05-13'),
     knowledgeCutoff: new Date('2023-10-01'),
     input: {
       image: true,
@@ -649,6 +687,7 @@ export const generatedModelFeatures = {
   'openai/gpt-4o-mini': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-07-18'),
     knowledgeCutoff: new Date('2023-10-01'),
     input: {
       image: true,
@@ -666,6 +705,7 @@ export const generatedModelFeatures = {
   'openai/gpt-5': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-08-07'),
     knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: true,
@@ -683,6 +723,7 @@ export const generatedModelFeatures = {
   'openai/gpt-5-mini': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-08-07'),
     knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: true,
@@ -700,6 +741,7 @@ export const generatedModelFeatures = {
   'openai/gpt-5-nano': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-08-07'),
     knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: true,
@@ -717,6 +759,7 @@ export const generatedModelFeatures = {
   'openai/gpt-oss-120b': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-08-05'),
     input: {
       image: false,
       text: true,
@@ -733,6 +776,7 @@ export const generatedModelFeatures = {
   'openai/gpt-oss-20b': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-08-05'),
     input: {
       image: false,
       text: true,
@@ -749,6 +793,7 @@ export const generatedModelFeatures = {
   'openai/o1': {
     reasoning: true,
     toolCall: false,
+    releaseDate: new Date('2024-09-12'),
     knowledgeCutoff: new Date('2023-10-01'),
     input: {
       image: true,
@@ -766,6 +811,7 @@ export const generatedModelFeatures = {
   'openai/o3': {
     reasoning: true,
     toolCall: false,
+    releaseDate: new Date('2025-01-31'),
     knowledgeCutoff: new Date('2024-04-01'),
     input: {
       image: true,
@@ -783,6 +829,7 @@ export const generatedModelFeatures = {
   'openai/o3-mini': {
     reasoning: true,
     toolCall: false,
+    releaseDate: new Date('2025-01-31'),
     knowledgeCutoff: new Date('2024-04-01'),
     input: {
       image: false,
@@ -800,6 +847,7 @@ export const generatedModelFeatures = {
   'openai/o4-mini': {
     reasoning: true,
     toolCall: false,
+    releaseDate: new Date('2025-01-31'),
     knowledgeCutoff: new Date('2024-04-01'),
     input: {
       image: true,
@@ -817,6 +865,7 @@ export const generatedModelFeatures = {
   'vercel/v0-1.0-md': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-05-22'),
     input: {
       image: true,
       text: true,
@@ -833,6 +882,7 @@ export const generatedModelFeatures = {
   'vercel/v0-1.5-md': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-06-09'),
     input: {
       image: true,
       text: true,
@@ -849,6 +899,7 @@ export const generatedModelFeatures = {
   'xai/grok-2': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-08-20'),
     knowledgeCutoff: new Date('2024-08-01'),
     input: {
       image: false,
@@ -866,6 +917,7 @@ export const generatedModelFeatures = {
   'xai/grok-2-vision': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2024-08-20'),
     knowledgeCutoff: new Date('2024-08-01'),
     input: {
       image: true,
@@ -883,6 +935,7 @@ export const generatedModelFeatures = {
   'xai/grok-3': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2024-12-09'),
     knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: false,
@@ -900,6 +953,7 @@ export const generatedModelFeatures = {
   'xai/grok-3-fast': {
     reasoning: false,
     toolCall: true,
+    releaseDate: new Date('2025-02-17'),
     knowledgeCutoff: new Date('2024-11-01'),
     input: {
       image: false,
@@ -917,6 +971,7 @@ export const generatedModelFeatures = {
   'xai/grok-3-mini': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2024-12-09'),
     knowledgeCutoff: new Date('2024-10-01'),
     input: {
       image: false,
@@ -934,6 +989,7 @@ export const generatedModelFeatures = {
   'xai/grok-3-mini-fast': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-02-17'),
     knowledgeCutoff: new Date('2024-11-01'),
     input: {
       image: false,
@@ -951,6 +1007,7 @@ export const generatedModelFeatures = {
   'xai/grok-4': {
     reasoning: true,
     toolCall: true,
+    releaseDate: new Date('2025-07-09'),
     knowledgeCutoff: new Date('2025-07-01'),
     input: {
       image: false,

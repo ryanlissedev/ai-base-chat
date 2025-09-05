@@ -27,6 +27,7 @@ type ModelsDevModel = {
   reasoning?: boolean;
   tool_call?: boolean;
   modalities?: ModelsDevModalities;
+  release_date: string;
 };
 
 type ModelsDevProvider = {
@@ -117,7 +118,7 @@ function buildTS({
 }): string {
   const lines = [];
   lines.push("import type { ModelId } from '@/lib/models/model-id';");
-  lines.push("import type { ModelFeatures } from '../ai/model-features';");
+  lines.push("import type { ModelFeatures } from './model-features';");
   lines.push('');
   lines.push('export const generatedModelFeatures = {');
 
@@ -143,6 +144,7 @@ function buildTS({
     entry.push(`  '${id}': {`);
     entry.push(`    reasoning: ${reasoning},`);
     entry.push(`    toolCall: ${toolCall},`);
+    entry.push(`    releaseDate: new Date('${m.release_date}'),`);
     if (knowledgeExpr) entry.push(`    knowledgeCutoff: ${knowledgeExpr},`);
     entry.push('    input: {');
     entry.push(`      image: ${imageIn},`);

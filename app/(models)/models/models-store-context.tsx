@@ -4,7 +4,6 @@ import { createContext, useContext, useRef } from 'react';
 import { useStoreWithEqualityFn } from 'zustand/traditional';
 import { createStore } from 'zustand/vanilla';
 import type { FilterState } from '@/app/(models)/models/model-filters';
-import type { SortOption } from '@/components/models/types';
 import {
   chatModels as allChatModels,
   type ModelDefinition,
@@ -23,6 +22,18 @@ const DEFAULT_FILTERS: FilterState = {
   categories: [],
   supportedParameters: [],
 };
+
+export type SortOption =
+  | 'newest'
+  | 'input-pricing-low'
+  | 'input-pricing-high'
+  | 'pricing-low'
+  | 'pricing-high'
+  | 'output-pricing-low'
+  | 'output-pricing-high'
+  | 'context-high'
+  | 'context-low'
+  | 'max-output-tokens-high';
 
 export type ModelsStore = {
   searchQuery: string;
@@ -131,20 +142,42 @@ export const createModelsStore = (
         switch (sortBy) {
           case 'newest':
             return b.id.localeCompare(a.id);
-          case 'pricing-low':
+          case 'input-pricing-low':
             return (
               Number.parseFloat(a.pricing.input) * 1_000_000 -
               Number.parseFloat(b.pricing.input) * 1_000_000
             );
-          case 'pricing-high':
+          case 'input-pricing-high':
             return (
               Number.parseFloat(b.pricing.input) * 1_000_000 -
               Number.parseFloat(a.pricing.input) * 1_000_000
+            );
+          case 'pricing-low':
+            return (
+              Number.parseFloat(a.pricing.output) * 1_000_000 -
+              Number.parseFloat(b.pricing.output) * 1_000_000
+            );
+          case 'pricing-high':
+            return (
+              Number.parseFloat(b.pricing.output) * 1_000_000 -
+              Number.parseFloat(a.pricing.output) * 1_000_000
+            );
+          case 'output-pricing-low':
+            return (
+              Number.parseFloat(a.pricing.output) * 1_000_000 -
+              Number.parseFloat(b.pricing.output) * 1_000_000
+            );
+          case 'output-pricing-high':
+            return (
+              Number.parseFloat(b.pricing.output) * 1_000_000 -
+              Number.parseFloat(a.pricing.output) * 1_000_000
             );
           case 'context-high':
             return b.context_window - a.context_window;
           case 'context-low':
             return a.context_window - b.context_window;
+          case 'max-output-tokens-high':
+            return (b.max_tokens ?? 0) - (a.max_tokens ?? 0);
           default:
             return 0;
         }
