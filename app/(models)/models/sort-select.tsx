@@ -25,10 +25,12 @@ export function SortSelect({
       </SelectTrigger>
       <SelectContent className="text-sm">
         <SelectItem value="newest">Newest</SelectItem>
-        <SelectItem value="pricing-low">$ Low → High</SelectItem>
-        <SelectItem value="pricing-high">$ High → Low</SelectItem>
-        <SelectItem value="context-high">Context High → Low</SelectItem>
-        <SelectItem value="context-low">Context Low → High</SelectItem>
+        <SelectItem value="pricing-high">Pricing (High → Low)</SelectItem>
+        <SelectItem value="pricing-low">Pricing (Low → High)</SelectItem>
+        <SelectItem value="context-high">Context (High → Low)</SelectItem>
+        <SelectItem value="max-output-tokens-high">
+          Max Output (High → Low)
+        </SelectItem>
       </SelectContent>
     </Select>
   );

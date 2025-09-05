@@ -42,8 +42,8 @@ export function WideModelDetails({
       {/* Header: title + provider + primary actions */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-col gap-3">
-          <div className="min-w-0 flex items-center gap-2">
-            {provider ? getProviderIcon(provider, 40) : null}
+          <div className="flex items-center gap-4">
+            {provider ? getProviderIcon(provider, 48) : null}
             <div className="min-w-0">
               <div className="text-3xl font-semibold tracking-tight truncate mb-0.5">
                 {model?.name ?? 'Model'}

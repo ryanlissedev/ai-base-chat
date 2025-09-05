@@ -11,13 +11,6 @@ import {
   type ImageModelData,
 } from '@/lib/models/image-models';
 
-const disabledModels: Partial<Record<ModelId, true>> = {
-  'anthropic/claude-opus-4': true,
-  'anthropic/claude-opus-4.1': true,
-  'morph/morph-v3-large': true,
-  'morph/morph-v3-fast': true,
-};
-
 export type ModelDefinition = ModelData & {
   features: ModelFeatures;
   disabled?: true;
@@ -27,17 +20,27 @@ export type ImageModelDefinition = ImageModelData & {
   features?: ModelFeatures;
 };
 
+const DISABLED_MODELS: Partial<Record<ModelId, true>> = {
+  // 'anthropic/claude-opus-4': true,
+  // 'anthropic/claude-opus-4.1': true,
+  'morph/morph-v3-large': true,
+  'morph/morph-v3-fast': true,
+};
+
 export const allModels = modelsData
   .map((model) => {
     const features = modelFeatures[model.id];
-    const disabled = disabledModels[model.id];
+    if (!features) {
+      console.error('No features for', model.id);
+    }
+
     return {
       ...model,
       features,
-      disabled,
+      disabled: DISABLED_MODELS[model.id],
     };
   })
-  .filter((model) => !model.disabled && model.type === 'language');
+  .filter((model) => model.type === 'language' && !model.disabled);
 
 const allImageModels = imageModelsData.map((model) => {
   const features = imageModelsFeatures[model.id];
@@ -51,9 +54,7 @@ const PROVIDER_ORDER = ['openai', 'google', 'anthropic', 'xai'];
 
 export const chatModels = allModels
   .filter(
-    (model) =>
-      !model.disabled &&
-      (model.features?.output?.text === true || !model.features), // Let's show models even if we haven't created features yet
+    (model) => model.features?.output?.text === true, // Let's show models even if we haven't created features yet
   )
   .sort((a, b) => {
     const aProviderIndex = PROVIDER_ORDER.indexOf(a.owned_by);

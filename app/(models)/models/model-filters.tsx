@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { MODEL_CATEGORIES } from '@/lib/models/model-categories';
 import { formatNumberCompact } from '@/lib/utils/format-number-compact';
 import { useModels } from '@/app/(models)/models/models-store-context';
+import { MODEL_RANGE_LIMITS } from '@/app/(models)/models/models-store-context';
 
 export type FilterState = {
   inputModalities: string[];
@@ -113,8 +114,8 @@ function LimitsFilter() {
           onValueChange={(value) =>
             updateFilters({ contextLength: value as [number, number] })
           }
-          max={1000000}
-          min={1000}
+          max={MODEL_RANGE_LIMITS.context[1]}
+          min={MODEL_RANGE_LIMITS.context[0]}
           step={1000}
           className="w-full"
         />
@@ -132,8 +133,8 @@ function LimitsFilter() {
           onValueChange={(value) =>
             updateFilters({ maxTokens: value as [number, number] })
           }
-          max={300000}
-          min={0}
+          max={MODEL_RANGE_LIMITS.maxTokens[1]}
+          min={MODEL_RANGE_LIMITS.maxTokens[0]}
           step={512}
           className="w-full"
         />
@@ -190,8 +191,8 @@ function PricingFilter() {
           onValueChange={(value) =>
             updateFilters({ inputPricing: value as [number, number] })
           }
-          max={20}
-          min={0}
+          max={MODEL_RANGE_LIMITS.inputPricing[1]}
+          min={MODEL_RANGE_LIMITS.inputPricing[0]}
           step={0.01}
           className="w-full"
         />
@@ -209,8 +210,8 @@ function PricingFilter() {
           onValueChange={(value) =>
             updateFilters({ outputPricing: value as [number, number] })
           }
-          max={20}
-          min={0}
+          max={MODEL_RANGE_LIMITS.outputPricing[1]}
+          min={MODEL_RANGE_LIMITS.outputPricing[0]}
           step={0.01}
           className="w-full"
         />

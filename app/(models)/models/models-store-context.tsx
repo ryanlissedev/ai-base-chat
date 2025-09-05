@@ -9,13 +9,45 @@ import {
   type ModelDefinition,
 } from '@/lib/ai/all-models';
 
+// Derive dynamic ranges from available models
+const contextWindows = allChatModels
+  .map((m) => m.context_window)
+  .filter((n): n is number => typeof n === 'number' && Number.isFinite(n));
+const maxTokensValues = allChatModels
+  .map((m) => m.max_tokens)
+  .filter((n): n is number => typeof n === 'number' && Number.isFinite(n));
+const inputPrices = allChatModels
+  .map((m) => Number.parseFloat(m.pricing.input) * 1_000_000)
+  .filter((n) => Number.isFinite(n));
+const outputPrices = allChatModels
+  .map((m) => Number.parseFloat(m.pricing.output) * 1_000_000)
+  .filter((n) => Number.isFinite(n));
+
+const minContext = contextWindows.length > 0 ? Math.min(...contextWindows) : 0;
+const maxContext = contextWindows.length > 0 ? Math.max(...contextWindows) : 0;
+const minMaxTokens =
+  maxTokensValues.length > 0 ? Math.min(...maxTokensValues) : 0;
+const maxMaxTokens =
+  maxTokensValues.length > 0 ? Math.max(...maxTokensValues) : 0;
+const minInputPrice = inputPrices.length > 0 ? Math.min(...inputPrices) : 0;
+const maxInputPrice = inputPrices.length > 0 ? Math.max(...inputPrices) : 0;
+const minOutputPrice = outputPrices.length > 0 ? Math.min(...outputPrices) : 0;
+const maxOutputPrice = outputPrices.length > 0 ? Math.max(...outputPrices) : 0;
+
+export const MODEL_RANGE_LIMITS = {
+  context: [minContext, maxContext] as [number, number],
+  maxTokens: [minMaxTokens, maxMaxTokens] as [number, number],
+  inputPricing: [minInputPrice, maxInputPrice] as [number, number],
+  outputPricing: [minOutputPrice, maxOutputPrice] as [number, number],
+};
+
 const DEFAULT_FILTERS: FilterState = {
   inputModalities: [],
   outputModalities: [],
-  contextLength: [1000, 1000000],
-  inputPricing: [0, 20],
-  outputPricing: [0, 20],
-  maxTokens: [0, 300000],
+  contextLength: [minContext, maxContext],
+  inputPricing: [minInputPrice, maxInputPrice],
+  outputPricing: [minOutputPrice, maxOutputPrice],
+  maxTokens: [minMaxTokens, maxMaxTokens],
   providers: [],
   features: { reasoning: false, toolCall: false, temperatureControl: false },
   series: [],
@@ -25,14 +57,9 @@ const DEFAULT_FILTERS: FilterState = {
 
 export type SortOption =
   | 'newest'
-  | 'input-pricing-low'
-  | 'input-pricing-high'
   | 'pricing-low'
   | 'pricing-high'
-  | 'output-pricing-low'
-  | 'output-pricing-high'
   | 'context-high'
-  | 'context-low'
   | 'max-output-tokens-high';
 
 export type ModelsStore = {
@@ -145,40 +172,26 @@ export const createModelsStore = (
               b.features.releaseDate.getTime() -
               a.features.releaseDate.getTime()
             );
-          case 'input-pricing-low':
-            return (
-              Number.parseFloat(a.pricing.input) * 1_000_000 -
-              Number.parseFloat(b.pricing.input) * 1_000_000
-            );
-          case 'input-pricing-high':
-            return (
-              Number.parseFloat(b.pricing.input) * 1_000_000 -
-              Number.parseFloat(a.pricing.input) * 1_000_000
-            );
           case 'pricing-low':
             return (
-              Number.parseFloat(a.pricing.output) * 1_000_000 -
-              Number.parseFloat(b.pricing.output) * 1_000_000
+              (Number.parseFloat(a.pricing.input) +
+                Number.parseFloat(a.pricing.output)) *
+                1_000_000 -
+              (Number.parseFloat(b.pricing.input) +
+                Number.parseFloat(b.pricing.output)) *
+                1_000_000
             );
           case 'pricing-high':
             return (
-              Number.parseFloat(b.pricing.output) * 1_000_000 -
-              Number.parseFloat(a.pricing.output) * 1_000_000
-            );
-          case 'output-pricing-low':
-            return (
-              Number.parseFloat(a.pricing.output) * 1_000_000 -
-              Number.parseFloat(b.pricing.output) * 1_000_000
-            );
-          case 'output-pricing-high':
-            return (
-              Number.parseFloat(b.pricing.output) * 1_000_000 -
-              Number.parseFloat(a.pricing.output) * 1_000_000
+              (Number.parseFloat(b.pricing.input) +
+                Number.parseFloat(b.pricing.output)) *
+                1_000_000 -
+              (Number.parseFloat(a.pricing.input) +
+                Number.parseFloat(a.pricing.output)) *
+                1_000_000
             );
           case 'context-high':
             return b.context_window - a.context_window;
-          case 'context-low':
-            return a.context_window - b.context_window;
           case 'max-output-tokens-high':
             return (b.max_tokens ?? 0) - (a.max_tokens ?? 0);
           default:
