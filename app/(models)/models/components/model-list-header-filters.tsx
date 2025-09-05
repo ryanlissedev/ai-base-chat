@@ -1,9 +1,9 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { SearchInput } from '@/components/models/search-input';
-import { SortSelect } from '@/components/models/sort-select';
-import { FilterSheet } from '@/components/models/filter-sheet';
+import { SearchInput } from '@/app/(models)/models/search-input';
+import { SortSelect } from '@/app/(models)/models/sort-select';
+import { FilterSheet } from '@/app/(models)/models/filter-sheet';
 import { RotateCcw } from 'lucide-react';
 import { useModels } from '@/app/(models)/models/models-store-context';
 
