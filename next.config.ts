@@ -1,8 +1,9 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  typedRoutes: true,
   experimental: {
-    ppr: true,
+    ppr: 'incremental',
     optimizePackageImports: [
       'react-tweet',
       'echarts-for-react',

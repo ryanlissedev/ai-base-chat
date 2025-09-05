@@ -1,16 +1,9 @@
 import * as React from 'react';
-import Link, { type LinkProps } from 'next/link';
+import Link from 'next/link';
 import type { VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
-
-interface LinkButtonProps
-  extends LinkProps,
-    VariantProps<typeof buttonVariants>,
-    Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps> {
-  disabled?: boolean;
-}
 
 function LinkButton({
   className,
@@ -20,10 +13,18 @@ function LinkButton({
   disabled,
   children,
   ...props
-}: LinkButtonProps) {
+}: {
+  className?: string;
+  variant?: VariantProps<typeof buttonVariants>['variant'];
+  size?: VariantProps<typeof buttonVariants>['size'];
+  href: string;
+  disabled?: boolean;
+  children?: React.ReactNode;
+  props?: React.AnchorHTMLAttributes<HTMLAnchorElement>;
+}) {
   return (
     <Link
-      href={!disabled ? href : ''}
+      href={new URL(!disabled ? href : '')}
       className={cn(
         buttonVariants({ variant, size, className }),
         disabled && 'pointer-events-none opacity-50',
@@ -37,4 +38,4 @@ function LinkButton({
   );
 }
 
-export { LinkButton, type LinkButtonProps };
+export { LinkButton };

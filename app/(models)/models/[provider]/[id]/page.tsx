@@ -7,12 +7,10 @@ import { allModels } from '@/lib/ai/all-models';
 // Toggle to include/exclude performance-related copy
 const ENABLE_PERFORMANCE_COPY = false;
 
-export default function SingleModelPage({
-  params,
-}: {
-  params: { provider: string; id: string };
-}) {
-  const { provider, id } = params;
+export default async function SingleModelPage(
+  props: PageProps<'/models/[provider]/[id]'>,
+) {
+  const { provider, id } = await props.params;
   const modelId = `${provider}/${id}`;
   const model = allModels.find((m) => m.id === modelId);
   if (!model) return notFound();
@@ -31,12 +29,10 @@ export default function SingleModelPage({
   );
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ provider: string; id: string }>;
-}): Promise<Metadata> {
-  const resolved = await params;
+export async function generateMetadata(
+  ctx: PageProps<'/models/[provider]/[id]'>,
+): Promise<Metadata> {
+  const resolved = await ctx.params;
   const provider = resolved.provider;
   const id = resolved.id;
 
@@ -128,6 +124,6 @@ export async function generateStaticParams() {
   );
   return sortedIds.map((fullId) => {
     const [provider, model] = fullId.split('/');
-    return { provider, id: model } as { provider: string; id: string };
+    return { provider, id: model };
   });
 }

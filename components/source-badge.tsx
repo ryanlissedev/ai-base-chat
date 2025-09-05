@@ -13,7 +13,11 @@ export function WebSourceBadge({ result }: { result: SearchResultItem }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Link href={result.url} target="_blank" rel="noopener noreferrer">
+        <Link
+          href={new URL(result.url)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <Badge
             variant="secondary"
             className="gap-1 max-w-[200px] truncate text-xs"

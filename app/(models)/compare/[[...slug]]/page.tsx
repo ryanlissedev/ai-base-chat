@@ -5,16 +5,14 @@ import { allModels } from '@/lib/ai/all-models';
 // Toggle to include/exclude "Performance" related copy
 const ENABLE_PERFORMANCE_COPY = false;
 
-export default function Page() {
+export default function Page(_props: PageProps<'/compare/[[...slug]]'>) {
   return <ComparePage />;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug?: string[] }>;
-}): Promise<Metadata> {
-  const resolved = await params;
+export async function generateMetadata(
+  _ctx: PageProps<'/compare/[[...slug]]'>,
+): Promise<Metadata> {
+  const resolved = await _ctx.params;
   const segments = Array.isArray(resolved?.slug) ? resolved.slug : [];
 
   const toId = (pair: string[] | undefined): string | null => {
@@ -130,11 +128,11 @@ export async function generateStaticParams() {
   // Singles: all ids
   const singles = sortedIds.map((id) => {
     const [provider, model] = id.split('/');
-    return { slug: [provider, model] as string[] };
+    return { slug: [provider, model] };
   });
 
   // Pairs: all unique combos i<j (avoid left/right duplicates)
-  const pairs: { slug: string[] }[] = [];
+  const pairs = [];
   for (let i = 0; i < sortedIds.length; i++) {
     for (let j = i + 1; j < sortedIds.length; j++) {
       const [p1, m1] = sortedIds[i].split('/');
@@ -144,7 +142,7 @@ export async function generateStaticParams() {
   }
 
   // Include the base route `/compare` (optional catch-all allows empty slug)
-  const root = { slug: [] as string[] };
+  const root: { slug: string[] } = { slug: [] };
 
   return [root, ...singles, ...pairs];
 }

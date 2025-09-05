@@ -31,7 +31,7 @@ export function LinkMarkdown({
 
   return (
     <Link
-      href={href}
+      href={new URL(href)}
       className={cn('text-blue-500 hover:underline', className)}
       {...props}
     >
