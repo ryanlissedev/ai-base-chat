@@ -15,7 +15,7 @@ import type { ArtifactKind } from '../artifacts/artifact-kind';
 import type { Suggestion } from '@/lib/db/schema';
 import type { ResearchUpdate } from './tools/research-updates-schema';
 import type { createDocumentTool as createDocument } from './tools/create-document';
-import type { ModelId } from './model-id';
+import type { ModelId } from '../models/model-id';
 
 export const toolNameSchema = z.enum([
   'getWeather',

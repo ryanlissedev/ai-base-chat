@@ -6,12 +6,12 @@ alwaysApply: true
 ## Repo Context
 - The package manager is bun
 - Vercel AI SDK for AI framework and frontend-backend interactions
-- Next.js with server actions
+- Next.js with app directory
 - ORM is Drizzle with the schema at `lib/db/schema.ts`
 - DB queries and mutations are at `lib/db/queries.ts`
 - To test your changes through compilation. Don't run a build. But do `bun test:types`
 - This repo uses Tailwind 4.
-
+- Shadcn UI is used for the UI components and the components are in `components/ui` folder. The config is in `components.json`.
 
 ## App structure
 - People interact with the AI through the `app/(chat)/api/chat/route.ts` by sending a message. It responds by creating a new message.

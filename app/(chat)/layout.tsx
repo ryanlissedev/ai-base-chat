@@ -8,7 +8,7 @@ import { ANONYMOUS_LIMITS } from '@/lib/types/anonymous';
 import { AppSidebar } from '@/components/app-sidebar';
 import { KeyboardShortcuts } from '@/components/keyboard-shortcuts';
 import { SessionProvider } from 'next-auth/react';
-import type { ModelId } from '@/lib/ai/model-id';
+import type { ModelId } from '@/lib/models/model-id';
 
 export default async function ChatLayout({
   children,

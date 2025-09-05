@@ -49,7 +49,7 @@ type ToolProps = {
   }) => void;
 };
 
-const Tool = ({
+function Tool({
   description,
   icon,
   selectedTool,
@@ -58,7 +58,7 @@ const Tool = ({
   setIsToolbarVisible,
   isAnimating,
   onClick,
-}: ToolProps) => {
+}: ToolProps) {
   const sendMessage = useSendMessage();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -131,17 +131,17 @@ const Tool = ({
       </TooltipContent>
     </Tooltip>
   );
-};
+}
 
 const randomArr = [...Array(6)].map((x) => nanoid(5));
 
-const ReadingLevelSelector = ({
+function ReadingLevelSelector({
   setSelectedTool,
   isAnimating,
 }: {
   setSelectedTool: Dispatch<SetStateAction<string | null>>;
   isAnimating: boolean;
-}) => {
+}) {
   const sendMessage = useSendMessage();
   const LEVELS = [
     'Elementary',
@@ -248,9 +248,9 @@ const ReadingLevelSelector = ({
       </Tooltip>
     </div>
   );
-};
+}
 
-export const Tools = ({
+export function Tools({
   isToolbarVisible,
   selectedTool,
   setSelectedTool,
@@ -264,7 +264,7 @@ export const Tools = ({
   isAnimating: boolean;
   setIsToolbarVisible: Dispatch<SetStateAction<boolean>>;
   tools: Array<ArtifactToolbarItem>;
-}) => {
+}) {
   const [primaryTool, ...secondaryTools] = tools;
 
   return (
@@ -301,9 +301,9 @@ export const Tools = ({
       />
     </motion.div>
   );
-};
+}
 
-const PureToolbar = ({
+function PureToolbar({
   isToolbarVisible,
   setIsToolbarVisible,
   status,
@@ -315,7 +315,7 @@ const PureToolbar = ({
   status: UseChatHelpers<ChatMessage>['status'];
   stop: UseChatHelpers<ChatMessage>['stop'];
   artifactKind: ArtifactKind;
-}) => {
+}) {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -453,7 +453,7 @@ const PureToolbar = ({
       </motion.div>
     </TooltipProvider>
   );
-};
+}
 
 export const Toolbar = memo(PureToolbar, (prevProps, nextProps) => {
   if (prevProps.status !== nextProps.status) return false;

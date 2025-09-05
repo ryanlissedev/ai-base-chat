@@ -1,6 +1,6 @@
 'use client';
 import type { Attachment, ChatMessage, UiToolName } from '@/lib/ai/types';
-import type { ModelId } from '@/lib/ai/model-id';
+import type { ModelId } from '@/lib/models/model-id';
 
 import type React from 'react';
 import {
@@ -46,12 +46,13 @@ import {
   DEFAULT_PDF_MODEL,
   DEFAULT_CHAT_IMAGE_COMPATIBLE_MODEL,
 } from '@/lib/ai/all-models';
-import { CreditLimitDisplay } from './upgrade-cta/credit-limit-display';
+import { LimitDisplay } from './upgrade-cta/limit-display';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { LoginPrompt } from './upgrade-cta/login-prompt';
 import { generateUUID } from '@/lib/utils';
 import { useSaveMessageMutation } from '@/hooks/chat-sync-hooks';
+import { ANONYMOUS_LIMITS } from '@/lib/types/anonymous';
 
 function PureMultimodalInput({
   chatId,
@@ -91,6 +92,10 @@ function PureMultimodalInput({
   } = useChatInput();
 
   const sendMessage = useSendMessage();
+  const isAnonymous = !session?.user;
+  const isModelDisallowedForAnonymous =
+    isAnonymous &&
+    !ANONYMOUS_LIMITS.AVAILABLE_MODELS.includes(selectedModelId as any);
 
   // Helper function to auto-switch to PDF-compatible model
   const switchToPdfCompatibleModel = useCallback(() => {
@@ -121,6 +126,41 @@ function PureMultimodalInput({
     imageUrl: '',
     imageName: undefined,
   });
+
+  // Centralized submission gating
+  const selectedModelDef = getModelDefinition(selectedModelId);
+  const isImageOutputModel = Boolean(selectedModelDef?.features?.output?.image);
+  const submission: { enabled: false; message: string } | { enabled: true } =
+    (() => {
+      if (isImageOutputModel) {
+        return {
+          enabled: false,
+          message: 'Image models are not supported yet',
+        };
+      }
+      if (isModelDisallowedForAnonymous) {
+        return { enabled: false, message: 'Log in to use this model' };
+      }
+      if (status !== 'ready' && status !== 'error') {
+        return {
+          enabled: false,
+          message: 'Please wait for the model to finish its response!',
+        };
+      }
+      if (uploadQueue.length > 0) {
+        return {
+          enabled: false,
+          message: 'Please wait for files to finish uploading!',
+        };
+      }
+      if (isEmpty) {
+        return {
+          enabled: false,
+          message: 'Please enter a message before sending!',
+        };
+      }
+      return { enabled: true };
+    })();
 
   // Helper function to process and validate files
   const processFiles = useCallback(
@@ -450,8 +490,6 @@ function PureMultimodalInput({
           />
         )}
 
-      {!isEditMode && <CreditLimitDisplay />}
-
       <input
         type="file"
         className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
@@ -469,15 +507,11 @@ function PureMultimodalInput({
           }`}
           onSubmit={(e) => {
             e.preventDefault();
-            if (status !== 'ready' && status !== 'error') {
-              toast.error('Please wait for the model to finish its response!');
-            } else if (uploadQueue.length > 0) {
-              toast.error('Please wait for files to finish uploading!');
-            } else if (isEmpty) {
-              toast.error('Please enter a message before sending!');
-            } else {
-              submitForm();
+            if (!submission.enabled) {
+              if (submission.message) toast.error(submission.message);
+              return;
             }
+            submitForm();
           }}
           {...getRootProps()}
         >
@@ -489,6 +523,19 @@ function PureMultimodalInput({
                 Drop images or PDFs here to attach
               </div>
             </div>
+          )}
+
+          {!isEditMode && (
+            <LimitDisplay
+              forceVariant={
+                isImageOutputModel
+                  ? 'image'
+                  : isModelDisallowedForAnonymous
+                    ? 'model'
+                    : 'credits'
+              }
+              className="p-2"
+            />
           )}
 
           <motion.div
@@ -533,17 +580,11 @@ function PureMultimodalInput({
                 : !event.shiftKey && !event.isComposing;
 
               if (shouldSubmit) {
-                if (status !== 'ready' && status !== 'error') {
-                  toast.error(
-                    'Please wait for the model to finish its response!',
-                  );
-                } else if (uploadQueue.length > 0) {
-                  toast.error('Please wait for files to finish uploading!');
-                } else if (isEmpty) {
-                  toast.error('Please enter a message before sending!');
-                } else {
-                  submitForm();
+                if (!submission.enabled) {
+                  if (submission.message) toast.error(submission.message);
+                  return true;
                 }
+                submitForm();
                 return true;
               }
 
@@ -561,6 +602,7 @@ function PureMultimodalInput({
             isEmpty={isEmpty}
             submitForm={submitForm}
             uploadQueue={uploadQueue}
+            submission={submission}
           />
         </PromptInput>
       </div>
@@ -637,6 +679,7 @@ function PureChatInputBottomControls({
   isEmpty,
   submitForm,
   uploadQueue,
+  submission,
 }: {
   selectedModelId: ModelId;
   onModelChange: (modelId: ModelId) => void;
@@ -647,6 +690,7 @@ function PureChatInputBottomControls({
   isEmpty: boolean;
   submitForm: () => void;
   uploadQueue: Array<string>;
+  submission: { enabled: boolean; message?: string };
 }) {
   return (
     <PromptInputToolbar className="flex flex-row justify-between min-w-0 w-full gap-1 @[400px]:gap-2 border-t">
@@ -655,7 +699,7 @@ function PureChatInputBottomControls({
         <ModelSelector
           selectedModelId={selectedModelId}
           className="text-xs @[400px]:text-sm w-fit shrink max-w-none px-2 @[400px]:px-3 truncate justify-start h-8 @[400px]:h-10"
-          onModelChange={onModelChange}
+          onModelChangeAction={onModelChange}
         />
         <ResponsiveTools
           tools={selectedTool}
@@ -666,12 +710,16 @@ function PureChatInputBottomControls({
       <PromptInputSubmit
         className={'shrink-0 size-8 @[400px]:size-10'}
         status={status}
-        disabled={status === 'ready' && (isEmpty || uploadQueue.length > 0)}
+        disabled={status === 'ready' && !submission.enabled}
         onClick={(e) => {
           e.preventDefault();
           if (status === 'streaming' || status === 'submitted') {
             void chatStore.getState().currentChatHelpers?.stop?.();
           } else if (status === 'ready' || status === 'error') {
+            if (!submission.enabled) {
+              if (submission.message) toast.error(submission.message);
+              return;
+            }
             submitForm();
           }
         }}
@@ -692,6 +740,10 @@ const ChatInputBottomControls = memo(
     if (prevProps.isEmpty !== nextProps.isEmpty) return false;
     if (prevProps.submitForm !== nextProps.submitForm) return false;
     if (prevProps.uploadQueue.length !== nextProps.uploadQueue.length)
+      return false;
+    if (prevProps.submission.enabled !== nextProps.submission.enabled)
+      return false;
+    if (prevProps.submission.message !== nextProps.submission.message)
       return false;
     return true;
   },

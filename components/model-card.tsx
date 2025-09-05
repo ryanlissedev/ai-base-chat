@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/tooltip';
 import { Calendar, Building, CheckCircle } from 'lucide-react';
 import type { ModelDefinition } from '@/lib/ai/all-models';
-import type { ProviderId } from '@/providers/models-generated';
+import type { ProviderId } from '@/lib/models/models.generated';
 import { cn } from '@/lib/utils';
 import { getFeatureConfig, isFeatureEnabled } from '@/lib/features-config';
 import { getProviderIcon } from './get-provider-icon';
@@ -141,19 +141,28 @@ export function ModelCard({
       )}
 
       <CardContent>
-        <div className="flex justify-start items-center gap-3 text-xs text-muted-foreground text-start">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3 text-[11px] sm:text-xs text-muted-foreground text-start">
           {maxTokens && (
             <div className="flex items-center gap-1">
               <span className="font-medium">{maxTokens.toLocaleString()}</span>
-              <span>Max out</span>
+              <span className="hidden sm:inline">Max out</span>
+              <span className="sm:hidden uppercase tracking-wide text-[10px] text-muted-foreground/80">
+                out
+              </span>
             </div>
+          )}
+          {maxTokens && contextLength && (
+            <div className="hidden sm:block h-3 w-px bg-border/60" />
           )}
           {contextLength && (
             <div className="flex items-center gap-1">
               <span className="font-medium">
                 {contextLength.toLocaleString()}
               </span>
-              <span>Max in</span>
+              <span className="hidden sm:inline">Max in</span>
+              <span className="sm:hidden uppercase tracking-wide text-[10px] text-muted-foreground/80">
+                in
+              </span>
             </div>
           )}
         </div>
@@ -165,7 +174,7 @@ export function ModelCard({
                 Reasoning
               </Badge>
             )}
-            {model.features?.functionCalling && (
+            {model.features?.toolCall && (
               <Badge variant="outline" className="text-xs">
                 Function Calling
               </Badge>

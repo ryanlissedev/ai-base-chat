@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+import { Cpu } from 'lucide-react';
 import { SidebarHistory } from '@/components/sidebar-history';
 import { SearchChatsButton } from '@/components/search-chats';
 import { SidebarCredits } from '@/components/sidebar-credits';
@@ -11,6 +13,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
   useSidebar,
@@ -18,7 +21,7 @@ import {
 import { SidebarTopRow } from '@/components/sidebar-top-row';
 
 export function AppSidebar() {
-  const { open, openMobile } = useSidebar();
+  const { open, openMobile, setOpenMobile } = useSidebar();
 
   return (
     <Sidebar
@@ -35,6 +38,16 @@ export function AppSidebar() {
 
           <SidebarMenuItem>
             <SearchChatsButton />
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip="Models" asChild>
+              <Link href="/models">
+                <Cpu className="size-4" />
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Models
+                </span>
+              </Link>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

@@ -2,7 +2,7 @@ import type { DeepResearchConfig, SearchAPI } from './configuration';
 import type { ModelMessage, ToolModelMessage } from 'ai';
 import { experimental_createMCPClient } from 'ai';
 
-import type { ModelId } from '@/lib/ai/model-id';
+import type { ModelId } from '@/lib/models/model-id';
 import type { StreamWriter } from '@/lib/ai/types';
 import { firecrawlWebSearch, tavilyWebSearch } from '../web-search';
 import { getModelDefinition } from '../../all-models';

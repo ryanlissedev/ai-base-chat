@@ -10,7 +10,7 @@ import { codeInterpreter } from '@/lib/ai/tools/code-interpreter';
 import type { Session } from 'next-auth';
 import { readDocument } from '@/lib/ai/tools/read-document';
 import { generateImage } from '@/lib/ai/tools/generate-image';
-import type { ModelId } from '@/lib/ai/model-id';
+import type { ModelId } from '@/lib/models/model-id';
 import type { StreamWriter } from '../types';
 import { deepResearch } from './deep-research/deep-research';
 

@@ -4,7 +4,7 @@ import { textDocumentHandler } from '@/lib/artifacts/text/server';
 import type { Document } from '../db/schema';
 import { saveDocument } from '../db/queries';
 import type { Session } from 'next-auth';
-import type { ModelId } from '../ai/model-id';
+import type { ModelId } from '../models/model-id';
 import type { StreamWriter } from '../ai/types';
 import type { ArtifactKind } from './artifact-kind';
 

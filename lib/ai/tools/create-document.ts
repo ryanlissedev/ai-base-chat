@@ -8,7 +8,7 @@ import {
 } from '@/lib/artifacts/server';
 import { artifactKinds } from '@/lib/artifacts/artifact-kind';
 import type { ModelMessage } from 'ai';
-import type { ModelId } from '@/lib/ai/model-id';
+import type { ModelId } from '@/lib/models/model-id';
 import type { StreamWriter } from '../types';
 import type { ArtifactKind } from '@/lib/artifacts/artifact-kind';
 import type { ArtifactToolResult } from './artifact-tool-result';

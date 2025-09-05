@@ -15,6 +15,6 @@ export const config = {
      * - manifest files (.json, .webmanifest)
      * - Images and other static assets (.svg, .png, .jpg, .jpeg, .gif, .webp, .ico)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|opengraph-image|manifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|json|webmanifest)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|opengraph-image|manifest|models|compare|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|json|webmanifest)$).*)',
   ],
 };

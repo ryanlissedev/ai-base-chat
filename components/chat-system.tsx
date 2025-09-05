@@ -5,6 +5,7 @@ import { Chat } from '@/components/chat';
 import { DataStreamHandler } from '@/components/data-stream-handler';
 import { ChatSync } from '@/components/chat-sync';
 import { ChatInputProvider } from '@/providers/chat-input-provider';
+import type { ModelId } from '@/lib/models/model-id';
 import { ArtifactProvider } from '@/hooks/use-artifact';
 import type { UiToolName, ChatMessage } from '@/lib/ai/types';
 
@@ -13,11 +14,13 @@ export const ChatSystem = memo(function ChatSystem({
   initialMessages,
   isReadonly,
   initialTool = null,
+  overrideModelId,
 }: {
   id: string;
   initialMessages: Array<ChatMessage>;
   isReadonly: boolean;
   initialTool?: UiToolName | null;
+  overrideModelId?: ModelId;
 }) {
   return (
     <ArtifactProvider>
@@ -36,6 +39,7 @@ export const ChatSystem = memo(function ChatSystem({
         <ChatInputProvider
           localStorageEnabled={true}
           initialTool={initialTool ?? null}
+          overrideModelId={overrideModelId}
         >
           <ChatSync id={id} initialMessages={initialMessages} />
           <Chat

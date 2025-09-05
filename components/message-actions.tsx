@@ -15,6 +15,7 @@ import { memo } from 'react';
 import equal from 'fast-deep-equal';
 import { chatStore, useMessageRoleById } from '@/lib/stores/chat-store';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Tag } from '@/components/tag';
 
 export function PureMessageActions({
   chatId,
@@ -199,9 +200,7 @@ export function PureMessageActions({
             return (
               message?.metadata?.selectedModel && (
                 <div className="flex items-center ml-2">
-                  <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                    {message.metadata.selectedModel}
-                  </span>
+                  <Tag>{message.metadata.selectedModel}</Tag>
                 </div>
               )
             );

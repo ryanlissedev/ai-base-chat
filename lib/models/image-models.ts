@@ -1,5 +1,5 @@
-import type { ImageModelId } from '@/lib/ai/model-id';
-import type { ProviderId } from './models-generated';
+import type { ImageModelId } from '@/lib/models/model-id';
+import type { ProviderId } from './models.generated';
 
 export interface ImageModelData {
   id: ImageModelId;
