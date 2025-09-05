@@ -1,7 +1,7 @@
 'use client';
 
 import { Container } from '@/components/container';
-import { ModelDetails } from '@/app/(models)/models/model-details';
+import { WideModelDetails } from '@/app/(models)/models/wide-model-details';
 import { useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { allModels } from '@/lib/ai/all-models';
@@ -27,12 +27,10 @@ export default function SingleModelPage() {
   }
 
   return (
-    <Container className="p-6 max-w-[450px]">
+    <Container className="p-6">
       <h1 className="text-2xl font-semibold mb-6">Model</h1>
-      <ModelDetails
-        className=""
-        modelDefinition={model}
-        onModelChangeAction={handleModelChange}
+      <WideModelDetails
+        model={model}
         enabledActions={{
           goToModel: false,
           chat: true,
