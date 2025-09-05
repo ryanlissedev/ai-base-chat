@@ -19,7 +19,7 @@ const disabledModels: Partial<Record<ModelId, true>> = {
 };
 
 export type ModelDefinition = ModelData & {
-  features?: ModelFeatures;
+  features: ModelFeatures;
   disabled?: true;
 };
 

@@ -56,7 +56,7 @@ function ConnectedSearchInput() {
 function ConnectedSortSelect() {
   const value = useModels((s) => s.sortBy);
   const setValue = useModels((s) => s.setSortBy);
-  return <SortSelect value={value} onChange={setValue} />;
+  return <SortSelect value={value} onChangeAction={setValue} />;
 }
 
 function ResetFiltersButton() {

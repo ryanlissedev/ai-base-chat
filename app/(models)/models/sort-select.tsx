@@ -7,19 +7,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { SortOption } from '@/components/models/types';
+import type { SortOption } from '@/app/(models)/models/models-store-context';
 
 export function SortSelect({
   value,
-  onChange,
+  onChangeAction,
   className,
 }: {
   value: SortOption;
-  onChange: (value: SortOption) => void;
+  onChangeAction: (value: SortOption) => void;
   className?: string;
 }) {
   return (
-    <Select value={value} onValueChange={(v: SortOption) => onChange(v)}>
+    <Select value={value} onValueChange={(v: SortOption) => onChangeAction(v)}>
       <SelectTrigger className={`max-w-40 ${className ?? ''}`}>
         <SelectValue placeholder="Sort" />
       </SelectTrigger>

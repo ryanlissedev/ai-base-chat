@@ -1,42 +1,150 @@
 import type { Metadata } from 'next';
 import ComparePage from '../compare-page';
+import { allModels } from '@/lib/ai/all-models';
 
-const pageTitle = 'Compare Models | Sparka AI';
-const pageDescription =
-  "Compare two models from Sparka's Vercel AI Gateway catalog side-by-side. Browse all providers and models, check capabilities, context windows, and pricing.";
-
-export const metadata: Metadata = {
-  title: pageTitle,
-  description: pageDescription,
-  keywords: [
-    'Sparka',
-    'Vercel AI Gateway',
-    'compare',
-    'models',
-    'LLM',
-    'AI models',
-    'providers',
-  ],
-  openGraph: {
-    title: pageTitle,
-    description: pageDescription,
-    url: '/compare',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: pageTitle,
-    description: pageDescription,
-  },
-  alternates: {
-    canonical: '/compare',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+// Toggle to include/exclude "Performance" related copy
+const ENABLE_PERFORMANCE_COPY = false;
 
 export default function Page() {
   return <ComparePage />;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug?: string[] }>;
+}): Promise<Metadata> {
+  const resolved = await params;
+  const segments = Array.isArray(resolved?.slug) ? resolved.slug : [];
+
+  const toId = (pair: string[] | undefined): string | null => {
+    if (!pair || pair.length < 2) return null;
+    return `${pair[0]}/${pair[1]}`;
+  };
+
+  const leftId = toId(segments.slice(0, 2));
+  const rightId = toId(segments.slice(2, 4));
+
+  const findModel = (id: string | null) =>
+    id ? allModels.find((m) => m.id === id) || null : null;
+
+  const left = findModel(leftId);
+  const right = findModel(rightId);
+
+  const capProv = (p?: string) =>
+    (p || '').slice(0, 1).toUpperCase() + (p || '').slice(1);
+
+  const displayName = (id: string | null) => {
+    const model = findModel(id);
+    if (!model) return id ?? '';
+    const provider = capProv(model.owned_by);
+    return `${provider} ${model.name}`.trim();
+  };
+
+  const siteName = 'Sparka AI';
+  const perfSuffix = ENABLE_PERFORMANCE_COPY ? ' & Performance' : '';
+
+  const buildCompareList = () => {
+    const parts = ['specs', 'context window', 'pricing'];
+    if (ENABLE_PERFORMANCE_COPY) parts.push('speed');
+    parts.push('limits');
+    return parts.length > 1
+      ? `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}`
+      : parts[0];
+  };
+
+  const compareList = buildCompareList();
+
+  let title = `AI Model Comparison: Pricing, Specs${perfSuffix} | Sparka AI`;
+  let description = `Compare AI models by ${compareList}.`;
+
+  const keywordsBase = [
+    'model comparison',
+    'ai model comparison',
+    'llm comparison',
+    'model vs model',
+    'ai model vs model',
+    'pricing per 1M tokens',
+    'context window',
+  ];
+  const perfKeywords = ENABLE_PERFORMANCE_COPY ? ['model benchmarks'] : [];
+  let keywords = [...keywordsBase, ...perfKeywords];
+
+  if (left && right) {
+    const a = displayName(left.id);
+    const b = displayName(right.id);
+    title = `${a} vs ${b}: Pricing, Specs${perfSuffix} | ${siteName}`;
+    description = `Compare ${a} vs ${b}: ${compareList}.`;
+    keywords = [
+      ...keywordsBase,
+      `${a} vs ${b}`,
+      `${b} vs ${a}`,
+      `${a} comparison`,
+      `${b} comparison`,
+    ];
+  } else if (left) {
+    const a = displayName(left.id);
+    title = `${a} Comparison: Pricing, Specs${perfSuffix} | ${siteName}`;
+    description = `Compare ${a} with other AI models: ${compareList}.`;
+    keywords = [
+      ...keywordsBase,
+      `${a} comparison`,
+      `${a} vs`,
+      `${a} alternatives`,
+    ];
+  }
+
+  const path = ['/compare', ...segments].join(segments.length ? '/' : '');
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: path,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+    keywords,
+    alternates: {
+      canonical: path,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
+
+export async function generateStaticParams() {
+  // Sort deterministically to keep generated paths stable if in-memory order changes
+  const sortedIds = [...allModels.map((m) => m.id)].sort((a, b) =>
+    a.localeCompare(b),
+  );
+
+  // Singles: all ids
+  const singles = sortedIds.map((id) => {
+    const [provider, model] = id.split('/');
+    return { slug: [provider, model] as string[] };
+  });
+
+  // Pairs: all unique combos i<j (avoid left/right duplicates)
+  const pairs: { slug: string[] }[] = [];
+  for (let i = 0; i < sortedIds.length; i++) {
+    for (let j = i + 1; j < sortedIds.length; j++) {
+      const [p1, m1] = sortedIds[i].split('/');
+      const [p2, m2] = sortedIds[j].split('/');
+      pairs.push({ slug: [p1, m1, p2, m2] });
+    }
+  }
+
+  // Include the base route `/compare` (optional catch-all allows empty slug)
+  const root = { slug: [] as string[] };
+
+  return [root, ...singles, ...pairs];
 }

@@ -166,6 +166,17 @@ function PureModelCard({
               /M
             </span>
           </span>
+          <span>•</span>
+          <span>
+            Released{' '}
+            <span className="font-medium text-foreground">
+              {model.features.releaseDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}
+            </span>
+          </span>
         </div>
       </CardHeader>
       <CardContent className="gap-3 flex flex-col">

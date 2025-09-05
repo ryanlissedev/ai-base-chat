@@ -159,6 +159,14 @@ export function ModelDetailsCard({
             <span className="capitalize">{provider}</span>
           </div>
         </div>
+        <div className="mt-1 text-sm text-muted-foreground">
+          Released{' '}
+          {model.features.releaseDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          })}
+        </div>
         <Separator className="my-2" />
         <Collapsible className="w-full [&[data-state=open]_.clamped]:hidden [&[data-state=open]_.trigger-closed]:hidden [&[data-state=closed]_.trigger-open]:hidden">
           <p

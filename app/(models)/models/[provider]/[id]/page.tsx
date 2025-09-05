@@ -1,34 +1,24 @@
-'use client';
-
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { Container } from '@/components/container';
 import { WideModelDetails } from '@/app/(models)/models/wide-model-details';
-import { useMemo, useState } from 'react';
-import { useParams } from 'next/navigation';
 import { allModels } from '@/lib/ai/all-models';
-import type { ModelDefinition } from '@/lib/ai/all-models';
 
-export default function SingleModelPage() {
-  const params = useParams<{ provider: string; id: string }>();
-  const [modelId, setModelId] = useState<string | null>(() => {
-    if (!params?.provider || !params?.id) return null;
-    return `${params.provider}/${params.id}`;
-  });
+// Toggle to include/exclude performance-related copy
+const ENABLE_PERFORMANCE_COPY = false;
 
-  const model: ModelDefinition | null = useMemo(() => {
-    if (!modelId) return null;
-    return allModels.find((m) => m.id === modelId) || null;
-  }, [modelId]);
-
-  function handleModelChange(nextId: string) {
-    setModelId(nextId);
-    if (typeof window !== 'undefined') {
-      window.history.pushState({}, '', `/models/${nextId}`);
-    }
-  }
+export default function SingleModelPage({
+  params,
+}: {
+  params: { provider: string; id: string };
+}) {
+  const { provider, id } = params;
+  const modelId = `${provider}/${id}`;
+  const model = allModels.find((m) => m.id === modelId);
+  if (!model) return notFound();
 
   return (
-    <Container className="p-6">
-      <h1 className="text-2xl font-semibold mb-6">Model</h1>
+    <Container className="max-w-5xl mx-auto p-6">
       <WideModelDetails
         model={model}
         enabledActions={{
@@ -39,4 +29,105 @@ export default function SingleModelPage() {
       />
     </Container>
   );
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ provider: string; id: string }>;
+}): Promise<Metadata> {
+  const resolved = await params;
+  const provider = resolved.provider;
+  const id = resolved.id;
+
+  const modelId = `${provider}/${id}`;
+  const model = allModels.find((m) => m.id === modelId) || null;
+
+  const capProv = (p?: string) =>
+    (p || '').slice(0, 1).toUpperCase() + (p || '').slice(1);
+  const displayName = (mId: string | null) => {
+    const m = mId ? allModels.find((x) => x.id === mId) || null : null;
+    if (!m) return mId ?? '';
+    const prov = capProv(m.owned_by);
+    return `${prov} ${m.name}`.trim();
+  };
+
+  const siteName = 'Sparka AI';
+  const a = displayName(model?.id ?? modelId);
+
+  const benchmarksSuffix = ENABLE_PERFORMANCE_COPY ? ' & Benchmarks' : '';
+  const buildDetailsList = () => {
+    const parts = ['capabilities', 'context window', 'pricing per 1M tokens'];
+    if (ENABLE_PERFORMANCE_COPY) parts.push('speed');
+    parts.push('limits', 'release date');
+    return parts.length > 1
+      ? `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}`
+      : parts[0];
+  };
+  const detailsList = buildDetailsList();
+
+  const title = `${a}: Specs, Pricing, Context Window${benchmarksSuffix} | ${siteName}`;
+  const description = `Full details for ${a}: ${detailsList}.`;
+
+  const path = `/models/${provider}/${id}`;
+
+  const keywordsBase = [
+    'ai model details',
+    'llm specs',
+    'model specs',
+    'model pricing',
+    'pricing per 1M tokens',
+    'context window',
+    'capabilities',
+    'limits',
+  ];
+  const perfKeywords = ENABLE_PERFORMANCE_COPY
+    ? ['model benchmarks', `${a} benchmarks`]
+    : [];
+  const keywords = [
+    ...keywordsBase,
+    ...perfKeywords,
+    a,
+    `${a} specs`,
+    `${a} pricing`,
+    `${a} context window`,
+    `${a} limits`,
+    `${a} release date`,
+    `${a} features`,
+    `${a} alternatives`,
+  ];
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: path,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+    keywords,
+    alternates: {
+      canonical: path,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
+
+export async function generateStaticParams() {
+  const sortedIds = [...allModels.map((m) => m.id)].sort((a, b) =>
+    a.localeCompare(b),
+  );
+  return sortedIds.map((fullId) => {
+    const [provider, model] = fullId.split('/');
+    return { provider, id: model } as { provider: string; id: string };
+  });
 }
