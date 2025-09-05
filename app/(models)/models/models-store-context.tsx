@@ -141,7 +141,10 @@ export const createModelsStore = (
       (a: ModelDefinition, b: ModelDefinition) => {
         switch (sortBy) {
           case 'newest':
-            return b.id.localeCompare(a.id);
+            return (
+              b.features.releaseDate.getTime() -
+              a.features.releaseDate.getTime()
+            );
           case 'input-pricing-low':
             return (
               Number.parseFloat(a.pricing.input) * 1_000_000 -
