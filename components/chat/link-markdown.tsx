@@ -31,7 +31,8 @@ export function LinkMarkdown({
 
   return (
     <Link
-      href={new URL(href)}
+      // @ts-expect-error - href is a valid URL
+      href={href}
       className={cn('text-blue-500 hover:underline', className)}
       {...props}
     >

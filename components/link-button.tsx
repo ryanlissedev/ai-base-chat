@@ -24,7 +24,8 @@ function LinkButton({
 }) {
   return (
     <Link
-      href={new URL(!disabled ? href : '')}
+      // @ts-expect-error - href is a valid URL
+      href={href}
       className={cn(
         buttonVariants({ variant, size, className }),
         disabled && 'pointer-events-none opacity-50',

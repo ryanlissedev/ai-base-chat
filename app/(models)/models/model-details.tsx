@@ -26,11 +26,11 @@ export function ModelDetails({
     <>
       <div
         className={cn(
-          'mb-6 flex flex-col gap-4 w-full max-w-[450px]',
+          'mb-6 flex flex-col gap-4 w-full max-w-[450px] ',
           className,
         )}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ">
           <ModelSelectorBase
             models={allModels.map((m) => ({
               id: m.id as ModelId,
@@ -38,7 +38,7 @@ export function ModelDetails({
             }))}
             selectedModelId={modelDefinition?.id}
             onModelChange={onModelChangeAction}
-            className="grow border text-base bg-card h-9 "
+            className="border text-base bg-card h-9 w-fit shrink grow truncate"
             enableFilters
             initialChevronDirection="down"
           />
