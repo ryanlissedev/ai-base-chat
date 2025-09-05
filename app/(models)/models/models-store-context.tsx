@@ -213,7 +213,14 @@ export const createModelsStore = (
       })),
     updateFilters: (v: Partial<FilterState>) =>
       set((state) => {
-        const nextFilters = { ...state.filters, ...v } as FilterState;
+        const nextFilters = {
+          ...state.filters,
+          ...v,
+          features: {
+            ...state.filters.features,
+            ...(v.features ?? {}),
+          },
+        } as FilterState;
         return {
           filters: nextFilters,
           _results: computeResults(

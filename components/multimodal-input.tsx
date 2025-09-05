@@ -699,7 +699,7 @@ function PureChatInputBottomControls({
         <ModelSelector
           selectedModelId={selectedModelId}
           className="text-xs @[400px]:text-sm w-fit shrink max-w-none px-2 @[400px]:px-3 truncate justify-start h-8 @[400px]:h-10"
-          onModelChange={onModelChange}
+          onModelChangeAction={onModelChange}
         />
         <ResponsiveTools
           tools={selectedTool}

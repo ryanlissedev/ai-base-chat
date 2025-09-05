@@ -15,10 +15,10 @@ import {
 export function PureModelSelector({
   selectedModelId,
   className,
-  onModelChange,
+  onModelChangeAction,
 }: {
   selectedModelId: ModelId;
-  onModelChange?: (modelId: ModelId) => void;
+  onModelChangeAction?: (modelId: ModelId) => void;
   className?: string;
 }) {
   const { data: session } = useSession();
@@ -43,7 +43,7 @@ export function PureModelSelector({
       className={cn('w-fit md:px-2', className)}
       models={models}
       selectedModelId={selectedModelId}
-      onModelChange={onModelChange}
+      onModelChange={onModelChangeAction}
       topContent={
         hasDisabledModels ? (
           <div className="p-3">
@@ -64,6 +64,6 @@ export const ModelSelector = memo(PureModelSelector, (prevProps, nextProps) => {
   return (
     prevProps.selectedModelId === nextProps.selectedModelId &&
     prevProps.className === nextProps.className &&
-    prevProps.onModelChange === nextProps.onModelChange
+    prevProps.onModelChangeAction === nextProps.onModelChangeAction
   );
 });
