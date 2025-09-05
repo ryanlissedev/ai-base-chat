@@ -28,11 +28,11 @@ export function ModelListHeaderFilters() {
       {/* Controls - desktop */}
       <div className="hidden sm:flex items-center justify-between gap-3">
         {/* Filters button hidden on desktop because filters are visible elsewhere */}
-        <div className="flex items-center gap-2 grow">
-          <div className="relative w-full max-w-md">
+        <div className="flex items-center gap-2  justify-between w-full">
+          <div className="flex gap-2 items-center w-full">
             <ConnectedSearchInput />
+            <ConnectedSortSelect />
           </div>
-          <ConnectedSortSelect />
 
           <ResetFiltersButton />
         </div>
