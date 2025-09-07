@@ -4,7 +4,7 @@ import { generateStaticParams as generateModelStaticParams } from '@/app/(models
 import { generateStaticParams as generateCompareStaticParams } from '@/app/(models)/compare/[[...slug]]/page';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.VERCEL_URL ?? 'http://localhost:3000';
+  const baseUrl = `http://${process.env.VERCEL_PROJECT_PRODUCTION_URL ?? 'localhost:3000'}`;
   const now = new Date();
 
   const staticEntries: MetadataRoute.Sitemap = [
