@@ -405,7 +405,6 @@ export async function POST(request: NextRequest) {
     // TODO: remove this when the gateway provider supports URLs
     const contextForLLM =
       await replaceFilePartUrlByBinaryDataInMessages(modelMessages);
-    log.debug({ contextForLLM }, 'context prepared');
     log.debug({ activeTools }, 'active tools');
 
     // Create AbortController with 55s timeout for credit cleanup

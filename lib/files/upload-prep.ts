@@ -1,18 +1,18 @@
 // Utilities for client-side file preparation prior to upload
 
+import imageCompression from 'browser-image-compression';
+
 export async function compressImageIfNeeded(
   file: File,
   {
-    maxBytes = 5 * 1024 * 1024,
-    maxDimension = 2048,
-    targetMime = 'image/jpeg',
+    maxBytes,
+    maxDimension,
     minQuality = 0.5,
   }: {
-    maxBytes?: number;
-    maxDimension?: number;
-    targetMime?: 'image/jpeg';
+    maxBytes: number;
+    maxDimension: number;
     minQuality?: number;
-  } = {},
+  },
 ): Promise<File> {
   if (!file.type.startsWith('image/')) return file;
   if (file.size <= maxBytes) return file;
@@ -20,88 +20,36 @@ export async function compressImageIfNeeded(
   // Only compress JPEG/PNG. Leave others unchanged.
   if (!['image/jpeg', 'image/png'].includes(file.type)) return file;
 
-  const loadImage = (fileToLoad: File): Promise<HTMLImageElement> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = (e) => reject(e);
-      img.src = URL.createObjectURL(fileToLoad);
-    });
-  };
+  const outputMime = file.type;
 
-  const toBlob = (
-    canvas: HTMLCanvasElement,
-    type: string,
-    quality: number,
-  ): Promise<Blob> =>
-    new Promise((resolve, reject) => {
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) return reject(new Error('Canvas toBlob failed'));
-          resolve(blob);
-        },
-        type,
-        quality,
-      );
-    });
+  const options = {
+    maxSizeMB: maxBytes / (1024 * 1024),
+    maxWidthOrHeight: maxDimension,
+    useWebWorker: true,
+    fileType: outputMime,
+    initialQuality: Math.min(0.9, Math.max(minQuality, 0.1)),
+  } as const;
 
   try {
-    const img = await loadImage(file);
-
-    let width = img.naturalWidth || img.width;
-    let height = img.naturalHeight || img.height;
-
-    const scale = Math.min(1, maxDimension / Math.max(width, height));
-    width = Math.max(1, Math.floor(width * scale));
-    height = Math.max(1, Math.floor(height * scale));
-
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return file;
-    ctx.drawImage(img, 0, 0, width, height);
-
-    let quality = 0.9;
-    let blob = await toBlob(canvas, targetMime, quality);
-
-    // Reduce quality until under size or threshold
-    while (blob.size > maxBytes && quality > minQuality) {
-      quality = Math.max(minQuality, quality - 0.1);
-      blob = await toBlob(canvas, targetMime, quality);
-    }
-
-    // Downscale further if still too large
-    while (
-      blob.size > maxBytes &&
-      Math.max(canvas.width, canvas.height) > 512
-    ) {
-      const downscale = 0.85;
-      const newW = Math.max(1, Math.floor(canvas.width * downscale));
-      const newH = Math.max(1, Math.floor(canvas.height * downscale));
-      const tmp = document.createElement('canvas');
-      tmp.width = newW;
-      tmp.height = newH;
-      const tctx = tmp.getContext('2d');
-      if (!tctx) break;
-      tctx.drawImage(canvas, 0, 0, newW, newH);
-      canvas.width = newW;
-      canvas.height = newH;
-      const cctx = canvas.getContext('2d');
-      if (!cctx) break;
-      cctx.drawImage(tmp, 0, 0);
-      blob = await toBlob(canvas, targetMime, quality);
-    }
-
-    if (blob.size >= file.size) {
-      return file;
-    }
+    const maybeResult = await imageCompression(file, options);
+    const resultBlob =
+      maybeResult instanceof File
+        ? maybeResult
+        : new File([maybeResult], file.name, {
+            type: outputMime,
+            lastModified: Date.now(),
+          });
+    if (resultBlob.size >= file.size) return file;
 
     const base = file.name.replace(/\.[^.]+$/, '');
-    const newExt = 'jpg';
-    const newName = `${base}.${newExt}`;
-    return new File([blob], newName, {
-      type: targetMime,
+    const ext =
+      outputMime === 'image/jpeg'
+        ? 'jpg'
+        : outputMime === 'image/png'
+          ? 'png'
+          : (outputMime.split('/')[1] ?? 'jpg');
+    return new File([resultBlob], `${base}.${ext}`, {
+      type: outputMime,
       lastModified: Date.now(),
     });
   } catch {
@@ -111,10 +59,9 @@ export async function compressImageIfNeeded(
 
 export async function processFilesForUpload(
   files: File[],
-  options?: {
-    maxBytes?: number;
-    maxDimension?: number;
-    targetMime?: 'image/jpeg';
+  options: {
+    maxBytes: number;
+    maxDimension: number;
   },
 ): Promise<{
   processedImages: File[];
@@ -126,7 +73,7 @@ export async function processFilesForUpload(
   const pdfFiles: File[] = [];
   const stillOversized: File[] = [];
   const unsupportedFiles: File[] = [];
-  const maxBytes = options?.maxBytes ?? 5 * 1024 * 1024;
+  const maxBytes = options.maxBytes;
 
   for (const file of files) {
     if (file.type.startsWith('image/')) {

@@ -103,6 +103,7 @@
     "@vercel/postgres": "^0.10.0",
     "ai": "^5.0.23",
     "bcrypt-ts": "^5.0.2",
+    "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.1",
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",

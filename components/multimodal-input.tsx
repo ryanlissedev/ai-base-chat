@@ -53,6 +53,15 @@ import { LoginPrompt } from './upgrade-cta/login-prompt';
 import { generateUUID } from '@/lib/utils';
 import { useSaveMessageMutation } from '@/hooks/chat-sync-hooks';
 import { ANONYMOUS_LIMITS } from '@/lib/types/anonymous';
+import { processFilesForUpload } from '@/lib/files/upload-prep';
+
+const IMAGE_UPLOAD_LIMITS = {
+  maxBytes: 1024 * 1024,
+  maxDimension: 2048,
+};
+const IMAGE_UPLOAD_MAX_MB = Math.round(
+  IMAGE_UPLOAD_LIMITS.maxBytes / (1024 * 1024),
+);
 
 function PureMultimodalInput({
   chatId,
@@ -164,33 +173,14 @@ function PureMultimodalInput({
 
   // Helper function to process and validate files
   const processFiles = useCallback(
-    (files: File[]) => {
-      const imageFiles: File[] = [];
-      const pdfFiles: File[] = [];
-      const oversizedFiles: File[] = [];
-      const unsupportedFiles: File[] = [];
-      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    async (files: File[]): Promise<File[]> => {
+      const { processedImages, pdfFiles, stillOversized, unsupportedFiles } =
+        await processFilesForUpload(files, IMAGE_UPLOAD_LIMITS);
 
-      files.forEach((file) => {
-        // Check file size first
-        if (file.size > MAX_FILE_SIZE) {
-          oversizedFiles.push(file);
-          return;
-        }
-
-        // Then check file type
-        if (file.type.startsWith('image/')) {
-          imageFiles.push(file);
-        } else if (file.type === 'application/pdf') {
-          pdfFiles.push(file);
-        } else {
-          unsupportedFiles.push(file);
-        }
-      });
-
-      // Show error messages for invalid files
-      if (oversizedFiles.length > 0) {
-        toast.error(`${oversizedFiles.length} file(s) exceed 5MB limit`);
+      if (stillOversized.length > 0) {
+        toast.error(
+          `${stillOversized.length} file(s) exceed ${IMAGE_UPLOAD_MAX_MB}MB after compression`,
+        );
       }
       if (unsupportedFiles.length > 0) {
         toast.error(
@@ -199,21 +189,21 @@ function PureMultimodalInput({
       }
 
       // Auto-switch model based on file types
-      if (pdfFiles.length > 0 || imageFiles.length > 0) {
+      if (pdfFiles.length > 0 || processedImages.length > 0) {
         let currentModelDef = getModelDefinition(selectedModelId);
 
-        // First check PDF support if PDFs are present
         if (pdfFiles.length > 0 && !currentModelDef.features?.input?.pdf) {
           currentModelDef = switchToPdfCompatibleModel();
         }
-
-        // Then check image support if images are present (using potentially updated model)
-        if (imageFiles.length > 0 && !currentModelDef.features?.input?.image) {
+        if (
+          processedImages.length > 0 &&
+          !currentModelDef.features?.input?.image
+        ) {
           currentModelDef = switchToImageCompatibleModel();
         }
       }
 
-      return [...imageFiles, ...pdfFiles];
+      return [...processedImages, ...pdfFiles];
     },
     [selectedModelId, switchToPdfCompatibleModel, switchToImageCompatibleModel],
   );
@@ -304,37 +294,45 @@ function PureMultimodalInput({
     handleSubmit(coreSubmitLogic, isEditMode);
   }, [handleSubmit, coreSubmitLogic, isEditMode]);
 
-  const uploadFile = useCallback(async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
+  const uploadFile = useCallback(
+    async (
+      file: File,
+    ): Promise<
+      { url: string; name: string; contentType: string } | undefined
+    > => {
+      const formData = new FormData();
+      formData.append('file', file);
 
-    try {
-      const response = await fetch('/api/files/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      try {
+        const response = await fetch('/api/files/upload', {
+          method: 'POST',
+          body: formData,
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        const { url, pathname, contentType } = data;
+        if (response.ok) {
+          const data: { url: string; pathname: string; contentType: string } =
+            await response.json();
+          const { url, pathname, contentType } = data;
 
-        return {
-          url,
-          name: pathname,
-          contentType: contentType,
-        };
+          return {
+            url,
+            name: pathname,
+            contentType: contentType,
+          };
+        }
+        const { error } = (await response.json()) as { error?: string };
+        toast.error(error);
+      } catch (error) {
+        toast.error('Failed to upload file, please try again!');
       }
-      const { error } = await response.json();
-      toast.error(error);
-    } catch (error) {
-      toast.error('Failed to upload file, please try again!');
-    }
-  }, []);
+    },
+    [],
+  );
 
   const handleFileChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(event.target.files || []);
-      const validFiles = processFiles(files);
+      const validFiles = await processFiles(files);
 
       if (validFiles.length === 0) return;
 
@@ -378,7 +376,7 @@ function PureMultimodalInput({
         return;
       }
 
-      const validFiles = processFiles(files);
+      const validFiles = await processFiles(files);
       if (validFiles.length === 0) return;
 
       setUploadQueue(validFiles.map((file) => file.name));
@@ -447,7 +445,7 @@ function PureMultimodalInput({
         return;
       }
 
-      const validFiles = processFiles(acceptedFiles);
+      const validFiles = await processFiles(acceptedFiles);
       if (validFiles.length === 0) return;
 
       setUploadQueue(validFiles.map((file) => file.name));
@@ -472,7 +470,7 @@ function PureMultimodalInput({
     noClick: true, // Prevent click to open file dialog since we have the button
     disabled: status !== 'ready',
     accept: {
-      'image/*': ['.png', '.jpg', '.jpeg', '.gif'],
+      'image/*': ['.png', '.jpg', '.jpeg'],
       'application/pdf': ['.pdf'],
     },
   });
