@@ -18,11 +18,11 @@ import { useDropzone } from 'react-dropzone';
 import { motion } from 'motion/react';
 import { useSession } from 'next-auth/react';
 import {
-  chatStore,
+  useChatHelperStop,
   useSetMessages,
+  useChatStoreApi,
   useMessageIds,
-  useSendMessage,
-} from '@/lib/stores/chat-store';
+} from '@/lib/stores/chat-store-context';
 
 import { AttachmentList } from './attachment-list';
 import { PlusIcon } from 'lucide-react';
@@ -78,13 +78,13 @@ function PureMultimodalInput({
   parentMessageId: string | null;
   onSendMessage?: (message: ChatMessage) => void | Promise<void>;
 }) {
+  const storeApi = useChatStoreApi();
   const { data: session } = useSession();
   const isMobile = useIsMobile();
   const { mutate: saveChatMessage } = useSaveMessageMutation();
   const setMessages = useSetMessages();
   const messageIds = useMessageIds();
 
-  // Detect mobile devices
   const {
     editorRef,
     selectedTool,
@@ -100,7 +100,6 @@ function PureMultimodalInput({
     handleSubmit,
   } = useChatInput();
 
-  const sendMessage = useSendMessage();
   const isAnonymous = !session?.user;
   const isModelDisallowedForAnonymous =
     isAnonymous &&
@@ -210,6 +209,7 @@ function PureMultimodalInput({
 
   const coreSubmitLogic = useCallback(() => {
     const input = getInputValue();
+    const sendMessage = storeApi.getState().currentChatHelpers?.sendMessage;
     if (!sendMessage) return;
 
     // For new chats, we need to update the url to include the chatId
@@ -220,7 +220,7 @@ function PureMultimodalInput({
     // Get the appropriate parent message ID
     const effectiveParentMessageId = isEditMode
       ? parentMessageId
-      : chatStore.getState().getLastMessageId();
+      : storeApi.getState().getLastMessageId();
 
     // In edit mode, trim messages to the parent message
     if (isEditMode) {
@@ -229,13 +229,16 @@ function PureMultimodalInput({
         setMessages([]);
       } else {
         // Find the parent message and trim to that point
-        const currentMessages = chatStore.getState().messages;
-        const parentIndex = currentMessages.findIndex(
-          (msg) => msg.id === parentMessageId,
-        );
+        const parentIndex = storeApi
+          .getState()
+          .getThrottledMessages()
+          .findIndex((msg: ChatMessage) => msg.id === parentMessageId);
         if (parentIndex !== -1) {
           // Keep messages up to and including the parent
-          const messagesUpToParent = currentMessages.slice(0, parentIndex + 1);
+          const messagesUpToParent = storeApi
+            .getState()
+            .getThrottledMessages()
+            .slice(0, parentIndex + 1);
           setMessages(messagesUpToParent);
         }
       }
@@ -276,7 +279,6 @@ function PureMultimodalInput({
     }
   }, [
     attachments,
-    sendMessage,
     isMobile,
     chatId,
     selectedTool,
@@ -288,6 +290,7 @@ function PureMultimodalInput({
     setMessages,
     editorRef,
     onSendMessage,
+    storeApi,
   ]);
 
   const submitForm = useCallback(() => {
@@ -665,8 +668,6 @@ function PureAttachmentsButton({
 
 const AttachmentsButton = memo(PureAttachmentsButton);
 
-// Removed standalone StopButton; stop is now handled by PromptInputSubmit
-
 function PureChatInputBottomControls({
   selectedModelId,
   onModelChange,
@@ -690,6 +691,7 @@ function PureChatInputBottomControls({
   uploadQueue: Array<string>;
   submission: { enabled: boolean; message?: string };
 }) {
+  const stopHelper = useChatHelperStop();
   return (
     <PromptInputToolbar className="flex flex-row justify-between min-w-0 w-full gap-1 @[400px]:gap-2 border-t">
       <PromptInputTools className="flex items-center gap-1 @[400px]:gap-2 min-w-0">
@@ -712,7 +714,7 @@ function PureChatInputBottomControls({
         onClick={(e) => {
           e.preventDefault();
           if (status === 'streaming' || status === 'submitted') {
-            void chatStore.getState().currentChatHelpers?.stop?.();
+            void stopHelper?.();
           } else if (status === 'ready' || status === 'error') {
             if (!submission.enabled) {
               if (submission.message) toast.error(submission.message);
