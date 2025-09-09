@@ -669,7 +669,8 @@ export const useMessageMetadata = (messageId: string | null) => {
     const message = state
       .getThrottledMessages()
       .find((m) => m.id === messageId);
-    if (!message) throw new Error(`Message not found for id: ${messageId}`);
+    // TODO: We should return an error and make sure state don't go out of sync
+    if (!message) return undefined;
     return message.metadata;
   }, shallow);
 };
