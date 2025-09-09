@@ -196,8 +196,8 @@ export async function GET(req: Request) {
                 width: '90px',
                 height: '90px',
                 borderRadius: '9999px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.10)',
+                // background: 'rgba(255,255,255,0.05)',
+                // border: '1px solid rgba(255,255,255,0.10)',
               }}
             >
               <div style={{ display: 'flex' }}>VS</div>
