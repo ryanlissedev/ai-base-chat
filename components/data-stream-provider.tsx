@@ -21,7 +21,6 @@ export function DataStreamProvider({
   const [dataStream, setDataStream] = useState<DataUIPart<CustomUIDataTypes>[]>(
     [],
   );
-
   const value = useMemo(() => ({ dataStream, setDataStream }), [dataStream]);
 
   return (

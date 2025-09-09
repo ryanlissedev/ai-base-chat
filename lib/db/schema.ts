@@ -56,6 +56,7 @@ export const message = pgTable('Message', {
   isPartial: boolean('isPartial').notNull().default(false),
   selectedModel: varchar('selectedModel', { length: 256 }).default(''),
   selectedTool: varchar('selectedTool', { length: 256 }).default(''),
+  lastContext: json('lastContext'),
 });
 
 export type DBMessage = InferSelectModel<typeof message>;

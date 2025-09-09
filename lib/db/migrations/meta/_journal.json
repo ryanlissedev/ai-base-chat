@@ -148,6 +148,20 @@
       "when": 1753000770291,
       "tag": "0020_strange_senator_kelly",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1757415064137,
+      "tag": "0021_exotic_menace",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1757443178603,
+      "tag": "0022_modern_mole_man",
+      "breakpoints": true
     }
   ]
 }

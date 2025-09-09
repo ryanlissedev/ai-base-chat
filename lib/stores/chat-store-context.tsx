@@ -662,6 +662,18 @@ export const useMessageMetadataById = (
     if (!message) throw new Error(`Message not found for id: ${messageId}`);
     return message.metadata;
   }, shallow);
+
+export const useMessageMetadata = (messageId: string | null) => {
+  return useChatStore((state) => {
+    if (!messageId) return undefined;
+    const message = state
+      .getThrottledMessages()
+      .find((m) => m.id === messageId);
+    if (!message) throw new Error(`Message not found for id: ${messageId}`);
+    return message.metadata;
+  }, shallow);
+};
+
 export const useMessagePartTypesById = (
   messageId: string,
 ): Array<ChatMessage['parts'][number]['type']> =>

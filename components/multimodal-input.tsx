@@ -1,6 +1,5 @@
 'use client';
 import type { Attachment, ChatMessage, UiToolName } from '@/lib/ai/types';
-import type { ModelId } from '@/lib/models/model-id';
 
 import type React from 'react';
 import {
@@ -15,7 +14,6 @@ import {
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDropzone } from 'react-dropzone';
-import { motion } from 'motion/react';
 import { useSession } from 'next-auth/react';
 import {
   useChatHelperStop,
@@ -23,8 +21,6 @@ import {
   useChatStoreApi,
   useMessageIds,
 } from '@/lib/stores/chat-store-context';
-
-import { AttachmentList } from './attachment-list';
 import { PlusIcon } from 'lucide-react';
 import { ImageModal } from './image-modal';
 import { ChatInputTextArea } from './chat-input';
@@ -32,7 +28,6 @@ import {
   PromptInput,
   PromptInputToolbar,
   PromptInputTools,
-  PromptInputContextBar,
   PromptInputSubmit,
   PromptInputButton,
 } from '@/components/ai-elements/prompt-input';
@@ -54,6 +49,8 @@ import { generateUUID } from '@/lib/utils';
 import { useSaveMessageMutation } from '@/hooks/chat-sync-hooks';
 import { ANONYMOUS_LIMITS } from '@/lib/types/anonymous';
 import { processFilesForUpload } from '@/lib/files/upload-prep';
+import type { ModelId } from '@/lib/models/model-id';
+import { ContextBar } from '@/components/context-bar';
 
 const IMAGE_UPLOAD_LIMITS = {
   maxBytes: 1024 * 1024,
@@ -539,28 +536,15 @@ function PureMultimodalInput({
             />
           )}
 
-          <motion.div
-            animate={{
-              height:
-                attachments.length > 0 || uploadQueue.length > 0 ? 'auto' : 0,
-              opacity: attachments.length > 0 || uploadQueue.length > 0 ? 1 : 0,
-            }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            style={{ overflow: 'hidden' }}
-          >
-            {(attachments.length > 0 || uploadQueue.length > 0) && (
-              <PromptInputContextBar className="border-b">
-                <AttachmentList
-                  attachments={attachments}
-                  uploadQueue={uploadQueue}
-                  onRemove={removeAttachment}
-                  onImageClick={handleImageClick}
-                  testId="attachments-preview"
-                  className="px-3 py-2"
-                />
-              </PromptInputContextBar>
-            )}
-          </motion.div>
+          <ContextBar
+            className=""
+            attachments={attachments}
+            uploadQueue={uploadQueue}
+            onRemove={removeAttachment}
+            onImageClick={handleImageClick}
+            selectedModelId={selectedModelId}
+            parentMessageId={parentMessageId}
+          />
 
           <ChatInputTextArea
             data-testid="multimodal-input"

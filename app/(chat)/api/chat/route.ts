@@ -264,6 +264,7 @@ export async function POST(request: NextRequest) {
             id: userMessage.id,
             chatId: chatId,
             role: userMessage.role,
+            lastContext: undefined,
             parts: userMessage.parts,
             attachments: [],
             createdAt: new Date(),
@@ -441,6 +442,7 @@ export async function POST(request: NextRequest) {
             id: messageId,
             chatId: chatId,
             role: 'assistant',
+            lastContext: undefined,
             parts: [], // Empty placeholder
             attachments: [],
             createdAt: new Date(),
@@ -534,6 +536,7 @@ export async function POST(request: NextRequest) {
                   return {
                     ...initialMetadata,
                     isPartial: false,
+                    usage: part.totalUsage,
                   };
                 }
               },
@@ -582,7 +585,7 @@ export async function POST(request: NextRequest) {
                     chatId: chatId,
                     role: assistantMessage.role ?? '',
                     parts: assistantMessage.parts ?? [],
-
+                    lastContext: responseMessage.metadata.usage,
                     attachments: [],
                     createdAt: new Date(),
                     annotations: [],
