@@ -45,7 +45,7 @@ export function WideModelDetails({
           <div className="flex items-center gap-4">
             {provider ? getProviderIcon(provider, 48) : null}
             <div className="min-w-0">
-              <div className="text-3xl font-semibold tracking-tight truncate mb-0.5">
+              <div className="sm:text-3xl text-2xl font-semibold tracking-tight mb-0.5">
                 {model?.name ?? 'Model'}
               </div>
               <div className="text-sm text-muted-foreground font-medium capitalize">

@@ -5,6 +5,8 @@ import { allModels } from '@/lib/ai/all-models';
 // Toggle to include/exclude "Performance" related copy
 const ENABLE_PERFORMANCE_COPY = false;
 
+const SITE_URL = `http://${process.env.VERCEL_PROJECT_PRODUCTION_URL ?? 'localhost:3000'}`;
+
 export default function Page(_props: PageProps<'/compare/[[...slug]]'>) {
   return <ComparePage />;
 }
@@ -94,6 +96,23 @@ export async function generateMetadata(
 
   const path = ['/compare', ...segments].join(segments.length ? '/' : '');
 
+  const query = new URLSearchParams();
+  if (leftId) query.set('modelId1', leftId);
+  if (rightId) query.set('modelId2', rightId);
+
+  // Use basic OG when no models are selected; otherwise use compare OG
+  let ogImageUrl: string;
+  if (leftId) {
+    ogImageUrl = `${SITE_URL}/api/og/compare${
+      query.toString() ? `?${query.toString()}` : ''
+    }`;
+  } else {
+    const basic = new URLSearchParams();
+    basic.set('title', 'AI Model Comparison');
+    basic.set('description', description);
+    ogImageUrl = `${SITE_URL}/api/og/basic?${basic.toString()}`;
+  }
+
   return {
     title,
     description,
@@ -102,11 +121,13 @@ export async function generateMetadata(
       description,
       url: path,
       type: 'website',
+      images: [ogImageUrl],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [ogImageUrl],
     },
     keywords,
     alternates: {
