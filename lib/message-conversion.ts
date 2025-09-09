@@ -45,6 +45,7 @@ export function chatMessageToDbMessage(
     role: message.role,
     parts: message.parts,
     attachments: [],
+    lastContext: message.metadata?.usage || null,
     createdAt: message.metadata?.createdAt || new Date(),
     annotations: [],
     isPartial: isPartial,
