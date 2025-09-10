@@ -2,7 +2,7 @@
 
 import type { Attachment } from '@/lib/ai/types';
 import type { ModelId } from '@/lib/models/model-id';
-import { useMessageMetadata } from '@/lib/stores/chat-store-context';
+import { useLastUsageUntilMessageId } from '@/lib/stores/chat-store-context';
 import { PromptInputContextBar } from '@/components/ai-elements/prompt-input';
 import { AttachmentList } from '@/components/attachment-list';
 import {
@@ -42,23 +42,7 @@ export function ContextBar({
   parentMessageId: string | null;
   className?: string;
 }) {
-  const metadata = useMessageMetadata(parentMessageId);
-  const usage = metadata?.usage;
-  const contextMax = useMemo(() => {
-    try {
-      const cw = getContextWindow(selectedModelId as unknown as string);
-      return cw.combinedMax ?? cw.inputMax ?? 0;
-    } catch {
-      return 0;
-    }
-  }, [selectedModelId]);
-
-  const usedTokens = useMemo(() => {
-    if (!usage) return 0;
-    const input = (usage as any).inputTokens ?? 0;
-    const cached = (usage as any).cachedInputTokens ?? 0;
-    return input + cached;
-  }, [usage]);
+  const usage = useLastUsageUntilMessageId(parentMessageId);
 
   const hasBarContent =
     attachments.length > 0 || uploadQueue.length > 0 || usage;
@@ -84,27 +68,54 @@ export function ContextBar({
             className="px-3 py-2 grow"
           />
         )}
-        <div className="ml-auto">
-          <Context
-            usedTokens={usedTokens}
-            maxTokens={contextMax}
-            usage={usage as LanguageModelUsage | undefined}
-            modelId={selectedModelId.split('/').join(':') as TokenLensModelId}
-          >
-            <ContextTrigger />
-            <ContextContent align="end">
-              <ContextContentHeader />
-              <ContextContentBody className="space-y-2">
-                <ContextInputUsage />
-                <ContextOutputUsage />
-                <ContextReasoningUsage />
-                <ContextCacheUsage />
-              </ContextContentBody>
-              <ContextContentFooter />
-            </ContextContent>
-          </Context>
-        </div>
+        {usage && (
+          <div className="ml-auto">
+            <ContextUsage usage={usage} selectedModelId={selectedModelId} />
+          </div>
+        )}
       </PromptInputContextBar>
     </motion.div>
+  );
+}
+
+function ContextUsage({
+  usage,
+  selectedModelId,
+}: { usage: LanguageModelUsage; selectedModelId: ModelId }) {
+  const contextMax = useMemo(() => {
+    try {
+      const cw = getContextWindow(selectedModelId as unknown as string);
+      return cw.combinedMax ?? cw.inputMax ?? 0;
+    } catch {
+      return 0;
+    }
+  }, [selectedModelId]);
+
+  const usedTokens = useMemo(() => {
+    if (!usage) return 0;
+    const input = (usage as any).inputTokens ?? 0;
+    const cached = (usage as any).cachedInputTokens ?? 0;
+    return input + cached;
+  }, [usage]);
+
+  return (
+    <Context
+      usedTokens={usedTokens}
+      maxTokens={contextMax}
+      usage={usage as LanguageModelUsage | undefined}
+      modelId={selectedModelId.split('/').join(':') as TokenLensModelId}
+    >
+      <ContextTrigger />
+      <ContextContent align="end">
+        <ContextContentHeader />
+        <ContextContentBody className="space-y-2">
+          <ContextInputUsage />
+          <ContextOutputUsage />
+          <ContextReasoningUsage />
+          <ContextCacheUsage />
+        </ContextContentBody>
+        <ContextContentFooter />
+      </ContextContent>
+    </Context>
   );
 }

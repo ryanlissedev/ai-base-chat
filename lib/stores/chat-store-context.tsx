@@ -258,6 +258,7 @@ export function createChatStore<UI_MESSAGE extends UIMessage>(
               ? state.messages[state.messages.length - 1].id
               : null;
           },
+
           getMessageIds: () => {
             const state = get();
             return (state._throttledMessages || state.messages).map(
@@ -612,6 +613,19 @@ export const useChatError = () => useChatStore((state) => state.error);
 export const useChatId = () => useChatStore((state) => state.id);
 export const useMessageIds = () =>
   useChatStore((state) => state.getMessageIds(), shallow);
+
+export const useLastUsageUntilMessageId = (messageId: string | null) =>
+  useChatStore((state) => {
+    if (!messageId) return undefined;
+    const messages = state._throttledMessages || state.messages;
+    const messageIdx = messages.findIndex((m) => m.id === messageId);
+    if (messageIdx === -1) return undefined;
+
+    const sliced = messages.slice(0, messageIdx + 1);
+    return sliced.findLast((m) => m.role === 'assistant' && m.metadata?.usage)
+      ?.metadata?.usage;
+  }, shallow);
+
 export const useMessageById = (messageId: string): ChatMessage =>
   useChatStore((state) => {
     const message = state
@@ -662,18 +676,6 @@ export const useMessageMetadataById = (
     if (!message) throw new Error(`Message not found for id: ${messageId}`);
     return message.metadata;
   }, shallow);
-
-export const useMessageMetadata = (messageId: string | null) => {
-  return useChatStore((state) => {
-    if (!messageId) return undefined;
-    const message = state
-      .getThrottledMessages()
-      .find((m) => m.id === messageId);
-    // TODO: We should return an error and make sure state don't go out of sync
-    if (!message) return undefined;
-    return message.metadata;
-  }, shallow);
-};
 
 export const useMessagePartTypesById = (
   messageId: string,
