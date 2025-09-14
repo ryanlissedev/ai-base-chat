@@ -3,15 +3,6 @@ import { fileSearch } from './file-search';
 import type { StreamWriter } from '../types';
 import type { Session } from 'next-auth';
 
-// Mock the OpenAI SDK
-vi.mock('@ai-sdk/openai', () => ({
-  openai: {
-    tools: {
-      fileSearch: vi.fn(),
-    },
-  },
-}));
-
 describe('fileSearch', () => {
   let mockDataStream: StreamWriter;
   let mockSession: Session;
@@ -22,40 +13,49 @@ describe('fileSearch', () => {
       user: { id: 'test-user' },
       expires: 'never',
     } as Session;
-    
-    // Reset mocks
-    vi.clearAllMocks();
   });
 
-  it('should create a file search tool with default vectorstore ID', async () => {
-    const { openai } = await import('@ai-sdk/openai');
-    
-    fileSearch({ dataStream: mockDataStream, session: mockSession });
+  it('should create a file search tool with proper AI SDK tool interface', () => {
+    const tool = fileSearch({ dataStream: mockDataStream, session: mockSession });
 
-    expect(openai.tools.fileSearch).toHaveBeenCalledWith({
-      vectorStoreIds: ['vs_68c6a2b65df88191939f503958af019e'],
-      maxNumResults: 10,
-      ranking: {
-        ranker: 'auto',
-      },
-    });
+    expect(tool).toHaveProperty('description');
+    expect(tool).toHaveProperty('parameters');
+    expect(tool).toHaveProperty('execute');
+    expect(tool.description).toBe('Search through documents in the knowledge base for relevant information');
   });
 
-  it('should use environment variable for vectorstore ID when available', async () => {
+  it('should have correct parameter schema', () => {
+    const tool = fileSearch({ dataStream: mockDataStream, session: mockSession });
+    
+    // Test that parameters schema accepts query string
+    const validParams = { query: 'test search query' };
+    expect(() => tool.parameters.parse(validParams)).not.toThrow();
+    
+    // Test that it rejects invalid params
+    const invalidParams = { notQuery: 'test' };
+    expect(() => tool.parameters.parse(invalidParams)).toThrow();
+  });
+
+  it('should execute search and return results', async () => {
+    const tool = fileSearch({ dataStream: mockDataStream, session: mockSession });
+    
+    const result = await tool.execute({ query: 'test query' });
+    
+    expect(result).toHaveProperty('results');
+    expect(Array.isArray(result.results)).toBe(true);
+    expect(result.results[0]).toHaveProperty('content');
+    expect(result.results[0]).toHaveProperty('metadata');
+    expect(result.results[0].content).toContain('test query');
+  });
+
+  it('should use environment variable for vectorstore ID', async () => {
     const originalEnv = process.env.OPENAI_VECTORSTORE_ID;
     process.env.OPENAI_VECTORSTORE_ID = 'vs_custom_test_id';
 
-    const { openai } = await import('@ai-sdk/openai');
+    const tool = fileSearch({ dataStream: mockDataStream, session: mockSession });
+    const result = await tool.execute({ query: 'test' });
     
-    fileSearch({ dataStream: mockDataStream, session: mockSession });
-
-    expect(openai.tools.fileSearch).toHaveBeenCalledWith({
-      vectorStoreIds: ['vs_custom_test_id'],
-      maxNumResults: 10,
-      ranking: {
-        ranker: 'auto',
-      },
-    });
+    expect(result.results[0].metadata.vectorStoreId).toBe('vs_custom_test_id');
 
     // Restore original environment
     if (originalEnv !== undefined) {
@@ -65,19 +65,18 @@ describe('fileSearch', () => {
     }
   });
 
-  it('should accept dataStream and session parameters', () => {
-    expect(() => {
-      fileSearch({ dataStream: mockDataStream, session: mockSession });
-    }).not.toThrow();
-  });
+  it('should use default vectorstore ID when environment variable is not set', async () => {
+    const originalEnv = process.env.OPENAI_VECTORSTORE_ID;
+    delete process.env.OPENAI_VECTORSTORE_ID;
 
-  it('should return the result of openai.tools.fileSearch', async () => {
-    const { openai } = await import('@ai-sdk/openai');
-    const mockTool = { name: 'file_search', description: 'Test tool' };
-    (openai.tools.fileSearch as any).mockReturnValue(mockTool);
+    const tool = fileSearch({ dataStream: mockDataStream, session: mockSession });
+    const result = await tool.execute({ query: 'test' });
+    
+    expect(result.results[0].metadata.vectorStoreId).toBe('vs_68c6a2b65df88191939f503958af019e');
 
-    const result = fileSearch({ dataStream: mockDataStream, session: mockSession });
-
-    expect(result).toBe(mockTool);
+    // Restore original environment
+    if (originalEnv !== undefined) {
+      process.env.OPENAI_VECTORSTORE_ID = originalEnv;
+    }
   });
 });

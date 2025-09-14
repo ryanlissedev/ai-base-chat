@@ -66,8 +66,6 @@ export const getModelProviderOptions = (
   | Record<string, never> => {
   const model = getModelDefinition(providerModelId);
   if (model.owned_by === 'openai') {
-    const vectorStoreId = process.env.OPENAI_VECTORSTORE_ID || 'vs_68c6a2b65df88191939f503958af019e';
-    
     if (model.features?.reasoning) {
       return {
         openai: {
@@ -77,27 +75,10 @@ export const getModelProviderOptions = (
           model.id === 'openai/gpt-5-nano'
             ? { reasoningEffort: 'low' }
             : {}),
-          tools: {
-            file_search: openai.tools.fileSearch({
-              vectorStoreIds: [vectorStoreId],
-              maxNumResults: 10,
-              ranking: { ranker: 'auto' },
-            }),
-          },
         } satisfies OpenAIResponsesProviderOptions,
       };
     } else {
-      return { 
-        openai: {
-          tools: {
-            file_search: openai.tools.fileSearch({
-              vectorStoreIds: [vectorStoreId],
-              maxNumResults: 10,
-              ranking: { ranker: 'auto' },
-            }),
-          },
-        } satisfies OpenAIResponsesProviderOptions,
-      };
+      return { openai: {} };
     }
   } else if (model.owned_by === 'anthropic') {
     if (model.features?.reasoning) {
