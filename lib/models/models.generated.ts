@@ -1178,8 +1178,8 @@ export const modelsData: ModelData[] = [
     owned_by: 'openai',
     name: 'GPT-5',
     description:
-      "GPT-5 is OpenAI's flagship language model that excels at complex reasoning, broad real-world knowledge, code-intensive, and multi-step agentic tasks.",
-    context_window: 400000,
+      "GPT-5 is OpenAI's best model for coding and agentic tasks. Scores 74.9% on SWE-bench Verified and 88% on Aider polyglot. Steerable, collaborative, and excels at producing high-quality code with proactive task completion. Knowledge cutoff: September 2024.",
+    context_window: 272000,
     max_tokens: 128000,
     type: 'language',
     pricing: {
@@ -1195,8 +1195,8 @@ export const modelsData: ModelData[] = [
     owned_by: 'openai',
     name: 'GPT-5 mini',
     description:
-      'GPT-5 mini is a cost optimized model that excels at reasoning/chat tasks. It offers an optimal balance between speed, cost, and capability.',
-    context_window: 400000,
+      'GPT-5 mini is a faster, cost-efficient version of GPT-5. Optimal balance between speed, cost, and capability for coding and reasoning tasks. Available to all GitHub Copilot plans including free tier. Knowledge cutoff: May 2024.',
+    context_window: 272000,
     max_tokens: 128000,
     type: 'language',
     pricing: {
@@ -1212,8 +1212,8 @@ export const modelsData: ModelData[] = [
     owned_by: 'openai',
     name: 'GPT-5 nano',
     description:
-      'GPT-5 nano is a high throughput model that excels at simple instruction or classification tasks.',
-    context_window: 400000,
+      'GPT-5 nano is the fastest and most cost-efficient GPT-5 variant. Optimized for high throughput simple instructions, classification tasks, and basic coding. Ideal for batch processing. Knowledge cutoff: May 2024.',
+    context_window: 272000,
     max_tokens: 128000,
     type: 'language',
     pricing: {

@@ -706,7 +706,7 @@ export const generatedModelFeatures = {
     reasoning: true,
     toolCall: true,
     releaseDate: new Date('2025-08-07'),
-    knowledgeCutoff: new Date('2024-10-01'),
+    knowledgeCutoff: new Date('2024-09-30'),
     input: {
       image: true,
       text: true,
@@ -724,7 +724,7 @@ export const generatedModelFeatures = {
     reasoning: true,
     toolCall: true,
     releaseDate: new Date('2025-08-07'),
-    knowledgeCutoff: new Date('2024-10-01'),
+    knowledgeCutoff: new Date('2024-05-30'),
     input: {
       image: true,
       text: true,
@@ -742,9 +742,9 @@ export const generatedModelFeatures = {
     reasoning: true,
     toolCall: true,
     releaseDate: new Date('2025-08-07'),
-    knowledgeCutoff: new Date('2024-10-01'),
+    knowledgeCutoff: new Date('2024-05-30'),
     input: {
-      image: true,
+      image: false,
       text: true,
       pdf: false,
       audio: false,
