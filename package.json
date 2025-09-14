@@ -21,7 +21,7 @@
     "db:up": "drizzle-kit up",
     "fetch-models": "tsx scripts/fetch-models.ts",
     "fetch-model-features": "tsx scripts/fetch-model-features.ts",
-    "test": "export PLAYWRIGHT=True && bunx playwright test --workers=4",
+    "test": "export PLAYWRIGHT=True && npx playwright test --workers=4",
     "test:unit": "vitest run",
     "test:types": "next typegen . && tsc --noEmit"
   },
