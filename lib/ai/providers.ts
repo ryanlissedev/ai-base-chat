@@ -66,9 +66,17 @@ export const getModelProviderOptions = (
   | Record<string, never> => {
   const model = getModelDefinition(providerModelId);
   if (model.owned_by === 'openai') {
+    const fileSearchTool = openai.tools.fileSearch({
+      vectorStoreIds: [
+        process.env.OPENAI_VECTORSTORE_ID ||
+          'vs_68c6a2b65df88191939f503958af019e',
+      ],
+    });
+
     if (model.features?.reasoning) {
       return {
         openai: {
+          tools: { file_search: fileSearchTool },
           reasoningSummary: 'auto',
           ...(model.id === 'openai/gpt-5' ||
           model.id === 'openai/gpt-5-mini' ||
@@ -78,7 +86,7 @@ export const getModelProviderOptions = (
         } satisfies OpenAIResponsesProviderOptions,
       };
     } else {
-      return { openai: {} };
+      return { openai: { tools: { file_search: fileSearchTool } } };
     }
   } else if (model.owned_by === 'anthropic') {
     if (model.features?.reasoning) {

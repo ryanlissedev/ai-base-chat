@@ -6,6 +6,11 @@ export const toolsDefinitions: Record<ToolName, ToolDefinition> = {
     description: 'Get the weather in a specific location',
     cost: 1,
   },
+  fileSearch: {
+    name: 'fileSearch',
+    description: 'Search files via OpenAI vector store',
+    cost: 2,
+  },
   createDocument: {
     name: 'createDocument',
     description: 'Create a new document',

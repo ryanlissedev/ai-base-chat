@@ -282,6 +282,8 @@ export async function POST(request: NextRequest) {
     // else if (selectedTool === 'reason') explicitlyRequestedTool = 'reasonSearch';
     else if (selectedTool === 'webSearch')
       explicitlyRequestedTools = ['webSearch'];
+    else if (selectedTool === 'fileSearch')
+      explicitlyRequestedTools = ['fileSearch'];
     else if (selectedTool === 'generateImage')
       explicitlyRequestedTools = ['generateImage'];
     else if (selectedTool === 'createDocument')
@@ -333,6 +335,10 @@ export async function POST(request: NextRequest) {
         activeTools = activeTools.filter(
           (tool: ToolName) => tool !== 'deepResearch',
         );
+      }
+      // Ensure fileSearch is available by default when tools are enabled
+      if (!activeTools.includes('fileSearch')) {
+        activeTools = [...activeTools, 'fileSearch'];
       }
     }
 

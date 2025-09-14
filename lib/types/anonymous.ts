@@ -40,6 +40,7 @@ export const ANONYMOUS_LIMITS = {
     'createDocument',
     'updateDocument',
     'retrieve',
+    'fileSearch',
     'webSearch',
     'stockChart',
     'codeInterpreter',
