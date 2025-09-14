@@ -44,7 +44,6 @@ import {
 import { LimitDisplay } from './upgrade-cta/limit-display';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { LoginPrompt } from './upgrade-cta/login-prompt';
 import { generateUUID } from '@/lib/utils';
 import { useSaveMessageMutation } from '@/hooks/chat-sync-hooks';
 import { ANONYMOUS_LIMITS } from '@/lib/types/anonymous';
@@ -144,7 +143,7 @@ function PureMultimodalInput({
         };
       }
       if (isModelDisallowedForAnonymous) {
-        return { enabled: false, message: 'Log in to use this model' };
+        return { enabled: false, message: 'This model is unavailable for guests' };
       }
       if (status !== 'ready' && status !== 'error') {
         return {
@@ -372,7 +371,7 @@ function PureMultimodalInput({
 
       // Check if user is anonymous
       if (!session?.user) {
-        toast.error('Sign in to attach files from clipboard');
+        toast.error('Attachments are unavailable for guests');
         return;
       }
 
@@ -640,11 +639,14 @@ function PureAttachmentsButton({
         </TooltipTrigger>
         <TooltipContent>Add Files</TooltipContent>
       </Tooltip>
-      <PopoverContent className="w-80 p-0" align="end">
-        <LoginPrompt
-          title="Sign in to attach files"
-          description="You can attach images and PDFs to your messages for the AI to analyze."
-        />
+      <PopoverContent className="w-80 p-3" align="end">
+        <div className="space-y-1 text-sm">
+          <div className="font-medium">Attachments unavailable for guests</div>
+          <div className="text-muted-foreground">
+            File uploads require an account. You can still chat and switch
+            models freely.
+          </div>
+        </div>
       </PopoverContent>
     </Popover>
   );

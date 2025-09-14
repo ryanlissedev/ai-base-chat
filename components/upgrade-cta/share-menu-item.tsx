@@ -32,7 +32,7 @@ export function ShareMenuItem({ onShare, children }: ShareMenuItemProps) {
           </DropdownMenuItem>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-2">
-          <p className="text-sm">Sign in to share your chats</p>
+          <p className="text-sm">Sharing unavailable for guests</p>
         </PopoverContent>
       </Popover>
     );
