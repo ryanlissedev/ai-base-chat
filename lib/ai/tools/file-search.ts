@@ -16,7 +16,7 @@ export function fileSearch({
 }) {
   return tool({
     description: 'Search through documents in the knowledge base for relevant information',
-    parameters: z.object({
+    inputSchema: z.object({
       query: z.string().describe('The search query to find relevant documents'),
     }),
     execute: async ({ query }) => {

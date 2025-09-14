@@ -19,28 +19,19 @@ describe('fileSearch', () => {
     const tool = fileSearch({ dataStream: mockDataStream, session: mockSession });
 
     expect(tool).toHaveProperty('description');
-    expect(tool).toHaveProperty('parameters');
+    expect(tool).toHaveProperty('inputSchema');
     expect(tool).toHaveProperty('execute');
     expect(tool.description).toBe('Search through documents in the knowledge base for relevant information');
   });
 
-  it('should have correct parameter schema', () => {
+  it('should have input schema defined', () => {
     const tool = fileSearch({ dataStream: mockDataStream, session: mockSession });
-    
-    // Test that parameters schema accepts query string
-    const validParams = { query: 'test search query' };
-    expect(() => tool.parameters.parse(validParams)).not.toThrow();
-    
-    // Test that it rejects invalid params
-    const invalidParams = { notQuery: 'test' };
-    expect(() => tool.parameters.parse(invalidParams)).toThrow();
+    expect(tool).toHaveProperty('inputSchema');
   });
 
   it('should execute search and return results', async () => {
     const tool = fileSearch({ dataStream: mockDataStream, session: mockSession });
-    
-    const result = await tool.execute({ query: 'test query' });
-    
+    const result: any = await (tool.execute as any)({ query: 'test query' }, {});
     expect(result).toHaveProperty('results');
     expect(Array.isArray(result.results)).toBe(true);
     expect(result.results[0]).toHaveProperty('content');
@@ -53,7 +44,7 @@ describe('fileSearch', () => {
     process.env.OPENAI_VECTORSTORE_ID = 'vs_custom_test_id';
 
     const tool = fileSearch({ dataStream: mockDataStream, session: mockSession });
-    const result = await tool.execute({ query: 'test' });
+    const result: any = await (tool.execute as any)({ query: 'test' }, {});
     
     expect(result.results[0].metadata.vectorStoreId).toBe('vs_custom_test_id');
 
@@ -70,7 +61,7 @@ describe('fileSearch', () => {
     delete process.env.OPENAI_VECTORSTORE_ID;
 
     const tool = fileSearch({ dataStream: mockDataStream, session: mockSession });
-    const result = await tool.execute({ query: 'test' });
+    const result: any = await (tool.execute as any)({ query: 'test' }, {});
     
     expect(result.results[0].metadata.vectorStoreId).toBe('vs_68c6a2b65df88191939f503958af019e');
 

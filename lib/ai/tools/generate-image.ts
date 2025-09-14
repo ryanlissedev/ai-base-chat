@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { tool, experimental_generateImage, type FileUIPart } from 'ai';
 import { getImageModel } from '@/lib/ai/providers';
 import { DEFAULT_IMAGE_MODEL } from '@/lib/ai/all-models';
-import OpenAI, { toFile } from 'openai';
 import { uploadFile } from '@/lib/blob';
 import { createModuleLogger } from '@/lib/logger';
 
@@ -11,9 +10,26 @@ interface GenerateImageProps {
   lastGeneratedImage?: { imageUrl: string; name: string } | null;
 }
 
-const openaiClient = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy, dynamic import of OpenAI SDK to avoid any build-time side effects
+let _openaiClient: any | null = null;
+let _toFile: ((data: Buffer, name: string, opts?: { type?: string }) => Promise<File>) | null = null;
+async function getOpenAI(): Promise<{ client: any | null; toFile: NonNullable<typeof _toFile> | null }> {
+  if (_openaiClient && _toFile) return { client: _openaiClient, toFile: _toFile };
+  const apiKey = process.env.OPENAI_API_KEY;
+  try {
+    const mod: any = await import('openai');
+    _toFile = mod.toFile as typeof _toFile;
+    if (apiKey) {
+      const OpenAI = mod.default;
+      _openaiClient = new OpenAI({ apiKey });
+      return { client: _openaiClient, toFile: _toFile };
+    }
+    return { client: null, toFile: _toFile };
+  } catch {
+    // If the SDK cannot be imported in this environment, treat as unavailable
+    return { client: null, toFile: null };
+  }
+}
 
 const log = createModuleLogger('ai.tools.generate-image');
 
@@ -59,6 +75,11 @@ Use for:
 
       try {
         if (isEdit) {
+          const { client, toFile } = await getOpenAI();
+          if (!client || !toFile) {
+            log.error({ note: 'Missing OPENAI_API_KEY for image edit' });
+            throw new Error('Image editing requires OPENAI_API_KEY');
+          }
           log.debug(
             {
               note: 'OpenAI edit mode',
@@ -98,7 +119,7 @@ Use for:
 
           inputImages.push(...partImages);
 
-          const rsp = await openaiClient.images.edit({
+          const rsp = await client.images.edit({
             model: 'gpt-image-1',
             image: inputImages, // Pass all images to OpenAI
             prompt,
