@@ -5,6 +5,7 @@ import {
   type LucideIcon,
   Images,
   Edit3,
+  Search,
 } from 'lucide-react';
 
 export interface ToolDefinition {
@@ -44,6 +45,13 @@ export const toolDefinitions: Record<UiToolName, ToolDefinition> = {
     icon: Edit3,
     shortName: 'Write',
   },
+  fileSearch: {
+    key: 'fileSearch',
+    name: 'File Search',
+    description: 'Search through documents in the knowledge base.',
+    icon: Search,
+    shortName: 'Files',
+  },
 };
 
 export const enabledTools: UiToolName[] = [
@@ -51,4 +59,5 @@ export const enabledTools: UiToolName[] = [
   'deepResearch',
   'generateImage',
   'createDocument',
+  'fileSearch',
 ];
