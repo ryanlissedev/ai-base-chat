@@ -286,6 +286,8 @@ export async function POST(request: NextRequest) {
       explicitlyRequestedTools = ['generateImage'];
     else if (selectedTool === 'createDocument')
       explicitlyRequestedTools = ['createDocument', 'updateDocument'];
+    else if (selectedTool === 'fileSearch')
+      explicitlyRequestedTools = ['fileSearch'];
 
     const baseModelCost = getBaseModelCostByModelId(selectedModelId);
 
@@ -333,6 +335,12 @@ export async function POST(request: NextRequest) {
         activeTools = activeTools.filter(
           (tool: ToolName) => tool !== 'deepResearch',
         );
+      }
+      
+      // Always include fileSearch if it's affordable (it's only 2 credits)
+      if (!activeTools.includes('fileSearch') && 
+          (isAnonymous ? ANONYMOUS_LIMITS.CREDITS >= 2 : (reservation ? reservation.budget - baseModelCost >= 2 : false))) {
+        activeTools.push('fileSearch');
       }
     }
 

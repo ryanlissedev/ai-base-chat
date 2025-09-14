@@ -13,6 +13,7 @@ import { generateImage } from '@/lib/ai/tools/generate-image';
 import type { ModelId } from '@/lib/models/model-id';
 import type { StreamWriter } from '../types';
 import { deepResearch } from './deep-research/deep-research';
+import { fileSearch } from '@/lib/ai/tools/file-search';
 
 export function getTools({
   dataStream,
@@ -68,6 +69,10 @@ export function getTools({
       dataStream,
       messageId,
       messages: contextForLLM,
+    }),
+    fileSearch: fileSearch({
+      dataStream,
+      session,
     }),
   };
 }
