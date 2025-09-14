@@ -183,11 +183,9 @@ export async function POST(request: NextRequest) {
         log.info('Anonymous message limit reached');
         return new Response(
           JSON.stringify({
-            error: `You've used all ${ANONYMOUS_LIMITS.CREDITS} free messages. Sign up to continue chatting with unlimited access!`,
+            error: `Guest limit reached (${ANONYMOUS_LIMITS.CREDITS} messages).`,
             type: 'ANONYMOUS_LIMIT_EXCEEDED',
             maxMessages: ANONYMOUS_LIMITS.CREDITS,
-            suggestion:
-              'Create an account to get unlimited messages and access to more AI models',
           }),
           {
             status: 402,

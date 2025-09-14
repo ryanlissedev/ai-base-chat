@@ -1,6 +1,4 @@
 import NextAuth, { type User, type Session } from 'next-auth';
-import Google from 'next-auth/providers/google';
-import GitHub from 'next-auth/providers/github';
 
 import { getUserByEmail, createUser } from '@/lib/db/queries';
 
@@ -17,16 +15,8 @@ export const {
   signOut,
 } = NextAuth({
   ...authConfig,
-  providers: [
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET,
-    }),
-    GitHub({
-      clientId: process.env.AUTH_GITHUB_ID,
-      clientSecret: process.env.AUTH_GITHUB_SECRET,
-    }),
-  ],
+  // Disable OAuth providers for guest-only usage
+  providers: [],
   callbacks: {
     async signIn({ user, account, profile }) {
       if (!account || !profile || !user?.email) {

@@ -84,7 +84,7 @@ export function getMessageByErrorCode(errorCode: ErrorCode): string {
       return "The request couldn't be processed. Please check your input and try again.";
 
     case 'unauthorized:auth':
-      return 'You need to sign in before continuing.';
+      return 'You do not have access to this resource.';
     case 'forbidden:auth':
       return 'Your account does not have access to this feature.';
 
@@ -97,7 +97,7 @@ export function getMessageByErrorCode(errorCode: ErrorCode): string {
     case 'forbidden:chat':
       return 'This chat belongs to another user. Please check the chat ID and try again.';
     case 'unauthorized:chat':
-      return 'You need to sign in to view this chat. Please sign in and try again.';
+      return 'You do not have access to view this chat.';
     case 'offline:chat':
       return "We're having trouble sending your message. Please check your internet connection and try again.";
 
@@ -106,7 +106,7 @@ export function getMessageByErrorCode(errorCode: ErrorCode): string {
     case 'forbidden:document':
       return 'This document belongs to another user. Please check the document ID and try again.';
     case 'unauthorized:document':
-      return 'You need to sign in to view this document. Please sign in and try again.';
+      return 'You do not have access to view this document.';
     case 'bad_request:document':
       return 'The request to create or update the document was invalid. Please check your input and try again.';
 

@@ -20,7 +20,6 @@ import { useGetChatById, useSetVisibility } from '@/hooks/chat-sync-hooks';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Copy, GlobeIcon, Loader2, LockIcon, Share } from 'lucide-react';
-import { LoginPrompt } from './upgrade-cta/login-prompt';
 
 type ShareStep = 'info' | 'shared';
 
@@ -280,11 +279,13 @@ export function ShareButton({
     return (
       <Popover>
         <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
-        <PopoverContent className="w-80 p-0" align="start">
-          <LoginPrompt
-            title="Sign in to share your chat"
-            description="Control who can see your conversations and share them with others."
-          />
+        <PopoverContent className="w-80 p-3 text-sm" align="start">
+          <div className="space-y-1">
+            <div className="font-medium">Sharing unavailable for guests</div>
+            <div className="text-muted-foreground">
+              Sharing requires an account. You can still chat anonymously.
+            </div>
+          </div>
         </PopoverContent>
       </Popover>
     );

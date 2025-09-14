@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import { chatModels, getModelDefinition } from '@/lib/ai/all-models';
 import type { ModelId } from '@/lib/models/model-id';
 import { ANONYMOUS_LIMITS } from '@/lib/types/anonymous';
-import { LoginCtaBanner } from '@/components/upgrade-cta/login-cta-banner';
 import {
   ModelSelectorBase,
   type ModelSelectorBaseItem,
@@ -33,28 +32,12 @@ export function PureModelSelector({
     });
   }, [isAnonymous]);
 
-  const hasDisabledModels = useMemo(
-    () => models.some((m) => m.disabled),
-    [models],
-  );
-
   return (
     <ModelSelectorBase
       className={cn('w-fit md:px-2', className)}
       models={models}
       selectedModelId={selectedModelId}
       onModelChange={onModelChangeAction}
-      topContent={
-        hasDisabledModels ? (
-          <div className="p-3">
-            <LoginCtaBanner
-              message="Sign in to unlock all models."
-              variant="default"
-              compact
-            />
-          </div>
-        ) : null
-      }
       enableFilters
     />
   );

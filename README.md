@@ -13,9 +13,7 @@
 
 </div>
 
-![sparka_gif_demo](https://github.com/user-attachments/assets/34a03eed-58fa-4b1e-b453-384351b1c08c)
-
-Access every major AI assistant Claude, GPT-4, Gemini, Grok, and 20+ models through one interface. Get capabilities like document analysis, image generation, code execution, and research tools without managing multiple subscriptions. Try instantly, no signup required.
+Access every major AI assistant Claude, GPT-4, Gemini, Grok, and 20+ models through one interface. Get capabilities like document analysis, image generation, code execution, and research tools without managing multiple subscriptions. Try instantly — no login required.
 
 
 ## ✨ Features
@@ -80,10 +78,8 @@ Sparka AI is built with modern technologies for scalability and performance:
 
 ### **Quick Start**
 
-1. **Clone and Install**
+1. **Install**
    ```bash
-   git clone https://github.com/franciscomoretti/sparka.git
-   cd sparka
    bun install
    ```
 
@@ -108,8 +104,4 @@ Visit [http://localhost:3000](http://localhost:3000) to start using Sparka AI lo
 
 ## 🙏 Acknowledgements
 
-Sparka AI was built on the shoulders of giants. We're deeply grateful to these outstanding open source projects:
-
-- **[Vercel AI Chatbot](https://github.com/vercel/ai-chatbot)** - Core architecture and AI SDK integration patterns
-- **[Scira](https://github.com/zaidmukaddam/scira)** - AI-powered search engine
-
+Sparka AI was built on the shoulders of giants. We're deeply grateful to the open source community and the projects that inspired this work.
