@@ -48,6 +48,7 @@ export const ANONYMOUS_LIMITS = {
     'requestSuggestions',
     'readDocument',
     'deepResearch',
+    'fileSearch',
   ] satisfies ToolName[],
   SESSION_DURATION: 2147483647, // Max session time
   // Very high rate-limit defaults (can be overridden via env)

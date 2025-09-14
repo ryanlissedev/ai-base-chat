@@ -61,6 +61,11 @@ export const toolsDefinitions: Record<ToolName, ToolDefinition> = {
     description: 'Research a topic',
     cost: 50,
   },
+  fileSearch: {
+    name: 'fileSearch',
+    description: 'Search through documents in the knowledge base',
+    cost: 2,
+  },
 };
 
 export const allTools = toolNameSchema.options;

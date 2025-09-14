@@ -9,6 +9,7 @@ import type { tavilyWebSearch } from '@/lib/ai/tools/web-search';
 import type { stockChart } from '@/lib/ai/tools/stock-chart';
 import type { codeInterpreter } from '@/lib/ai/tools/code-interpreter';
 import type { retrieve } from '@/lib/ai/tools/retrieve';
+import type { fileSearch } from '@/lib/ai/tools/file-search';
 import type {
   InferUITool,
   UIMessage,
@@ -34,6 +35,7 @@ export const toolNameSchema = z.enum([
   'codeInterpreter',
   'generateImage',
   'deepResearch',
+  'fileSearch',
 ]);
 
 const _ = toolNameSchema.options satisfies ToolName[];
@@ -45,6 +47,7 @@ export const frontendToolsSchema = z.enum([
   'deepResearch',
   'generateImage',
   'createDocument',
+  'fileSearch',
 ]);
 
 const __ = frontendToolsSchema.options satisfies ToolNameInternal[];
@@ -74,6 +77,7 @@ type webSearchTool = InferUITool<ReturnType<typeof tavilyWebSearch>>;
 type stockChartTool = InferUITool<typeof stockChart>;
 type codeInterpreterTool = InferUITool<typeof codeInterpreter>;
 type retrieveTool = InferUITool<typeof retrieve>;
+type fileSearchTool = InferUITool<ReturnType<typeof fileSearch>>;
 
 export type ChatTools = {
   getWeather: weatherTool;
@@ -87,6 +91,7 @@ export type ChatTools = {
   stockChart: stockChartTool;
   codeInterpreter: codeInterpreterTool;
   retrieve: retrieveTool;
+  fileSearch: fileSearchTool;
 };
 
 export type CustomUIDataTypes = {

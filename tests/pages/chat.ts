@@ -1,6 +1,6 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { legacyChatModels } from '@/lib/ai/legacy-models';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { legacyChatModels } from '../../lib/ai/legacy-models';
 import { expect, type Page } from '@playwright/test';
 
 export class ChatPage {
