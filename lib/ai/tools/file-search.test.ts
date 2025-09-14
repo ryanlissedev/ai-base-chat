@@ -19,7 +19,7 @@ describe('fileSearch', () => {
     const tool = fileSearch({ dataStream: mockDataStream, session: mockSession });
 
     expect(tool).toHaveProperty('description');
-    expect(tool).toHaveProperty('parameters');
+    expect(tool).toHaveProperty('inputSchema');
     expect(tool).toHaveProperty('execute');
     expect(tool.description).toBe('Search through documents in the knowledge base for relevant information');
   });
@@ -29,11 +29,11 @@ describe('fileSearch', () => {
     
     // Test that parameters schema accepts query string
     const validParams = { query: 'test search query' };
-    expect(() => tool.parameters.parse(validParams)).not.toThrow();
+    expect(() => tool.inputSchema.parse(validParams)).not.toThrow();
     
     // Test that it rejects invalid params
     const invalidParams = { notQuery: 'test' };
-    expect(() => tool.parameters.parse(invalidParams)).toThrow();
+    expect(() => tool.inputSchema.parse(invalidParams)).toThrow();
   });
 
   it('should execute search and return results', async () => {
