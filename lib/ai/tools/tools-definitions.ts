@@ -54,7 +54,7 @@ export const toolsDefinitions: Record<ToolName, ToolDefinition> = {
   generateImage: {
     name: 'generateImage',
     description: 'Generate images from text descriptions',
-    cost: 5,
+    cost: 50,
   },
   deepResearch: {
     name: 'deepResearch',
