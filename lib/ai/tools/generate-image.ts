@@ -11,9 +11,15 @@ interface GenerateImageProps {
   lastGeneratedImage?: { imageUrl: string; name: string } | null;
 }
 
-const openaiClient = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy-init OpenAI client to avoid throwing at import time during build
+let openaiClient: OpenAI | null = null;
+function getOpenAIClient(): OpenAI | null {
+  if (openaiClient) return openaiClient;
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return null;
+  openaiClient = new OpenAI({ apiKey });
+  return openaiClient;
+}
 
 const log = createModuleLogger('ai.tools.generate-image');
 
@@ -59,6 +65,11 @@ Use for:
 
       try {
         if (isEdit) {
+          const client = getOpenAIClient();
+          if (!client) {
+            log.error({ note: 'Missing OPENAI_API_KEY for image edit' });
+            throw new Error('Image editing requires OPENAI_API_KEY');
+          }
           log.debug(
             {
               note: 'OpenAI edit mode',
@@ -98,7 +109,7 @@ Use for:
 
           inputImages.push(...partImages);
 
-          const rsp = await openaiClient.images.edit({
+          const rsp = await client.images.edit({
             model: 'gpt-image-1',
             image: inputImages, // Pass all images to OpenAI
             prompt,
