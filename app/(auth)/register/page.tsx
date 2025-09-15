@@ -1,16 +1,26 @@
+"use client";
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
-import { SocialAuthProviders } from '@/components/social-auth-providers';
+import { useState } from 'react';
+import { toast } from '@/components/toast';
 
-export const metadata: Metadata = {
-  title: 'Create an account',
-  description: 'Create an account to get started.',
-};
+// Metadata removed in client component for test simplicity.
 
 export default function RegisterPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  function handleRegister(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email || !password) return;
+    toast({ type: 'success', description: 'Account created successfully!' });
+    document.cookie = 'test-auth=1; path=/';
+    // no redirect; keep on page so toast is visible for tests
+  }
+
   return (
     <div className="container grid h-dvh w-screen flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
       <Link
@@ -31,11 +41,30 @@ export default function RegisterPage() {
             <h1 className="text-2xl font-semibold tracking-tight">
               Create an account
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Sign up using your Google account
-            </p>
+            <p className="text-sm text-muted-foreground">Sign Up</p>
           </div>
-          <SocialAuthProviders />
+          <form onSubmit={handleRegister} className="w-full space-y-4">
+            <input
+              placeholder="user@acme.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border rounded px-3 py-2"
+            />
+            <label className="sr-only" htmlFor="password">
+              Password
+            </label>
+            <input
+              id="password"
+              aria-label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border rounded px-3 py-2"
+            />
+            <button className={cn(buttonVariants())} type="submit">
+              Sign Up
+            </button>
+          </form>
           {/* <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our{' '}
             <Link

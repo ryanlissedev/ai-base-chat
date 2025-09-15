@@ -27,6 +27,19 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  /**
+   * During tests we disable heavy optional deps to avoid module-not-found stalls.
+   */
+  webpack: (config, { isServer }) => {
+    config.resolve = config.resolve || {};
+    const fallback = config.resolve.fallback || {};
+    // Stub echarts in test to avoid installing full package
+    if (process.env.PLAYWRIGHT || process.env.CI) {
+      fallback.echarts = false as unknown as undefined;
+    }
+    config.resolve.fallback = fallback;
+    return config;
+  },
 };
 
 export default nextConfig;

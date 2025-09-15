@@ -125,7 +125,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: process.env.SKIP_WEBSERVER ? undefined : {
-    command: 'bun run dev',
+    command: 'PORT=3001 npm run dev',
     url: baseURL,
     timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,

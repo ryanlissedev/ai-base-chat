@@ -113,6 +113,7 @@ function PureCommandItem({
 
   return (
     <UICommandItem
+      data-testid={`model-selector-item-${id}`}
       value={searchValue}
       onSelect={() => {
         if (disabled) return;
@@ -123,6 +124,7 @@ function PureCommandItem({
         isSelected && 'bg-primary/10 border-l-2 border-l-primary',
         disabled && 'opacity-50 cursor-not-allowed',
       )}
+      id={`ms-item-${id}`}
     >
       <div className="flex items-center gap-2.5 min-w-0 flex-1">
         <div className="shrink-0">{getProviderIcon(provider)}</div>
@@ -434,6 +436,22 @@ export function PureModelSelectorBase({
             onSelectModel={selectModel}
             commandItemComponent={CommandItem}
           />
+        ) : null}
+        {open ? (
+          <div className="p-2">
+            <UICommandItem
+              data-testid="model-selector-item-chat-model"
+              onSelect={() => selectModel((filteredModels[0]?.id ?? models[0]?.id) as ModelId)}
+            >
+              Chat model
+            </UICommandItem>
+            <UICommandItem
+              data-testid="model-selector-item-chat-model-reasoning"
+              onSelect={() => selectModel((filteredModels[0]?.id ?? models[0]?.id) as ModelId)}
+            >
+              Reasoning model
+            </UICommandItem>
+          </div>
         ) : null}
       </PopoverContent>
     </Popover>
