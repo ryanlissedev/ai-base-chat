@@ -48,7 +48,7 @@ export const Mermaid = ({ chart, className }: MermaidProps) => {
 
         // Use a stable ID based on chart content hash to prevent re-renders
         const chartHash = chart.split('').reduce((acc, char) => {
-          // biome-ignore lint/suspicious/noBitwiseOperators: "Required for Mermaid"
+          // eslint-disable-next-line no-bitwise
           return ((acc << 5) - acc + char.charCodeAt(0)) | 0;
         }, 0);
         const uniqueId = `mermaid-${Math.abs(chartHash)}`;

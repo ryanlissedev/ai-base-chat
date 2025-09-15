@@ -3,6 +3,8 @@
  * Provides methods to track and measure application performance
  */
 
+import React from 'react';
+
 interface PerformanceMetric {
   name: string;
   value: number;
@@ -203,7 +205,7 @@ class PerformanceMonitor {
       this.recordMetric('page-load-request', navigation.responseStart - navigation.requestStart);
       this.recordMetric('page-load-response', navigation.responseEnd - navigation.responseStart);
       this.recordMetric('page-load-dom', navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart);
-      this.recordMetric('page-load-total', navigation.loadEventEnd - navigation.navigationStart);
+      this.recordMetric('page-load-total', navigation.loadEventEnd - navigation.fetchStart);
     }
   }
 

@@ -18,7 +18,10 @@ import {
 } from '@/lib/db/queries';
 import { generateUUID } from '@/lib/utils';
 import { generateTitleFromUserMessage } from '../../actions';
+import { createModuleLogger } from '@/lib/logger';
 import { getTools } from '@/lib/ai/tools/tools';
+
+const logger = createModuleLogger('chat-api');
 import { toolsDefinitions, allTools } from '@/lib/ai/tools/tools-definitions';
 import type { ToolName, ChatMessage } from '@/lib/ai/types';
 import type { NextRequest } from 'next/server';
@@ -53,7 +56,6 @@ import { getRecentGeneratedImage } from './getRecentGeneratedImage';
 import { getCreditReservation } from './getCreditReservation';
 import { filterReasoningParts } from './filterReasoningParts';
 import { getThreadUpToMessageId } from './getThreadUpToMessageId';
-import { createModuleLogger } from '@/lib/logger';
 
 // Create shared Redis clients for resumable stream and cleanup
 let redisPublisher: any = null;
@@ -85,11 +87,9 @@ export function getStreamContext() {
       });
     } catch (error: any) {
       if (error.message.includes('REDIS_URL')) {
-        console.log(
-          ' > Resumable streams are disabled due to missing REDIS_URL',
-        );
+        logger.warn('Resumable streams are disabled due to missing REDIS_URL');
       } else {
-        console.error(error);
+        logger.error({ error }, 'Error in resumable streams setup');
       }
     }
   }
@@ -298,10 +298,7 @@ export async function POST(request: NextRequest) {
         await getCreditReservation(userId, baseModelCost);
 
       if (creditError) {
-        console.log(
-          'RESPONSE > POST /api/chat: Credit reservation error:',
-          creditError,
-        );
+        logger.error({ error: creditError }, 'Credit reservation error');
         return new Response(creditError, {
           status: 402,
         });

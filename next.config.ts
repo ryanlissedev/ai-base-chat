@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
     optimizePackageImports: [
       'react-tweet',
       'echarts-for-react',
-      '@lobehub/icons',
     ],
     // Enable external packages for server components to allow pino transports
   },

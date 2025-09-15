@@ -59,7 +59,7 @@ class ErrorBoundary extends React.Component<
         const FallbackComponent = this.props.fallback;
         return (
           <FallbackComponent
-            error={this.state.error!}
+            error={this.state.error || new Error('Unknown error')}
             resetError={this.resetError}
           />
         );
@@ -67,7 +67,7 @@ class ErrorBoundary extends React.Component<
 
       return (
         <DefaultErrorFallback
-          error={this.state.error!}
+          error={this.state.error || new Error('Unknown error')}
           resetError={this.resetError}
         />
       );

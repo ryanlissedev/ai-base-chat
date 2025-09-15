@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { user, chat, message, suggestion, document, vote } from "./schema";
+import { user, chat, message, suggestion, document, vote } from "../schema";
 
 export const chatRelations = relations(chat, ({one, many}) => ({
 	user: one(user, {

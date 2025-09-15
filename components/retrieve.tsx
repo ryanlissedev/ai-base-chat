@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { ChevronDown, ExternalLink, Globe, TextIcon } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -15,11 +16,11 @@ interface RetrieveResult {
   }[];
 }
 
-export function Retrieve({
+const RetrieveComponent = ({
   result,
 }: {
   result?: RetrieveResult;
-}) {
+}) => {
   if (!result) {
     return (
       <div className="border border-neutral-200 rounded-xl my-4 p-4 dark:border-neutral-800 bg-linear-to-b from-white to-neutral-50 dark:from-neutral-900 dark:to-neutral-900/90">
@@ -139,4 +140,8 @@ export function Retrieve({
       </div>
     </div>
   );
-}
+};
+
+export const Retrieve = memo(RetrieveComponent, (prevProps, nextProps) => {
+  return prevProps.result === nextProps.result;
+});

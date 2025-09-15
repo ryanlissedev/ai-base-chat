@@ -1,6 +1,7 @@
 import 'server-only';
 import { and, asc, desc, eq, gt, gte, inArray } from 'drizzle-orm';
 import { del } from '@vercel/blob';
+import { createModuleLogger } from '../logger';
 
 import {
   user,
@@ -17,11 +18,13 @@ import type { ArtifactKind } from '../artifacts/artifact-kind';
 import type { Attachment } from '@/lib/ai/types';
 import { db } from './client';
 
+const logger = createModuleLogger('db-queries');
+
 export async function getUserByEmail(email: string): Promise<Array<User>> {
   try {
     return await db.select().from(user).where(eq(user.email, email));
   } catch (error) {
-    console.error('Failed to get user from database');
+    logger.error({ error }, 'Failed to get user from database');
     throw error;
   }
 }
@@ -42,7 +45,7 @@ export async function createUser({
       image,
     });
   } catch (error) {
-    console.error('Failed to create user in database');
+    logger.error({ error }, 'Failed to create user in database');
     throw error;
   }
 }
@@ -65,7 +68,7 @@ export async function saveChat({
       title,
     });
   } catch (error) {
-    console.error('Failed to save chat in database');
+    logger.error({ error }, 'Failed to save chat in database');
     throw error;
   }
 }
@@ -85,7 +88,7 @@ export async function deleteChatById({ id }: { id: string }) {
 
     return await db.delete(chat).where(eq(chat.id, id));
   } catch (error) {
-    console.error('Failed to delete chat by id from database');
+    logger.error({ error }, 'Failed to delete chat by id from database');
     throw error;
   }
 }
@@ -98,7 +101,7 @@ export async function getChatsByUserId({ id }: { id: string }) {
       .where(eq(chat.userId, id))
       .orderBy(desc(chat.updatedAt));
   } catch (error) {
-    console.error('Failed to get chats by user from database');
+    logger.error({ error }, 'Failed to get chats by user from database');
     throw error;
   }
 }
@@ -117,7 +120,7 @@ export async function getChatById({ id }: { id: string }) {
     const [selectedChat] = await db.select().from(chat).where(eq(chat.id, id));
     return selectedChat;
   } catch (error) {
-    console.error('Failed to get chat by id from database');
+    logger.error({ error }, 'Failed to get chat by id from database');
     throw error;
   }
 }
@@ -135,7 +138,7 @@ export async function saveMessage({
 
     return result;
   } catch (error) {
-    console.error('Failed to save message in database', error);
+    logger.error({ error }, 'Failed to save message in database');
     throw error;
   }
 }
@@ -164,7 +167,7 @@ export async function saveMessages({
 
     return result;
   } catch (error) {
-    console.error('Failed to save messages in database', error);
+    logger.error({ error }, 'Failed to save messages in database');
     throw error;
   }
 }
@@ -187,7 +190,7 @@ export async function updateMessage({
       })
       .where(eq(message.id, _message.id));
   } catch (error) {
-    console.error('Failed to update message in database', error);
+    logger.error({ error }, 'Failed to update message in database');
     throw error;
   }
 }
@@ -200,7 +203,7 @@ export async function getAllMessagesByChatId({ chatId }: { chatId: string }) {
       .where(eq(message.chatId, chatId))
       .orderBy(asc(message.createdAt));
   } catch (error) {
-    console.error('Failed to get all messages by chat ID', error);
+    logger.error({ error }, 'Failed to get all messages by chat ID');
     throw error;
   }
 }
@@ -232,7 +235,7 @@ export async function voteMessage({
       isUpvoted: type === 'up',
     });
   } catch (error) {
-    console.error('Failed to upvote message in database', error);
+    logger.error({ error }, 'Failed to upvote message in database');
     throw error;
   }
 }
@@ -241,7 +244,7 @@ export async function getVotesByChatId({ id }: { id: string }) {
   try {
     return await db.select().from(vote).where(eq(vote.chatId, id));
   } catch (error) {
-    console.error('Failed to get votes by chat id from database', error);
+    logger.error({ error }, 'Failed to get votes by chat id from database');
     throw error;
   }
 }
@@ -272,7 +275,7 @@ export async function saveDocument({
       createdAt: new Date(),
     });
   } catch (error) {
-    console.error('Failed to save document in database', error);
+    logger.error({ error }, 'Failed to save document in database');
     throw error;
   }
 }
@@ -287,7 +290,7 @@ async function _getDocumentsById({ id }: { id: string }) {
 
     return documents;
   } catch (error) {
-    console.error('Failed to get document by id from database', error);
+    logger.error({ error }, 'Failed to get document by id from database');
     throw error;
   }
 }
@@ -331,9 +334,7 @@ export async function getDocumentsById({
 
     return documents;
   } catch (error) {
-    console.error(
-      'Failed to get documents by id with visibility from database',
-    );
+    logger.error({ error }, 'Failed to get documents by id with visibility from database');
     throw error;
   }
 }
@@ -358,7 +359,7 @@ export async function getPublicDocumentsById({ id }: { id: string }) {
 
     return documents;
   } catch (error) {
-    console.error('Failed to get public documents by id from database');
+    logger.error({ error }, 'Failed to get public documents by id from database');
     throw error;
   }
 }
@@ -373,7 +374,7 @@ export async function getDocumentById({ id }: { id: string }) {
 
     return selectedDocument;
   } catch (error) {
-    console.error('Failed to get document by id from database');
+    logger.error({ error }, 'Failed to get document by id from database');
     throw error;
   }
 }
@@ -399,9 +400,7 @@ export async function deleteDocumentsByIdAfterTimestamp({
       .delete(document)
       .where(and(eq(document.id, id), gt(document.createdAt, timestamp)));
   } catch (error) {
-    console.error(
-      'Failed to delete documents by id after timestamp from database',
-    );
+    logger.error({ error }, 'Failed to delete documents by id after timestamp from database');
     throw error;
   }
 }
@@ -414,7 +413,7 @@ export async function saveSuggestions({
   try {
     return await db.insert(suggestion).values(suggestions);
   } catch (error) {
-    console.error('Failed to save suggestions in database');
+    logger.error({ error }, 'Failed to save suggestions in database');
     throw error;
   }
 }
@@ -430,9 +429,7 @@ export async function getSuggestionsByDocumentId({
       .from(suggestion)
       .where(and(eq(suggestion.documentId, documentId)));
   } catch (error) {
-    console.error(
-      'Failed to get suggestions by document version from database',
-    );
+    logger.error({ error }, 'Failed to get suggestions by document version from database');
     throw error;
   }
 }
@@ -451,7 +448,7 @@ export async function getDocumentsByMessageIds({
       .where(inArray(document.messageId, messageIds))
       .orderBy(asc(document.createdAt));
   } catch (error) {
-    console.error('Failed to get documents by message IDs from database');
+    logger.error({ error }, 'Failed to get documents by message IDs from database');
     throw error;
   }
 }
@@ -474,7 +471,7 @@ export async function saveDocuments({
   try {
     return await db.insert(document).values(documents);
   } catch (error) {
-    console.error('Failed to save documents in database', error);
+    logger.error({ error }, 'Failed to save documents in database');
     throw error;
   }
 }
@@ -483,7 +480,7 @@ export async function getMessageById({ id }: { id: string }) {
   try {
     return await db.select().from(message).where(eq(message.id, id));
   } catch (error) {
-    console.error('Failed to get message by id from database');
+    logger.error({ error }, 'Failed to get message by id from database');
     throw error;
   }
 }
@@ -522,9 +519,7 @@ export async function deleteMessagesByChatIdAfterTimestamp({
         );
     }
   } catch (error) {
-    console.error(
-      'Failed to delete messages by id after timestamp from database',
-    );
+    logger.error({ error }, 'Failed to delete messages by id after timestamp from database');
     throw error;
   }
 }
@@ -580,9 +575,7 @@ export async function deleteMessagesByChatIdAfterMessageId({
         );
     }
   } catch (error) {
-    console.error(
-      'Failed to delete messages by chat id after message id from database',
-    );
+    logger.error({ error }, 'Failed to delete messages by chat id after message id from database');
     throw error;
   }
 }
@@ -597,7 +590,7 @@ export async function updateChatVisiblityById({
   try {
     return await db.update(chat).set({ visibility }).where(eq(chat.id, chatId));
   } catch (error) {
-    console.error('Failed to update chat visibility in database');
+    logger.error({ error }, 'Failed to update chat visibility in database');
     throw error;
   }
 }
@@ -617,7 +610,7 @@ export async function updateChatTitleById({
       })
       .where(eq(chat.id, chatId));
   } catch (error) {
-    console.error('Failed to update chat title by id from database');
+    logger.error({ error }, 'Failed to update chat title by id from database');
     throw error;
   }
 }
@@ -637,7 +630,7 @@ export async function updateChatIsPinnedById({
       })
       .where(eq(chat.id, chatId));
   } catch (error) {
-    console.error('Failed to update chat isPinned by id from database');
+    logger.error({ error }, 'Failed to update chat isPinned by id from database');
     throw error;
   }
 }
@@ -655,7 +648,7 @@ export async function updateChatUpdatedAt({
       })
       .where(eq(chat.id, chatId));
   } catch (error) {
-    console.error('Failed to update chat updatedAt by id from database');
+    logger.error({ error }, 'Failed to update chat updatedAt by id from database');
     throw error;
   }
 }
@@ -675,10 +668,7 @@ export async function getMessagesWithAttachments() {
   try {
     return await db.select({ attachments: message.attachments }).from(message);
   } catch (error) {
-    console.error(
-      'Failed to get messages with attachments from database',
-      error,
-    );
+    logger.error({ error }, 'Failed to get messages with attachments from database');
     throw error;
   }
 }
@@ -702,7 +692,7 @@ export async function getAllAttachmentUrls(): Promise<string[]> {
 
     return attachmentUrls;
   } catch (error) {
-    console.error('Failed to get attachment URLs from database', error);
+    logger.error({ error }, 'Failed to get attachment URLs from database');
     throw error;
   }
 }
@@ -726,7 +716,7 @@ async function deleteAttachmentsFromMessages(messages: DBMessage[]) {
       await del(attachmentUrls);
     }
   } catch (error) {
-    console.error('Failed to delete attachments from Vercel Blob:', error);
+    logger.error({ error }, 'Failed to delete attachments from Vercel Blob');
     // Don't throw here - we still want to proceed with message deletion
     // even if blob cleanup fails
   }

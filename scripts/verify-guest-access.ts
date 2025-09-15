@@ -136,7 +136,7 @@ if (envModels.toLowerCase() === 'all') {
 }
 
 // Summary
-console.log('\n' + '='.repeat(50));
+console.log(`\n${'='.repeat(50)}`);
 console.log(`${GREEN}Passed: ${passed}${RESET} | ${RED}Failed: ${failed}${RESET}`);
 
 if (failed === 0) {
