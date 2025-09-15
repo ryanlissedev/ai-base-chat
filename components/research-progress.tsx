@@ -1,5 +1,5 @@
 import { Maximize2, Minimize2 } from 'lucide-react';
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 // Type-only imports
 import type { ResearchUpdate } from '@/lib/ai/tools/research-updates-schema';
@@ -26,15 +26,15 @@ export const ResearchProgress = ({
   totalExpectedSteps: number;
   isComplete: boolean;
 }) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const lastUpdate = updates.length > 0 ? updates[updates.length - 1] : null;
 
-  const searchCount = React.useMemo(() => {
+  const searchCount = useMemo(() => {
     return updates.filter((u) => u.type === 'web').length;
   }, [updates]);
 
-  const sourceCount = React.useMemo(() => {
+  const sourceCount = useMemo(() => {
     return updates
       .filter((u) => u.type === 'web')
       .reduce((acc, u) => acc + (u.results?.length || 0), 0);
@@ -47,7 +47,7 @@ export const ResearchProgress = ({
       ? `Research Complete`
       : lastUpdate.title || updateName[lastUpdate.type];
 
-  const timeSpent = React.useMemo(() => {
+  const timeSpent = useMemo(() => {
     if (isComplete) {
       const progressUpdates = updates.filter(
         (u) => u.type === 'started' || u.type === 'completed',

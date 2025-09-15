@@ -3,6 +3,7 @@
 import { CopyIcon } from '@/components/icons';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 interface GeneratedImageProps {
   result?: {
@@ -49,10 +50,13 @@ export function GeneratedImage({
   return (
     <div className="flex flex-col gap-4 w-full border rounded-lg overflow-hidden">
       <div className="relative group">
-        <img
+        <Image
           src={result.imageUrl}
           alt={result.prompt}
+          width={800}
+          height={800}
           className="w-full h-auto max-w-full"
+          unoptimized={true}
         />
         <button
           type="button"

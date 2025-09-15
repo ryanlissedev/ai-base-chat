@@ -143,7 +143,10 @@ function PureMultimodalInput({
         };
       }
       if (isModelDisallowedForAnonymous) {
-        return { enabled: false, message: 'This model is unavailable for guests' };
+        return {
+          enabled: false,
+          message: 'This model is unavailable for guests',
+        };
       }
       if (status !== 'ready' && status !== 'error') {
         return {

@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: postgres-test-db
+    environment:
+      POSTGRES_DB: test_db
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+      - ./tests/db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d test_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgtap-test:
+    image: postgres:16-alpine
+    container_name: pgtap-test-runner
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres-test
+      PGPORT: 5432
+      PGDATABASE: test_db
+      PGUSER: test_user
+      PGPASSWORD: test_password
+    volumes:
+      - ./tests/db:/tests
+      - ./lib/db:/app/lib/db
+    working_dir: /tests
+    command: >
+      sh -c "
+        # Install dependencies
+        apk add --no-cache git curl build-base perl-dev postgresql-dev &&
+        # Install pgTAP
+        git clone https://github.com/theory/pgtap.git /tmp/pgtap &&
+        cd /tmp/pgtap &&
+        make &&
+        make install &&
+        # Wait for postgres to be ready
+        until pg_isready -h postgres-test -U test_user -d test_db; do
+          echo 'Waiting for PostgreSQL to be ready...'
+          sleep 2
+        done &&
+        echo 'PostgreSQL is ready!' &&
+        # Run tests
+        pg_prove -h postgres-test -U test_user -d test_db /tests/sql/*.sql
+      "
+    profiles:
+      - test
+
+volumes:
+  postgres_test_data:

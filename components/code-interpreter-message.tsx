@@ -1,4 +1,4 @@
-import InteractiveChart, { type BaseChart } from './interactive-charts';
+import { InteractiveChart, type BaseChart } from './interactive-charts';
 import { CollapsibleSection } from './collapsible-section';
 
 export function CodeInterpreterMessage({

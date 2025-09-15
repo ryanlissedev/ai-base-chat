@@ -1,7 +1,8 @@
 import { cn } from '@/lib/utils';
 import { Badge } from './ui/badge';
 import { Check, Loader2, TrendingUpIcon } from 'lucide-react';
-import InteractiveStockChart, {
+import {
+  InteractiveStockChart,
   type StockChartProps,
 } from './interactive-stock-chart';
 

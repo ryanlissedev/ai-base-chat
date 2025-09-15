@@ -72,7 +72,7 @@ const VirtualizedScrollArea = ({
         }, 100);
       }
     }
-  }, [initialScroll?.index, rowVirtualizer]);
+  }, [initialScroll, rowVirtualizer]);
   return (
     <ScrollArea
       style={{ height: `${listHeight}px` }}

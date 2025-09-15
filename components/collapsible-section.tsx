@@ -18,7 +18,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import React from 'react';
+import React, { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import {
   oneLight,
@@ -50,9 +50,9 @@ export function CollapsibleSection({
   icon,
   status,
 }: CollapsibleSectionProps) {
-  const [copied, setCopied] = React.useState(false);
-  const [isExpanded, setIsExpanded] = React.useState(true);
-  const [activeTab, setActiveTab] = React.useState<'code' | 'output'>('code');
+  const [copied, setCopied] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [activeTab, setActiveTab] = useState<'code' | 'output'>('code');
   const { theme } = useTheme();
   const IconComponent = icon ? IconMapping[icon] : null;
 

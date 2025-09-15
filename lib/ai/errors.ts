@@ -42,7 +42,7 @@ export class ChatSDKError extends Error {
   constructor(errorCode: ErrorCode, cause?: string) {
     const [type, surface] = errorCode.split(':');
     const message = getMessageByErrorCode(errorCode);
-    
+
     // Pass the message directly to super() constructor
     super(message);
 

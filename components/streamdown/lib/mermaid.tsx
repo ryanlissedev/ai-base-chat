@@ -48,7 +48,7 @@ export const Mermaid = ({ chart, className }: MermaidProps) => {
 
         // Use a stable ID based on chart content hash to prevent re-renders
         const chartHash = chart.split('').reduce((acc, char) => {
-          // biome-ignore lint/suspicious/noBitwiseOperators: "Required for Mermaid"
+          // biome-ignore lint/suspicious/noAssignInExpressions: Required for Mermaid hash calculation
           return ((acc << 5) - acc + char.charCodeAt(0)) | 0;
         }, 0);
         const uniqueId = `mermaid-${Math.abs(chartHash)}`;
@@ -76,7 +76,7 @@ export const Mermaid = ({ chart, className }: MermaidProps) => {
     };
 
     renderChart();
-  }, [chart]);
+  }, [chart, lastValidSvg, svgContent]);
 
   // Show loading only on initial load when we have no content
   if (isLoading && !svgContent && !lastValidSvg) {

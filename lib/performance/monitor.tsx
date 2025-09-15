@@ -3,6 +3,8 @@
  * Provides methods to track and measure application performance
  */
 
+import React, { useEffect } from 'react';
+
 interface PerformanceMetric {
   name: string;
   value: number;
@@ -48,7 +50,11 @@ class PerformanceMonitor {
   /**
    * Record a performance metric
    */
-  recordMetric(name: string, value: number, metadata?: Record<string, unknown>): void {
+  recordMetric(
+    name: string,
+    value: number,
+    metadata?: Record<string, unknown>,
+  ): void {
     if (!this.config.enabled || Math.random() > this.config.sampleRate) {
       return;
     }
@@ -67,9 +73,10 @@ class PerformanceMonitor {
       this.metrics = this.metrics.slice(-this.config.maxMetrics);
     }
 
-    // Log in development
+    // Log in development using proper logger
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[Performance] ${name}: ${value.toFixed(2)}ms`, metadata);
+      // Use structured logging instead of console.log
+      // In production, this should go to your logging service
     }
   }
 
@@ -79,7 +86,7 @@ class PerformanceMonitor {
   async measureFunction<T>(
     name: string,
     fn: () => Promise<T>,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ): Promise<T> {
     const endTiming = this.startTiming(name);
     try {
@@ -95,7 +102,7 @@ class PerformanceMonitor {
    */
   getMetrics(name?: string): PerformanceMetric[] {
     if (name) {
-      return this.metrics.filter(metric => metric.name === name);
+      return this.metrics.filter((metric) => metric.name === name);
     }
     return [...this.metrics];
   }
@@ -116,7 +123,7 @@ class PerformanceMonitor {
       return null;
     }
 
-    const values = metrics.map(m => m.value).sort((a, b) => a - b);
+    const values = metrics.map((m) => m.value).sort((a, b) => a - b);
     const count = values.length;
     const average = values.reduce((sum, val) => sum + val, 0) / count;
     const min = values[0];
@@ -196,14 +203,35 @@ class PerformanceMonitor {
   }
 
   private recordPageLoadMetrics(): void {
-    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    const navigation = performance.getEntriesByType(
+      'navigation',
+    )[0] as PerformanceNavigationTiming;
     if (navigation) {
-      this.recordMetric('page-load-dns', navigation.domainLookupEnd - navigation.domainLookupStart);
-      this.recordMetric('page-load-tcp', navigation.connectEnd - navigation.connectStart);
-      this.recordMetric('page-load-request', navigation.responseStart - navigation.requestStart);
-      this.recordMetric('page-load-response', navigation.responseEnd - navigation.responseStart);
-      this.recordMetric('page-load-dom', navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart);
-      this.recordMetric('page-load-total', navigation.loadEventEnd - navigation.navigationStart);
+      this.recordMetric(
+        'page-load-dns',
+        navigation.domainLookupEnd - navigation.domainLookupStart,
+      );
+      this.recordMetric(
+        'page-load-tcp',
+        navigation.connectEnd - navigation.connectStart,
+      );
+      this.recordMetric(
+        'page-load-request',
+        navigation.responseStart - navigation.requestStart,
+      );
+      this.recordMetric(
+        'page-load-response',
+        navigation.responseEnd - navigation.responseStart,
+      );
+      this.recordMetric(
+        'page-load-dom',
+        navigation.domContentLoadedEventEnd -
+          navigation.domContentLoadedEventStart,
+      );
+      this.recordMetric(
+        'page-load-total',
+        navigation.loadEventEnd - navigation.startTime,
+      );
     }
   }
 
@@ -211,7 +239,7 @@ class PerformanceMonitor {
    * Clean up observers
    */
   cleanup(): void {
-    this.observers.forEach(observer => observer.disconnect());
+    this.observers.forEach((observer) => observer.disconnect());
     this.observers.clear();
   }
 }
@@ -224,19 +252,22 @@ export function usePerformanceMonitor() {
   return {
     startTiming: performanceMonitor.startTiming.bind(performanceMonitor),
     recordMetric: performanceMonitor.recordMetric.bind(performanceMonitor),
-    measureFunction: performanceMonitor.measureFunction.bind(performanceMonitor),
+    measureFunction:
+      performanceMonitor.measureFunction.bind(performanceMonitor),
   };
 }
 
 // Higher-order component for monitoring component render times
 export function withPerformanceMonitoring<P extends object>(
   Component: React.ComponentType<P>,
-  componentName: string
+  componentName: string,
 ) {
   return function MonitoredComponent(props: P) {
-    const endTiming = performanceMonitor.startTiming(`component-render-${componentName}`);
-    
-    React.useEffect(() => {
+    const endTiming = performanceMonitor.startTiming(
+      `component-render-${componentName}`,
+    );
+
+    useEffect(() => {
       endTiming();
     });
 
@@ -245,4 +276,3 @@ export function withPerformanceMonitoring<P extends object>(
 }
 
 export default PerformanceMonitor;
-

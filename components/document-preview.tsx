@@ -185,7 +185,7 @@ const PureHitboxLayer = ({
             },
       );
     },
-    [setArtifact, result],
+    [setArtifact, result, messageId],
   );
 
   return (

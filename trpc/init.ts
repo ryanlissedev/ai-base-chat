@@ -6,11 +6,11 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-import { auth } from "@/app/(auth)/auth";
+import { auth } from '@/app/(auth)/auth';
 
-import { TRPCError, initTRPC } from "@trpc/server";
-import superjson from "superjson";
-import { ZodError } from "zod";
+import { TRPCError, initTRPC } from '@trpc/server';
+import superjson from 'superjson';
+import { ZodError } from 'zod';
 import { cache } from 'react';
 
 /**
@@ -33,7 +33,6 @@ export const createTRPCContext = cache(async () => {
 });
 
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
-
 
 /**
  * 2. INITIALIZATION
@@ -119,12 +118,12 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  */
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
   if (!ctx.user) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
   const { id, ...rest } = ctx.user;
   if (!id) {
     console.error('User ID missing in session callback');
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
   return next({
     ctx: {
@@ -133,6 +132,3 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
     },
   });
 });
-
-
-

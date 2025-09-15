@@ -43,9 +43,7 @@ const VARIANT_CONFIG: Record<
   },
   model: {
     dismissible: false,
-    getMessage: () => (
-      <span>This model isn&apos;t available for guests.</span>
-    ),
+    getMessage: () => <span>This model isn&apos;t available for guests.</span>,
     getClasses: () =>
       'bg-amber-100 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200',
   },

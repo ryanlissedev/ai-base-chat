@@ -10,6 +10,9 @@ export function register() {
     });
   } catch (error) {
     // Gracefully handle instrumentation errors during development
-    console.warn('Instrumentation failed to initialize:', error instanceof Error ? error.message : 'Unknown error');
+    console.warn(
+      'Instrumentation failed to initialize:',
+      error instanceof Error ? error.message : 'Unknown error',
+    );
   }
 }

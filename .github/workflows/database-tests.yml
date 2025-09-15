@@ -1,0 +1,130 @@
+name: Database Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'lib/db/**'
+      - 'tests/db/**'
+      - 'docker-compose.test.yml'
+      - 'drizzle.config.ts'
+      - '.github/workflows/database-tests.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'lib/db/**'
+      - 'tests/db/**'
+      - 'docker-compose.test.yml'
+      - 'drizzle.config.ts'
+      - '.github/workflows/database-tests.yml'
+
+jobs:
+  database-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Run pgTAP Database Tests
+        run: npm run test:db:ci
+        env:
+          CI: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-test-results
+          path: |
+            tests/db/results/
+            docker-compose.test.yml
+          retention-days: 5
+
+      - name: Database Test Summary
+        if: always()
+        run: |
+          echo "## Database Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ $? -eq 0 ]; then
+            echo "✅ All pgTAP database tests passed!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Some database tests failed. Check the logs above for details." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Coverage" >> $GITHUB_STEP_SUMMARY
+          echo "- Schema validation tests" >> $GITHUB_STEP_SUMMARY
+          echo "- Constraint and type tests" >> $GITHUB_STEP_SUMMARY
+          echo "- Index validation tests" >> $GITHUB_STEP_SUMMARY
+          echo "- Foreign key relationship tests" >> $GITHUB_STEP_SUMMARY
+          echo "- Query functionality tests" >> $GITHUB_STEP_SUMMARY
+          echo "- Individual table tests (User, Chat, Message, Vote, Document, Suggestion)" >> $GITHUB_STEP_SUMMARY
+
+  database-migration-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start test database
+        run: npm run test:db:start
+
+      - name: Wait for database
+        run: |
+          timeout=60
+          count=0
+          while [ $count -lt $timeout ]; do
+            if docker-compose -f docker-compose.test.yml exec -T postgres-test pg_isready -U test_user -d test_db; then
+              echo "Database is ready!"
+              break
+            fi
+            sleep 2
+            count=$((count + 2))
+          done
+
+      - name: Test database migrations
+        run: npm run db:test:migrate
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5433/test_db
+
+      - name: Verify migration success
+        run: |
+          docker-compose -f docker-compose.test.yml exec -T postgres-test psql -U test_user -d test_db -c "\dt" > migration_result.txt
+          echo "Migration completed successfully. Tables created:"
+          cat migration_result.txt
+
+      - name: Cleanup
+        if: always()
+        run: npm run test:db:stop

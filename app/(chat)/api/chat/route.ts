@@ -336,10 +336,16 @@ export async function POST(request: NextRequest) {
           (tool: ToolName) => tool !== 'deepResearch',
         );
       }
-      
+
       // Always include fileSearch if it's affordable (it's only 2 credits)
-      if (!activeTools.includes('fileSearch') && 
-          (isAnonymous ? ANONYMOUS_LIMITS.CREDITS >= 2 : (reservation ? reservation.budget - baseModelCost >= 2 : false))) {
+      if (
+        !activeTools.includes('fileSearch') &&
+        (isAnonymous
+          ? ANONYMOUS_LIMITS.CREDITS >= 2
+          : reservation
+            ? reservation.budget - baseModelCost >= 2
+            : false)
+      ) {
         activeTools.push('fileSearch');
       }
     }

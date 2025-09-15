@@ -123,6 +123,7 @@ function PureCommandItem({
         isSelected && 'bg-primary/10 border-l-2 border-l-primary',
         disabled && 'opacity-50 cursor-not-allowed',
       )}
+      data-testid={`model-selector-item-${id}`}
     >
       <div className="flex items-center gap-2.5 min-w-0 flex-1">
         <div className="shrink-0">{getProviderIcon(provider)}</div>
@@ -389,7 +390,7 @@ export function PureModelSelectorBase({
         setOpen(false);
       });
     },
-    [onModelChange],
+    [onModelChange, setOptimisticModelId],
   );
 
   return (

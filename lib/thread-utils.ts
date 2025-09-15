@@ -16,7 +16,9 @@ export function getDefaultLeafMessage<T extends MessageNode>(
 
   // Sort by createdAt descending and return the first one
   const sorted = [...allMessages].sort(
-    (a, b) => new Date(b.metadata?.createdAt || new Date()).getTime() - new Date(a.metadata?.createdAt || new Date()).getTime(),
+    (a, b) =>
+      new Date(b.metadata?.createdAt || new Date()).getTime() -
+      new Date(a.metadata?.createdAt || new Date()).getTime(),
   );
 
   return sorted[0];

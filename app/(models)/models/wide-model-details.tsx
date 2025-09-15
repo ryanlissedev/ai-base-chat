@@ -28,7 +28,7 @@ export function WideModelDetails({
   const provider = model?.owned_by as ProviderId | undefined;
   const contextCompact = useMemo(
     () => (model ? formatNumberCompact(model.context_window) : '--'),
-    [model?.id, model?.context_window],
+    [model],
   );
 
   const actions = {

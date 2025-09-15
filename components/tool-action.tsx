@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 import { motion } from 'motion/react';
 import { Favicon } from './favicon';
 
 // ToolActionKind component
-const ToolActionKind = React.forwardRef<
+const ToolActionKind = forwardRef<
   HTMLDivElement,
   {
     icon: React.ReactNode;
@@ -13,11 +13,7 @@ const ToolActionKind = React.forwardRef<
   }
 >(({ icon, name, className, ...props }, ref) => {
   return (
-    <div
-      ref={ref}
-      className={cn('shrink-0 flex gap-1', className)}
-      {...props}
-    >
+    <div ref={ref} className={cn('shrink-0 flex gap-1', className)} {...props}>
       {icon}
       <span className="text-xs text-foreground/80">{name}</span>
     </div>
@@ -26,7 +22,7 @@ const ToolActionKind = React.forwardRef<
 ToolActionKind.displayName = 'ToolActionKind';
 
 // ToolActionContent component
-const ToolActionContent = React.forwardRef<
+const ToolActionContent = forwardRef<
   HTMLDivElement,
   {
     title: string;
@@ -59,7 +55,7 @@ const ToolActionContent = React.forwardRef<
 ToolActionContent.displayName = 'ToolActionContent';
 
 // ToolActionContainer component
-const ToolActionContainer = React.forwardRef<
+const ToolActionContainer = forwardRef<
   HTMLAnchorElement,
   {
     href: string;

@@ -12,9 +12,15 @@ interface GenerateImageProps {
 
 // Lazy, dynamic import of OpenAI SDK to avoid any build-time side effects
 let _openaiClient: any | null = null;
-let _toFile: ((data: Buffer, name: string, opts?: { type?: string }) => Promise<File>) | null = null;
-async function getOpenAI(): Promise<{ client: any | null; toFile: NonNullable<typeof _toFile> | null }> {
-  if (_openaiClient && _toFile) return { client: _openaiClient, toFile: _toFile };
+let _toFile:
+  | ((data: Buffer, name: string, opts?: { type?: string }) => Promise<File>)
+  | null = null;
+async function getOpenAI(): Promise<{
+  client: any | null;
+  toFile: NonNullable<typeof _toFile> | null;
+}> {
+  if (_openaiClient && _toFile)
+    return { client: _openaiClient, toFile: _toFile };
   const apiKey = process.env.OPENAI_API_KEY;
   try {
     const mod: any = await import('openai');

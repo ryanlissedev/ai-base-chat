@@ -50,7 +50,7 @@ export class ChatPage {
 
   async hasChatIdInUrl() {
     await expect(this.page).toHaveURL(
-      /^http:\/\/localhost:3001\/chat\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+      /\/chat\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
     );
   }
 

@@ -24,11 +24,13 @@ const ALL_CHAT_MODELS = chatModels.map((m) => m.id) as ModelId[];
 const AVAILABLE_MODELS: readonly ModelId[] =
   envAnonymousModels.toLowerCase() === 'all'
     ? (ALL_CHAT_MODELS as readonly ModelId[])
-    : ((envAnonymousModels
+    : (envAnonymousModels
         .split(',')
         .map((s) => s.trim())
         .filter((s) => s.length > 0)
-        .filter((id) => (ALL_CHAT_MODELS as ModelId[]).includes(id as ModelId)) as ModelId[]) as readonly ModelId[]);
+        .filter((id) =>
+          (ALL_CHAT_MODELS as ModelId[]).includes(id as ModelId),
+        ) as ModelId[] as readonly ModelId[]);
 
 export const ANONYMOUS_LIMITS = {
   // High defaults as requested; effectively no limits for guests by default.

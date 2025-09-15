@@ -1,5 +1,4 @@
-import type { ImageModelId } from '@/lib/models/model-id';
-import type { ModelId } from '@/lib/models/model-id';
+import type { ImageModelId, ModelId } from '@/lib/models/model-id';
 import { generatedModelFeatures } from './model-features.generated';
 
 export interface ModelFeatures {

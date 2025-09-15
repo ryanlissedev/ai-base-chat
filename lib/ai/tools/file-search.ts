@@ -15,7 +15,8 @@ export function fileSearch({
   session: Session;
 }) {
   return tool({
-    description: 'Search through documents in the knowledge base for relevant information',
+    description:
+      'Search through documents in the knowledge base for relevant information',
     inputSchema: z.object({
       query: z.string().describe('The search query to find relevant documents'),
     }),
@@ -28,11 +29,13 @@ export function fileSearch({
             content: `Searching for: "${query}" in the knowledge base...`,
             metadata: {
               source: 'vectorstore',
-              vectorStoreId: process.env.OPENAI_VECTORSTORE_ID || 'vs_68c6a2b65df88191939f503958af019e',
+              vectorStoreId:
+                process.env.OPENAI_VECTORSTORE_ID ||
+                'vs_68c6a2b65df88191939f503958af019e',
               query: query,
-            }
-          }
-        ]
+            },
+          },
+        ],
       };
     },
   });

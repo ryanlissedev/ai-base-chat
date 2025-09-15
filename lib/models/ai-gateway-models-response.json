@@ -478,9 +478,7 @@
       "context_window": 1048576,
       "max_tokens": 32768,
       "type": "language",
-      "tags": [
-        "image-generation"
-      ],
+      "tags": ["image-generation"],
       "pricing": {
         "input": "0.0000003",
         "output": "0.0000025"

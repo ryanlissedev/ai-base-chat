@@ -13,8 +13,10 @@ import { providers } from '@/lib/models/models.generated';
 import { cn } from '@/lib/utils';
 import { MODEL_CATEGORIES } from '@/lib/models/model-categories';
 import { formatNumberCompact } from '@/lib/utils/format-number-compact';
-import { useModels } from '@/app/(models)/models/models-store-context';
-import { MODEL_RANGE_LIMITS } from '@/app/(models)/models/models-store-context';
+import {
+  useModels,
+  MODEL_RANGE_LIMITS,
+} from '@/app/(models)/models/models-store-context';
 
 export type FilterState = {
   inputModalities: string[];

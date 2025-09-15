@@ -1,24 +1,17 @@
 import * as path from 'node:path';
-import { generateId } from 'ai';
-import { getUnixTime } from 'date-fns';
 import { expect, test as setup } from '@playwright/test';
 
 const authFile = path.join(__dirname, '../playwright/.auth/session.json');
 
 setup('authenticate', async ({ page }) => {
-  const testEmail = `test-${getUnixTime(new Date())}@playwright.com`;
-  const testPassword = generateId();
+  // Navigate to home page to create an anonymous session
+  await page.goto('/');
 
-  await page.goto('http://localhost:3001/login');
-  await page.getByPlaceholder('user@acme.com').click();
-  await page.getByPlaceholder('user@acme.com').fill(testEmail);
-  await page.getByLabel('Password').click();
-  await page.getByLabel('Password').fill(testPassword);
-  await page.getByRole('button', { name: 'Sign Up' }).click();
+  // Wait for the page to load and establish anonymous session
+  await expect(page.getByTestId('multimodal-input')).toBeVisible({
+    timeout: 10000,
+  });
 
-  await expect(page.getByTestId('toast')).toContainText(
-    'Account created successfully!',
-  );
-
+  // Save the anonymous session state
   await page.context().storageState({ path: authFile });
 });

@@ -89,8 +89,8 @@ export function ResponsiveTools({
             <div className="space-y-1">
               <div className="font-medium">Tools unavailable for guests</div>
               <div className="text-muted-foreground">
-                Some tools modify or save content and require an account.
-                Chat and model switching work without login.
+                Some tools modify or save content and require an account. Chat
+                and model switching work without login.
               </div>
             </div>
           </PopoverContent>
