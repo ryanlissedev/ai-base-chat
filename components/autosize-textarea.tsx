@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { useImperativeHandle } from 'react';
+import { useImperativeHandle, useCallback } from 'react';
 
 interface UseAutosizeTextAreaProps {
   textAreaRef: React.MutableRefObject<HTMLTextAreaElement | null>;
@@ -89,6 +89,11 @@ export const AutosizeTextarea = React.forwardRef<
       setTriggerAutoSize(value as string);
     }, [props?.defaultValue, value]);
 
+    const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setTriggerAutoSize(e.target.value);
+      onChange?.(e);
+    }, [onChange]);
+
     return (
       <textarea
         {...props}
@@ -98,10 +103,7 @@ export const AutosizeTextarea = React.forwardRef<
           'flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
           className,
         )}
-        onChange={(e) => {
-          setTriggerAutoSize(e.target.value);
-          onChange?.(e);
-        }}
+        onChange={handleChange}
       />
     );
   },

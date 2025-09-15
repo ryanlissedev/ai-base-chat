@@ -83,7 +83,7 @@ testModels.forEach((modelId) => {
 });
 
 // 7. Summary
-console.log('\n' + '=' .repeat(60));
+console.log(`\n${'=' .repeat(60)}`);
 console.log('📊 Summary:');
 if (ANONYMOUS_LIMITS.AVAILABLE_MODELS.length === 0) {
   console.log('❌ No models available for guests! Check ANONYMOUS_MODELS env var.');

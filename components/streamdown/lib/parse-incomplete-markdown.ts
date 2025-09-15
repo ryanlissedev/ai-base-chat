@@ -143,7 +143,7 @@ const handleIncompleteInlineCode = (text: string): string => {
   if (inlineTripleBacktickMatch && !text.includes('\n')) {
     // Check if it ends with exactly 2 backticks (incomplete)
     if (text.endsWith('``') && !text.endsWith('```')) {
-      return `${text}` + '`';
+      return `${text}\``;
     }
     // Already complete inline triple backticks
     return text;
@@ -173,7 +173,7 @@ const handleIncompleteInlineCode = (text: string): string => {
   if (inlineCodeMatch && !insideIncompleteCodeBlock) {
     const singleBacktickCount = countSingleBackticks(text);
     if (singleBacktickCount % 2 === 1) {
-      return `${text}` + '`';
+      return `${text}\``;
     }
   }
 

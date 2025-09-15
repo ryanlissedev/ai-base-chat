@@ -31,13 +31,13 @@ interface DocumentPreviewProps {
   type?: 'create' | 'update';
 }
 
-export function DocumentPreview({
+const DocumentPreviewComponent = ({
   isReadonly,
   result,
   args,
   messageId,
   type = 'create',
-}: DocumentPreviewProps) {
+}: DocumentPreviewProps) => {
   const { artifact, setArtifact } = useArtifact();
   const { data: documents, isLoading: isDocumentsFetching } = useDocuments(
     result?.id || '',
@@ -314,3 +314,13 @@ const DocumentContent = ({ document }: { document: Document }) => {
     </div>
   );
 };
+
+export const DocumentPreview = memo(DocumentPreviewComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.isReadonly === nextProps.isReadonly &&
+    prevProps.messageId === nextProps.messageId &&
+    prevProps.type === nextProps.type &&
+    equal(prevProps.result, nextProps.result) &&
+    equal(prevProps.args, nextProps.args)
+  );
+});

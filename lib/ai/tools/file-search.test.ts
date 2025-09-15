@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { fileSearch } from './file-search';
 import type { StreamWriter } from '../types';
 import type { Session } from 'next-auth';
@@ -52,7 +52,7 @@ describe('fileSearch', () => {
     if (originalEnv !== undefined) {
       process.env.OPENAI_VECTORSTORE_ID = originalEnv;
     } else {
-      delete process.env.OPENAI_VECTORSTORE_ID;
+      process.env.OPENAI_VECTORSTORE_ID = undefined;
     }
   });
 
