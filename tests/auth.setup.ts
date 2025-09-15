@@ -9,7 +9,7 @@ setup('authenticate', async ({ page }) => {
   const testEmail = `test-${getUnixTime(new Date())}@playwright.com`;
   const testPassword = generateId();
 
-  await page.goto('http://localhost:3000/login');
+  await page.goto('http://localhost:3001/login');
   await page.getByPlaceholder('user@acme.com').click();
   await page.getByPlaceholder('user@acme.com').fill(testEmail);
   await page.getByLabel('Password').click();

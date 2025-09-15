@@ -216,8 +216,7 @@ function PureMessagePart({
         <div key={toolCallId}>
           <DocumentToolCall
             type="update"
-            // @ts-expect-error - TODO: fix this
-            args={input}
+            args={input as Record<string, unknown>}
             isReadonly={isReadonly}
           />
         </div>
@@ -270,8 +269,7 @@ function PureMessagePart({
         <div key={toolCallId}>
           <DocumentToolCall
             type="request-suggestions"
-            // @ts-expect-error - TODO: fix this
-            args={input}
+            args={input as Record<string, unknown>}
             isReadonly={isReadonly}
           />
         </div>

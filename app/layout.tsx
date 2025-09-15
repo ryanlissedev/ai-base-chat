@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+// import { Geist, Geist_Mono } from 'next/font/google';
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -27,17 +27,18 @@ export const viewport = {
   interactiveWidget: 'resizes-content' as const,
 };
 
-const geist = Geist({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-geist',
-});
+// Temporarily disabled due to Turbopack font loading issues
+// const geist = Geist({
+//   subsets: ['latin'],
+//   display: 'swap',
+//   variable: '--font-geist',
+// });
 
-const geistMono = Geist_Mono({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-geist-mono',
-});
+// const geistMono = Geist_Mono({
+//   subsets: ['latin'],
+//   display: 'swap',
+//   variable: '--font-geist-mono',
+// });
 
 const LIGHT_THEME_COLOR = 'hsl(0 0% 100%)';
 const DARK_THEME_COLOR = 'hsl(240deg 10% 3.92%)';
@@ -72,7 +73,7 @@ export default async function RootLayout({
       // prop is necessary to avoid the React hydration mismatch warning.
       // https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
       suppressHydrationWarning
-      className={`${geist.variable} ${geistMono.variable}`}
+      className=""
     >
       <head>
         <script

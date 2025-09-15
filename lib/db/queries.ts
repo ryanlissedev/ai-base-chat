@@ -140,7 +140,11 @@ export async function saveMessage({
   }
 }
 
-// TODO: This should indicate the it's only updating messages for a single chat
+/**
+ * Saves multiple messages to the database.
+ * Note: This function updates messages for potentially multiple chats.
+ * If you need to save messages for a single chat only, use saveMessage instead.
+ */
 export async function saveMessages({
   _messages,
 }: {
