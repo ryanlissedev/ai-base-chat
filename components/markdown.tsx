@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import type { JSX } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { cn } from '@/lib/utils';

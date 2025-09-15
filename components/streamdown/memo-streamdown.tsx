@@ -23,7 +23,6 @@ type HardenReactMarkdownProps = Options & {
 
 // Handle both ESM and CJS imports
 const hardenReactMarkdown =
-  // biome-ignore lint/suspicious/noExplicitAny: "this is needed."
   (hardenReactMarkdownImport as any).default || hardenReactMarkdownImport;
 
 // Create a hardened version of ReactMarkdown

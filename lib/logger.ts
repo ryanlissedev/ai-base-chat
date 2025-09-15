@@ -1,4 +1,4 @@
-import pino, { type Logger, stdTimeFunctions } from 'pino';
+import { default as pino, type Logger, stdTimeFunctions } from 'pino';
 
 // Prefer JSON in production; pretty in development.
 // We also add base bindings so child loggers inherit app metadata.

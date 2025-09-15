@@ -15,7 +15,9 @@ bun run db:push            # Direct schema push (dev only)
 
 # Testing Strategy
 bun test                   # Playwright E2E (auth → reasoning → chat flows)
-bun run test:unit          # Vitest unit tests
+bun run test:unit          # Vitest Node unit tests (API, utils)
+bun run test:components    # Vitest React component tests (jsdom)
+bun run test:all           # Run both Node + jsdom suites
 bun run test:db            # pgTAP database tests (170+ assertions)
 bun run test:types         # TypeScript compilation check
 

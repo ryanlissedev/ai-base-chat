@@ -4,7 +4,7 @@ import { openai, type OpenAIResponsesProviderOptions } from '@ai-sdk/openai';
 import type { AnthropicProviderOptions } from '@ai-sdk/anthropic';
 import type { GoogleGenerativeAIProviderOptions } from '@ai-sdk/google';
 import { getImageModelDefinition, getModelDefinition } from './all-models';
-import { gateway } from '@ai-sdk/gateway';
+import { createGatewayProvider } from '@ai-sdk/gateway';
 import type { ImageModelId, ModelId } from '../models/model-id';
 import { getModelAndProvider } from '../models/utils';
 
@@ -17,7 +17,14 @@ const telemetryConfig = {
 
 export const getLanguageModel = (modelId: ModelId) => {
   const model = getModelDefinition(modelId);
-  const languageProvider = gateway(model.id);
+
+  // Use AI Gateway with default baseURL and optional API key
+  const gatewayProvider = createGatewayProvider({
+    baseURL: process.env.AI_GATEWAY_BASE_URL || 'https://ai-gateway.vercel.sh/v1/ai',
+    apiKey: process.env.AI_GATEWAY_API_KEY,
+  });
+
+  const languageProvider = gatewayProvider(model.id);
 
   // Wrap with reasoning middleware if the model supports reasoning
   if (model.features?.reasoning && model.owned_by === 'xai') {

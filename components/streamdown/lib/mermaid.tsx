@@ -36,7 +36,6 @@ export const Mermaid = ({ chart, className }: MermaidProps) => {
   const [svgContent, setSvgContent] = useState<string>('');
   const [lastValidSvg, setLastValidSvg] = useState<string>('');
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: "Required for Mermaid"
   useEffect(() => {
     const renderChart = async () => {
       try {
@@ -48,7 +47,6 @@ export const Mermaid = ({ chart, className }: MermaidProps) => {
 
         // Use a stable ID based on chart content hash to prevent re-renders
         const chartHash = chart.split('').reduce((acc, char) => {
-          // biome-ignore lint/suspicious/noAssignInExpressions: Required for Mermaid hash calculation
           return ((acc << 5) - acc + char.charCodeAt(0)) | 0;
         }, 0);
         const uniqueId = `mermaid-${Math.abs(chartHash)}`;
@@ -119,7 +117,6 @@ export const Mermaid = ({ chart, className }: MermaidProps) => {
     <div
       aria-label="Mermaid chart"
       className={cn('my-4 flex justify-center', className)}
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: "Required for Mermaid"
       dangerouslySetInnerHTML={{ __html: displaySvg }}
       role="img"
     />

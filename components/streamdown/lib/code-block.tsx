@@ -78,7 +78,6 @@ export const CodeBlock = ({
             'overflow-x-auto dark:hidden [&>pre]:bg-transparent!',
             className,
           )}
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: "this is needed."
           dangerouslySetInnerHTML={{ __html: html }}
           {...props}
         />
@@ -87,7 +86,6 @@ export const CodeBlock = ({
             'hidden overflow-x-auto dark:block [&>pre]:bg-transparent!',
             className,
           )}
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: "this is needed."
           dangerouslySetInnerHTML={{ __html: darkHtml }}
           {...props}
         />

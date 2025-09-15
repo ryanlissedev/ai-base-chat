@@ -6,8 +6,9 @@ import { defineConfig, devices } from '@playwright/test';
  */
 import { config } from 'dotenv';
 
+// Use .env.test for tests, otherwise .env.local
 config({
-  path: '.env.local',
+  path: process.env.PLAYWRIGHT ? '.env.test' : '.env.local',
 });
 
 /* Use process.env.PORT by default and fallback to port 3000 */
@@ -127,7 +128,7 @@ export default defineConfig({
   webServer: process.env.SKIP_WEBSERVER
     ? undefined
     : {
-        command: 'bun run dev',
+        command: 'pnpm run dev',
         url: baseURL,
         timeout: 120 * 1000,
         reuseExistingServer: !process.env.CI,

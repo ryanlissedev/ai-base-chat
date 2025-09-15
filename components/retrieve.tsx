@@ -84,6 +84,7 @@ export function Retrieve({
         <div className="flex items-start gap-4">
           <div className="relative w-10 h-10 shrink-0">
             <div className="absolute inset-0 bg-linear-to-br from-primary/10 to-transparent rounded-lg" />
+            {/* eslint-disable-next-line @next/next/no-img-element -- Dynamic favicon from external API, Next.js Image doesn't support this use case */}
             <img
               className="h-5 w-5 absolute inset-0 m-auto"
               src={`https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(result.results[0].url)}`}

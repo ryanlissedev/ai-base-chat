@@ -1,4 +1,4 @@
-import Exa from 'exa-js';
+import { default as Exa } from 'exa-js';
 import type { StreamWriter } from '../../types';
 
 export type XSearchResult = {

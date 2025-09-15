@@ -81,6 +81,7 @@ export function OGFooter({
       tw={`flex items-center text-slate-300 ${containerTw}`}
       style={{ display: 'flex', gap: '.75rem', alignItems: 'center' }}
     >
+      {/* eslint-disable-next-line @next/next/no-img-element -- OG image generation requires <img> for proper rendering in external contexts */}
       <img
         width={iconSize}
         height={iconSize}
@@ -140,11 +141,13 @@ export function OGIcon({
 
   if (bare) {
     return src ? (
+      // eslint-disable-next-line @next/next/no-img-element -- OG image generation requires <img> for proper rendering in external contexts
       <img width={bareSizePx} height={bareSizePx} src={src} alt={alt} />
     ) : null;
   }
 
   return src ? (
+    // eslint-disable-next-line @next/next/no-img-element -- OG image generation requires <img> for proper rendering in external contexts
     <img
       src={src}
       alt={alt}

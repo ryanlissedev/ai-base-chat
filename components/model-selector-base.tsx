@@ -1,6 +1,6 @@
 'use client';
 
-import {
+import React, {
   startTransition,
   useMemo,
   useOptimistic,
@@ -45,9 +45,9 @@ const initialFilters = enabledFeatures.reduce<FeatureFilter>((acc, feature) => {
 
 function getFeatureIcons(modelDefinition: ModelDefinition) {
   const features = modelDefinition.features;
-  if (!features) return [] as JSX.Element[];
+  if (!features) return [] as React.JSX.Element[];
 
-  const icons: JSX.Element[] = [];
+  const icons: React.JSX.Element[] = [];
 
   const enabled = getEnabledFeatures();
   const featureIconMap = [

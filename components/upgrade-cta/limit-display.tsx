@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ReactElement } from 'react';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
@@ -18,7 +18,7 @@ const VARIANT_CONFIG: Record<
     }: {
       remaining: number;
       isAtLimit: boolean;
-    }) => JSX.Element;
+    }) => ReactElement;
     getClasses: ({ isAtLimit }: { isAtLimit: boolean }) => string;
   }
 > = {

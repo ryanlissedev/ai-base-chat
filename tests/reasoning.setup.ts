@@ -11,9 +11,9 @@ setup('switch to reasoning model', async ({ page }) => {
   const chatPage = new ChatPage(page);
   await chatPage.createNewChat();
 
-  await chatPage.chooseModelFromSelector('perplexity/sonar-reasoning');
+  await chatPage.chooseModelFromSelector('chat-model-reasoning');
 
-  await expect(chatPage.getSelectedModel()).resolves.toEqual('Sonar Reasoning');
+  await expect(chatPage.getSelectedModel()).resolves.toEqual('Reasoning model');
 
   await page.waitForTimeout(1000);
   await page.context().storageState({ path: reasoningFile });

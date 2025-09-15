@@ -10,6 +10,7 @@ export function Favicon({
   className?: string;
 } & React.ImgHTMLAttributes<HTMLImageElement>) {
   return (
+    // eslint-disable-next-line @next/next/no-img-element -- Favicon requires <img> for external URLs, Next.js Image doesn't support dynamic external favicons
     <img
       src={url}
       className={cn('w-4 h-4', className)}

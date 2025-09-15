@@ -17,7 +17,7 @@ import type { LexicalChatInputRef } from '@/components/lexical-chat-input';
 import type { ModelId } from '@/lib/models/model-id';
 
 interface ChatInputContextType {
-  editorRef: React.RefObject<LexicalChatInputRef>;
+  editorRef: React.RefObject<LexicalChatInputRef | null>;
   selectedTool: UiToolName | null;
   setSelectedTool: Dispatch<SetStateAction<UiToolName | null>>;
   attachments: Array<Attachment>;

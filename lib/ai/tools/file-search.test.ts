@@ -69,12 +69,14 @@ describe('fileSearch', () => {
     if (originalEnv !== undefined) {
       process.env.OPENAI_VECTORSTORE_ID = originalEnv;
     } else {
-      delete process.env.OPENAI_VECTORSTORE_ID;
+      // Delete the environment variable to properly unset it
+      process.env.OPENAI_VECTORSTORE_ID = undefined;
     }
   });
 
   it('should use default vectorstore ID when environment variable is not set', async () => {
     const originalEnv = process.env.OPENAI_VECTORSTORE_ID;
+    // biome-ignore lint/performance/noDelete: Need to properly unset environment variable for testing
     delete process.env.OPENAI_VECTORSTORE_ID;
 
     const tool = fileSearch({
