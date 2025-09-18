@@ -13,9 +13,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-COMPOSE_FILE="docker-compose.test.yml"
+COMPOSE_FILE="docker-compose.test.simple.yml"
 DB_SERVICE="postgres-test"
-TEST_SERVICE="pgtap-test"
+TEST_SERVICE="db-test"
 TEST_DB_URL="postgresql://test_user:test_password@localhost:5433/test_db"
 
 # Functions
@@ -42,28 +42,39 @@ cleanup() {
 
 wait_for_db() {
     log_info "Waiting for database to be ready..."
-    local max_attempts=30
+    local max_attempts=60  # Increased from 30 to 60
     local attempt=0
 
     while [ $attempt -lt $max_attempts ]; do
-        if docker-compose -f "$COMPOSE_FILE" exec -T "$DB_SERVICE" pg_isready -U test_user -d test_db >/dev/null 2>&1; then
+        # Try multiple connection methods to ensure database is truly ready
+        if docker-compose -f "$COMPOSE_FILE" exec -T "$DB_SERVICE" pg_isready -U test_user -d test_db >/dev/null 2>&1 && \
+           docker-compose -f "$COMPOSE_FILE" exec -T "$DB_SERVICE" psql -U test_user -d test_db -c "SELECT 1;" >/dev/null 2>&1; then
             log_success "Database is ready!"
             return 0
         fi
 
         attempt=$((attempt + 1))
         log_info "Attempt $attempt/$max_attempts - waiting for database..."
-        sleep 2
+        sleep 3  # Increased from 2 to 3 seconds
     done
 
     log_error "Database failed to become ready within timeout"
+    log_info "Checking container status..."
+    docker-compose -f "$COMPOSE_FILE" ps
+    log_info "Checking container logs..."
+    docker-compose -f "$COMPOSE_FILE" logs "$DB_SERVICE" | tail -20
     return 1
 }
 
 setup_database() {
     log_info "Setting up test database..."
 
+    # Clean any existing containers first
+    log_info "Cleaning up any existing containers..."
+    docker-compose -f "$COMPOSE_FILE" down -v --remove-orphans 2>/dev/null || true
+
     # Start the database service
+    log_info "Starting database service..."
     docker-compose -f "$COMPOSE_FILE" up -d "$DB_SERVICE"
 
     # Wait for database to be ready
@@ -72,25 +83,37 @@ setup_database() {
         return 1
     fi
 
-    # Run database migrations
+    # Run database migrations with proper environment
     log_info "Running database migrations..."
-    if ! DATABASE_URL="$TEST_DB_URL" npm run db:migrate; then
+    export DATABASE_URL="$TEST_DB_URL"
+    export POSTGRES_URL="$TEST_DB_URL"
+    
+    if ! npm run db:migrate; then
         log_error "Failed to run migrations"
+        log_info "Checking migration logs..."
+        docker-compose -f "$COMPOSE_FILE" logs "$DB_SERVICE" | tail -10
         return 1
     fi
 
-    log_success "Database setup completed"
+    # Verify database setup
+    log_info "Verifying database setup..."
+    if docker-compose -f "$COMPOSE_FILE" exec -T "$DB_SERVICE" psql -U test_user -d test_db -c "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public';" >/dev/null 2>&1; then
+        local table_count=$(docker-compose -f "$COMPOSE_FILE" exec -T "$DB_SERVICE" psql -U test_user -d test_db -t -c "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public';" | tr -d ' \n')
+        log_success "Database setup completed with $table_count tables"
+    else
+        log_warning "Could not verify table count, but database appears to be running"
+    fi
 }
 
-run_pgtap_tests() {
-    log_info "Running pgTAP tests..."
+run_database_tests() {
+    log_info "Running database tests..."
 
     # Build and run the test container
     if docker-compose -f "$COMPOSE_FILE" run --rm "$TEST_SERVICE"; then
-        log_success "All pgTAP tests passed!"
+        log_success "All database tests passed!"
         return 0
     else
-        log_error "Some pgTAP tests failed!"
+        log_error "Some database tests failed!"
         return 1
     fi
 }
@@ -189,7 +212,7 @@ case "$COMMAND" in
         setup_database
         ;;
     test)
-        run_pgtap_tests
+        run_database_tests
         ;;
     test-file)
         setup_database
@@ -197,7 +220,7 @@ case "$COMMAND" in
         ;;
     run)
         setup_database
-        run_pgtap_tests
+        run_database_tests
         ;;
     clean)
         cleanup

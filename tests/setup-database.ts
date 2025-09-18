@@ -1,34 +1,31 @@
 import { test as base } from '@playwright/test';
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
+import { runTestMigration } from '../lib/db/migrate-test';
 
 export const test = base.extend({
   // Set up clean database before each test
   page: async ({ page }, use) => {
-    // Clean up any existing test database
-    const testDbPath = path.join(process.cwd(), 'test.db');
-    if (fs.existsSync(testDbPath)) {
-      fs.unlinkSync(testDbPath);
-    }
-
-    // Initialize fresh test database
+    // Initialize PostgreSQL test database
+    const testDatabaseUrl = process.env.POSTGRES_URL || 'postgresql://test_user:test_password@localhost:5433/test_db';
+    
     try {
-      // Run database migrations for test environment
-      execSync('DATABASE_URL=file:./test.db npx prisma db push --force-reset', {
-        stdio: 'ignore',
-        env: { ...process.env, DATABASE_URL: 'file:./test.db' }
-      });
+      // The database container should already be running from globalSetup
+      // but we still need to run migrations for test isolation
+      await runTestMigration(testDatabaseUrl);
     } catch (error) {
-      console.warn('Database setup failed, continuing with existing database:', error);
+      console.error('Database setup failed:', error);
+      console.error('This usually means:');
+      console.error('1. The test database container is not running');
+      console.error('2. Database connection parameters are incorrect');
+      console.error('3. Database migrations failed');
+      console.error('Make sure to run the global setup or start the database manually with:');
+      console.error('  docker compose -f docker-compose.test.yml up -d postgres-test');
+      throw error; // Fail fast instead of continuing with broken database
     }
 
     await use(page);
 
-    // Cleanup after test (optional - commented out to keep for debugging)
-    // if (fs.existsSync(testDbPath)) {
-    //   fs.unlinkSync(testDbPath);
-    // }
+    // Note: Database cleanup is handled by the test environment
+    // No explicit cleanup needed as each test run uses isolated transactions
   },
 });
 

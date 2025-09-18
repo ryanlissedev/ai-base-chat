@@ -28,7 +28,7 @@
     "test:components:watch": "vitest --config vitest.config.unit.ts",
     "test:all": "vitest run --config vitest.config.ts && vitest run --config vitest.config.unit.ts",
     "test:types": "next typegen . && tsc --noEmit",
-    "test:db": "tests/db/scripts/run-tests.sh",
+    "test:db": "tests/db/scripts/run-simple-tests.sh",
     "test:db:ci": "tests/db/scripts/ci-test.sh",
     "test:db:start": "docker-compose -f docker-compose.test.yml up -d postgres-test",
     "test:db:stop": "docker-compose -f docker-compose.test.yml down -v",

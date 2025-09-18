@@ -33,33 +33,16 @@ export const test = base.extend({
           mockResponse = "I understand your question.";
         }
         
-        // Create a streaming response similar to real API
-        const encoder = new TextEncoder();
-        const stream = new ReadableStream({
-          start(controller) {
-            // Split response into chunks to simulate streaming
-            const chunks = mockResponse.split(' ');
-            chunks.forEach((chunk, index) => {
-              setTimeout(() => {
-                if (index === chunks.length - 1) {
-                  controller.enqueue(encoder.encode(`data: {"type":"text","text":"${chunk}"}\n\n`));
-                  controller.enqueue(encoder.encode('data: {"type":"finish"}\n\n'));
-                  controller.close();
-                } else {
-                  controller.enqueue(encoder.encode(`data: {"type":"text","text":"${chunk} "}\n\n`));
-                }
-              }, index * 10);
-            });
-          }
-        });
+        // Create a simple streaming response body as a string
+        // For tests, we simulate streaming by sending the complete response immediately
+        const streamBody = `data: {"type":"text","text":"${mockResponse}"}\n\ndata: {"type":"finish"}\n\n`;
         
         await route.fulfill({
           status: 200,
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',
-            'Transfer-Encoding': 'chunked',
           },
-          body: stream,
+          body: streamBody,
         });
       } else {
         await route.continue();
