@@ -2,13 +2,13 @@ import { expect as baseExpect, test as baseTest } from '@playwright/test';
 import { createAuthenticatedContext, type UserContext } from './helpers';
 import { getUnixTime } from 'date-fns';
 
-interface Fixtures {
+interface WorkerFixtures {
   adaContext: UserContext;
   babbageContext: UserContext;
   curieContext: UserContext;
 }
 
-export const test = baseTest.extend<{}, Fixtures>({
+export const test = baseTest.extend<{}, WorkerFixtures>({
   adaContext: [
     async ({ browser }, use, workerInfo) => {
       const ada = await createAuthenticatedContext({

@@ -1,7 +1,14 @@
 import { vi } from 'vitest';
 
 // Mock environment variables for testing
-process.env.NODE_ENV = 'test';
+if (!process.env.NODE_ENV) {
+  Object.defineProperty(process.env, 'NODE_ENV', {
+    value: 'test',
+    writable: true,
+    enumerable: true,
+    configurable: true
+  });
+}
 
 // Mock Next.js router
 vi.mock('next/navigation', () => ({
@@ -19,8 +26,7 @@ vi.mock('next/navigation', () => ({
 
 // Only set up browser mocks if we're in a browser environment
 if (typeof window !== 'undefined') {
-  // Import jest-dom for browser tests
-  import('@testing-library/jest-dom');
+  // Note: jest-dom is imported in setup.dom.ts for component tests
 
   // Mock window.matchMedia
   Object.defineProperty(window, 'matchMedia', {
@@ -42,12 +48,12 @@ if (typeof window !== 'undefined') {
     observe: vi.fn(),
     unobserve: vi.fn(),
     disconnect: vi.fn(),
-  })) as any;
+  })) as unknown as typeof IntersectionObserver;
 
   // Mock ResizeObserver
   global.ResizeObserver = vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
     disconnect: vi.fn(),
-  })) as any;
+  })) as unknown as typeof ResizeObserver;
 }

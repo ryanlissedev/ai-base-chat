@@ -56,8 +56,9 @@ import { getThreadUpToMessageId } from './getThreadUpToMessageId';
 import { createModuleLogger } from '@/lib/logger';
 
 // Create shared Redis clients for resumable stream and cleanup
-let redisPublisher: any = null;
-let redisSubscriber: any = null;
+type RedisClient = Awaited<ReturnType<typeof import('redis').createClient>> | null;
+let redisPublisher: RedisClient = null;
+let redisSubscriber: RedisClient = null;
 
 if (process.env.REDIS_URL) {
   (async () => {
@@ -83,8 +84,8 @@ export function getStreamContext() {
             }
           : {}),
       });
-    } catch (error: any) {
-      if (error.message.includes('REDIS_URL')) {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('REDIS_URL')) {
         console.log(
           ' > Resumable streams are disabled due to missing REDIS_URL',
         );
@@ -198,7 +199,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Validate model for anonymous users
-      if (!ANONYMOUS_LIMITS.AVAILABLE_MODELS.includes(selectedModelId as any)) {
+      if (!ANONYMOUS_LIMITS.AVAILABLE_MODELS.includes(selectedModelId)) {
         log.warn('Model not available for anonymous users');
         return new Response(
           JSON.stringify({
@@ -484,7 +485,10 @@ export async function POST(request: NextRequest) {
                     (toolResult) =>
                       toolResult.type === 'tool-result' &&
                       toolResult.toolName === 'deepResearch' &&
-                      (toolResult.output as any).format === 'report',
+                      typeof toolResult.output === 'object' &&
+                      toolResult.output !== null &&
+                      'format' in toolResult.output &&
+                      toolResult.output.format === 'report',
                   );
                 });
               },
@@ -649,7 +653,7 @@ export async function POST(request: NextRequest) {
             if (keys.length > 0) {
               // Set 5 minute expiration on all stream-related keys
               await Promise.all(
-                keys.map((key: string) => redisPublisher.expire(key, 300)),
+                keys.map((key: string) => redisPublisher?.expire(key, 300)),
               );
             }
           } catch (error) {

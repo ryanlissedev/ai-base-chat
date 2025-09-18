@@ -52,7 +52,7 @@ describe('Message Component', () => {
     const { container } = render(
       <div data-testid="message-user">
         <div data-testid="message-content">{mockMessage.content}</div>
-        <button data-testid="message-edit-button" onClick={() => onEdit(mockMessage.id)}>
+        <button type="button" data-testid="message-edit-button" onClick={() => onEdit(mockMessage.id)}>
           Edit
         </button>
       </div>
@@ -78,7 +78,7 @@ describe('Message Component', () => {
         <div data-testid="message-content">{mockMessage.content}</div>
         {mockMessage.reasoning && (
           <>
-            <button data-testid="message-reasoning-toggle">Show reasoning</button>
+            <button type="button" data-testid="message-reasoning-toggle">Show reasoning</button>
             <div data-testid="message-reasoning" style={{ display: 'none' }}>
               {mockMessage.reasoning}
             </div>
@@ -104,10 +104,10 @@ describe('Message Component', () => {
     const { container } = render(
       <div data-testid="message-assistant">
         <div data-testid="message-content">{mockMessage.content}</div>
-        <button data-testid="message-upvote" onClick={() => onUpvote(mockMessage.id)}>
+        <button type="button" data-testid="message-upvote" onClick={() => onUpvote(mockMessage.id)}>
           👍
         </button>
-        <button data-testid="message-downvote" onClick={() => onDownvote(mockMessage.id)}>
+        <button type="button" data-testid="message-downvote" onClick={() => onDownvote(mockMessage.id)}>
           👎
         </button>
       </div>

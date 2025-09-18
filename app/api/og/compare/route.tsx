@@ -1,6 +1,7 @@
 import { ImageResponse } from '@vercel/og';
 
 import { allModels } from '@/lib/ai/all-models';
+import type { ModelFeatures } from '@/lib/models/model-features';
 import { getProviderIconUrl } from '../../../(models)/get-provider-icon-url';
 import { ModalitiesRow } from '@/lib/og/ModalitiesRow';
 import {
@@ -154,12 +155,12 @@ export async function GET(req: Request) {
               <ModalitiesRow
                 inputKeys={
                   inputModalitiesOrder.filter(
-                    (key) => (left?.features?.input as any)?.[key],
+                    (key) => left?.features?.input?.[key as keyof ModelFeatures['input']],
                   ) as Array<'text' | 'image' | 'pdf' | 'audio' | 'video'>
                 }
                 outputKeys={
                   outputModalitiesOrder.filter(
-                    (key) => (left?.features?.output as any)?.[key],
+                    (key) => left?.features?.output?.[key as keyof ModelFeatures['output']],
                   ) as Array<'text' | 'image' | 'audio' | 'video'>
                 }
                 capabilityIcons={capabilityIcons}
@@ -271,12 +272,12 @@ export async function GET(req: Request) {
                 <ModalitiesRow
                   inputKeys={
                     inputModalitiesOrder.filter(
-                      (key) => (right?.features?.input as any)?.[key],
+                      (key) => right?.features?.input?.[key as keyof ModelFeatures['input']],
                     ) as Array<'text' | 'image' | 'pdf' | 'audio' | 'video'>
                   }
                   outputKeys={
                     outputModalitiesOrder.filter(
-                      (key) => (right?.features?.output as any)?.[key],
+                      (key) => right?.features?.output?.[key as keyof ModelFeatures['output']],
                     ) as Array<'text' | 'image' | 'audio' | 'video'>
                   }
                   capabilityIcons={capabilityIcons}

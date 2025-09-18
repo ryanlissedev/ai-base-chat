@@ -228,11 +228,11 @@ describe('Authentication API', () => {
         undefined,
       ];
 
-      const isValidToken = (token: any) => {
+      const isValidToken = (token: unknown) => {
         if (!token || typeof token !== 'string') return false;
         try {
           const decoded = JSON.parse(Buffer.from(token, 'base64').toString());
-          return decoded.userId && decoded.createdAt;
+          return !!(decoded.userId && decoded.createdAt);
         } catch {
           return false;
         }

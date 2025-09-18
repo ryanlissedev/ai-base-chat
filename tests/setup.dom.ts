@@ -2,7 +2,14 @@ import { vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
 // Ensure test environment flag
-process.env.NODE_ENV = 'test';
+if (!process.env.NODE_ENV) {
+  Object.defineProperty(process.env, 'NODE_ENV', {
+    value: 'test',
+    writable: true,
+    enumerable: true,
+    configurable: true
+  });
+}
 
 // Mock Next.js router/navigation used by components
 vi.mock('next/navigation', () => ({
@@ -34,46 +41,52 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 // IntersectionObserver mock
-// @ts-expect-error attach to global
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-}));
+})) as unknown as typeof IntersectionObserver;
 
 // ResizeObserver mock
-// @ts-expect-error attach to global
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-}));
+})) as unknown as typeof ResizeObserver;
 
 // Clipboard API mock for user-event clipboard interactions
 // Ensure navigator.clipboard exists
 if (!('clipboard' in navigator)) {
-  // @ts-expect-error - define clipboard
-  navigator.clipboard = {
-    writeText: vi.fn().mockResolvedValue(undefined),
-    readText: vi.fn().mockResolvedValue(''),
-  } as unknown as Clipboard;
+  Object.defineProperty(navigator, 'clipboard', {
+    value: {
+      writeText: vi.fn().mockResolvedValue(undefined),
+      readText: vi.fn().mockResolvedValue(''),
+    },
+    writable: true
+  });
 } else {
-  // @ts-expect-error - patch clipboard
-  navigator.clipboard.writeText = navigator.clipboard.writeText || vi.fn().mockResolvedValue(undefined);
-  // @ts-expect-error - patch clipboard
-  navigator.clipboard.readText = navigator.clipboard.readText || vi.fn().mockResolvedValue('');
+  if (!navigator.clipboard.writeText) {
+    navigator.clipboard.writeText = vi.fn().mockResolvedValue(undefined);
+  }
+  if (!navigator.clipboard.readText) {
+    navigator.clipboard.readText = vi.fn().mockResolvedValue('');
+  }
 }
 
 // Common DOM helpers used in tests and components
-// @ts-expect-error - jsdom sometimes lacks scrollTo
-window.scrollTo = window.scrollTo || vi.fn();
-// @ts-expect-error - optional helper
-HTMLElement.prototype.scrollIntoView = HTMLElement.prototype.scrollIntoView || (vi.fn() as any);
+if (!window.scrollTo) {
+  window.scrollTo = vi.fn();
+}
+if (!HTMLElement.prototype.scrollIntoView) {
+  HTMLElement.prototype.scrollIntoView = vi.fn();
+}
 
 // TextEncoder/TextDecoder for libraries that rely on them
 import { TextEncoder, TextDecoder } from 'node:util';
-// @ts-expect-error - attach to global if not present
-global.TextEncoder = global.TextEncoder || TextEncoder;
-// @ts-expect-error - attach to global if not present
-global.TextDecoder = global.TextDecoder || (TextDecoder as unknown as typeof global.TextDecoder);
+if (!global.TextEncoder) {
+  (global as typeof global & { TextEncoder: typeof TextEncoder }).TextEncoder = TextEncoder;
+}
+if (!global.TextDecoder) {
+  (global as typeof global & { TextDecoder: typeof TextDecoder }).TextDecoder = TextDecoder as unknown as typeof global.TextDecoder;
+}
 

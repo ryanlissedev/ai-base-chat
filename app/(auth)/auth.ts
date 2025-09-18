@@ -1,4 +1,5 @@
 import NextAuth, { type User, type Session } from 'next-auth';
+import type { JWT } from 'next-auth/jwt';
 
 import { getUserByEmail, createUser } from '@/lib/db/queries';
 
@@ -69,7 +70,7 @@ export const {
       token,
     }: {
       session: ExtendedSession;
-      token: { id?: string; [key: string]: any };
+      token: JWT & { id?: string };
     }) {
       if (session.user && token.id) {
         session.user.id = token.id;

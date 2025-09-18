@@ -1,6 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createMocks } from 'node-mocks-http';
-import type { NextRequest } from 'next/server';
 
 // Mock the AI SDK
 vi.mock('ai', () => ({

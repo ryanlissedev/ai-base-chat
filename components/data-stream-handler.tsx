@@ -45,7 +45,7 @@ export function DataStreamHandler({ id }: { id: string }) {
     newDeltas.forEach((delta) => {
       // Clear deepResearch tool when a research process completes
       if (delta.type === 'data-researchUpdate') {
-        const update: any = (delta as any).data;
+        const update = 'data' in delta ? delta.data : null;
         if (update?.type === 'completed') {
           setSelectedTool((current) =>
             current === 'deepResearch' ? null : current,

@@ -1,14 +1,23 @@
 import { vi } from 'vitest';
 
 // Ensure test environment flag
-process.env.NODE_ENV = 'test';
+if (!process.env.NODE_ENV) {
+  Object.defineProperty(process.env, 'NODE_ENV', {
+    value: 'test',
+    writable: true,
+    enumerable: true,
+    configurable: true
+  });
+}
 
 // Provide TextEncoder/TextDecoder in Node if missing (for libraries expecting them)
 import { TextEncoder, TextDecoder } from 'node:util';
-// @ts-expect-error - attach to global if not present
-global.TextEncoder = global.TextEncoder || TextEncoder;
-// @ts-expect-error - attach to global if not present
-global.TextDecoder = global.TextDecoder || (TextDecoder as unknown as typeof global.TextDecoder);
+if (!global.TextEncoder) {
+  (global as typeof global & { TextEncoder: typeof TextEncoder }).TextEncoder = TextEncoder;
+}
+if (!global.TextDecoder) {
+  (global as typeof global & { TextDecoder: typeof TextDecoder }).TextDecoder = TextDecoder as unknown as typeof global.TextDecoder;
+}
 
 // Mock Next.js router/navigation to prevent imports from crashing in Node tests
 vi.mock('next/navigation', () => ({

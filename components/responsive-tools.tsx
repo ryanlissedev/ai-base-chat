@@ -19,6 +19,7 @@ import { Separator } from './ui/separator';
 import { getModelDefinition } from '@/lib/ai/all-models';
 import { toolDefinitions, enabledTools } from './chat-features-definitions';
 import type { UiToolName } from '@/lib/ai/types';
+import type { ModelId } from '@/lib/models/model-id';
 
 export function ResponsiveTools({
   tools,
@@ -27,7 +28,7 @@ export function ResponsiveTools({
 }: {
   tools: UiToolName | null;
   setTools: Dispatch<SetStateAction<UiToolName | null>>;
-  selectedModelId: string;
+  selectedModelId: ModelId;
 }) {
   const { data: session } = useSession();
   const isAnonymous = !session?.user;
@@ -35,7 +36,7 @@ export function ResponsiveTools({
 
   const { hasReasoningModel, hasUnspecifiedFeatures } = (() => {
     try {
-      const modelDef = getModelDefinition(selectedModelId as any);
+      const modelDef = getModelDefinition(selectedModelId);
       return {
         hasReasoningModel: modelDef.features?.reasoning === true,
         hasUnspecifiedFeatures: !modelDef.features,

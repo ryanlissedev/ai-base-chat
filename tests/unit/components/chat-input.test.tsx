@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
@@ -16,7 +16,7 @@ describe('Chat Input Component', () => {
     render(
       <div>
         <textarea data-testid="multimodal-input" placeholder="Type a message..." />
-        <button data-testid="send-button">Send</button>
+        <button type="button" data-testid="send-button">Send</button>
       </div>
     );
 
@@ -30,7 +30,7 @@ describe('Chat Input Component', () => {
     render(
       <div>
         <textarea data-testid="multimodal-input" placeholder="Type a message..." />
-        <button data-testid="send-button">Send</button>
+        <button type="button" data-testid="send-button">Send</button>
       </div>
     );
 
@@ -47,7 +47,7 @@ describe('Chat Input Component', () => {
     render(
       <div>
         <textarea data-testid="multimodal-input" placeholder="Type a message..." defaultValue="Test message" />
-        <button data-testid="send-button" onClick={() => {
+        <button type="button" data-testid="send-button" onClick={() => {
           const input = document.querySelector('[data-testid="multimodal-input"]') as HTMLTextAreaElement;
           handleSend(input.value);
         }}>Send</button>
@@ -64,7 +64,7 @@ describe('Chat Input Component', () => {
     render(
       <div>
         <textarea data-testid="multimodal-input" placeholder="Type a message..." value="" readOnly />
-        <button data-testid="send-button" disabled={true}>Send</button>
+        <button type="button" data-testid="send-button" disabled={true}>Send</button>
       </div>
     );
 
@@ -79,9 +79,9 @@ describe('Chat Input Component', () => {
       <div>
         <textarea data-testid="multimodal-input" placeholder="Type a message..." />
         {isGenerating ? (
-          <button data-testid="stop-button" onClick={onStop}>Stop</button>
+          <button type="button" data-testid="stop-button" onClick={onStop}>Stop</button>
         ) : (
-          <button data-testid="send-button">Send</button>
+          <button type="button" data-testid="send-button">Send</button>
         )}
       </div>
     );
@@ -145,11 +145,11 @@ describe('Chat Input Component', () => {
   it('shows attachments button', () => {
     render(
       <div>
-        <button data-testid="attachments-button" aria-label="Add attachments">
+        <button type="button" data-testid="attachments-button" aria-label="Add attachments">
           📎
         </button>
         <textarea data-testid="multimodal-input" placeholder="Type a message..." />
-        <button data-testid="send-button">Send</button>
+        <button type="button" data-testid="send-button">Send</button>
       </div>
     );
 
@@ -169,6 +169,7 @@ describe('Chat Input Component', () => {
           onChange={(e) => handleFileSelect(e.target.files)}
         />
         <button
+          type="button"
           data-testid="attachments-button"
           onClick={() => {
             const fileInput = document.querySelector('[data-testid="file-input"]') as HTMLInputElement;
@@ -195,6 +196,7 @@ describe('Chat Input Component', () => {
       <div>
         <textarea data-testid="multimodal-input" placeholder="Type a message..." />
         <button
+          type="button"
           data-testid="send-button"
           onClick={() => {
             const input = document.querySelector('[data-testid="multimodal-input"]') as HTMLTextAreaElement;

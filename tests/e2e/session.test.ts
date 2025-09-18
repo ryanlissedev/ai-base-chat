@@ -13,7 +13,7 @@ test.describe.serial('Guest Session', () => {
       throw new Error('Failed to load page');
     }
 
-    let request = response.request();
+    let request: import('@playwright/test').Request | null = response.request();
 
     const chain = [];
 
@@ -55,7 +55,7 @@ test.describe.serial('Guest Session', () => {
       throw new Error('Failed to load page');
     }
 
-    let request = response.request();
+    let request: import('@playwright/test').Request | null = response.request();
 
     const chain = [];
 
