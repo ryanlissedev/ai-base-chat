@@ -84,6 +84,7 @@ export function PureMessageActions({
         ) : (
           <Action
             tooltip="Edit message"
+            data-testid="message-edit-button"
             className="text-muted-foreground hover:text-accent-foreground hover:bg-accent h-7 w-7 p-0"
             onClick={() => onStartEdit?.()}
           >

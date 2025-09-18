@@ -70,6 +70,7 @@ export const PureUserMessage = ({
           mode === 'edit' ? 'max-w-full [&>div]:max-w-full' : undefined,
           'py-1',
         )}
+        data-testid="message-user"
       >
         <div
           className={cn(

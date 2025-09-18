@@ -106,6 +106,7 @@ export function DataStreamHandler({ id }: { id: string }) {
             return {
               ...draftArtifact,
               status: 'idle',
+              isVisible: draftArtifact.documentId !== 'init' && draftArtifact.content.trim().length > 0,
             };
 
           default:

@@ -32,8 +32,22 @@ export class ChatPage {
     await textInput.click();
     await textInput.fill(message);
     
-    // Wait for send button to be available and click it
-    await this.page.waitForSelector('[data-testid="send-button"]', { state: 'visible' });
+    // Wait for the button to exist (either send-button or stop-button)
+    // and be enabled (status = 'ready', not disabled)
+    await this.page.waitForFunction(() => {
+      const sendButton = document.querySelector('[data-testid="send-button"]');
+      const stopButton = document.querySelector('[data-testid="stop-button"]');
+      
+      // Check if send button exists and is enabled
+      if (sendButton) {
+        return !sendButton.hasAttribute('disabled');
+      }
+      
+      // If only stop button exists, the AI is generating - wait for send button
+      return false;
+    }, { timeout: 10000 });
+    
+    // Click the send button (should exist and be enabled now)
     await this.sendButton.click();
   }
 
@@ -52,7 +66,15 @@ export class ChatPage {
     // Wait for generation to complete (send button becomes enabled)
     await this.page.waitForFunction(() => {
       const sendButton = document.querySelector('[data-testid="send-button"]');
-      return sendButton && !sendButton.hasAttribute('disabled');
+      const stopButton = document.querySelector('[data-testid="stop-button"]');
+      
+      // Generation is complete when send button exists and is enabled
+      if (sendButton) {
+        return !sendButton.hasAttribute('disabled');
+      }
+      
+      // If only stop button exists, generation is still in progress
+      return false;
     }, { timeout: 15000 });
   }
 
