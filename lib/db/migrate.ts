@@ -21,20 +21,32 @@ const runMigrate = async () => {
                             process.env.CI === 'true' ||
                             process.env.NODE_ENV === 'production';
   
-  if (!databaseUrl) {
+  // Check if database URL is a local file (SQLite) that won't work in cloud environments
+  const isLocalFileDatabase = databaseUrl && (
+    databaseUrl.startsWith('file:') || 
+    databaseUrl.startsWith('sqlite:') ||
+    databaseUrl.includes('./test.db')
+  );
+  
+  if (!databaseUrl || (isBuildEnvironment && isLocalFileDatabase)) {
     if (isBuildEnvironment) {
-      console.log('🔧 Skipping database migration during build (no database URL provided)');
+      const reason = !databaseUrl 
+        ? 'no database URL provided' 
+        : 'local file database not available in cloud environment';
+      console.log(`🔧 Skipping database migration during build (${reason})`);
       console.log('✅ Build can proceed without database connectivity');
       process.exit(0);
     }
     
-    console.error('❌ No database URL found');
-    console.error('Please set POSTGRES_URL or DATABASE_URL environment variable');
-    console.error('Available environment variables:');
-    Object.keys(process.env)
-      .filter(key => key.includes('DATABASE') || key.includes('POSTGRES'))
-      .forEach(key => console.error(`  ${key}=${process.env[key]}`));
-    process.exit(1);
+    if (!databaseUrl) {
+      console.error('❌ No database URL found');
+      console.error('Please set POSTGRES_URL or DATABASE_URL environment variable');
+      console.error('Available environment variables:');
+      Object.keys(process.env)
+        .filter(key => key.includes('DATABASE') || key.includes('POSTGRES'))
+        .forEach(key => console.error(`  ${key}=${process.env[key]}`));
+      process.exit(1);
+    }
   }
 
   console.log(`🔗 Connecting to database: ${databaseUrl.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@')}`);
