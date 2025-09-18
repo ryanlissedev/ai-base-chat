@@ -24,8 +24,23 @@ export const test = base.extend({
 
     // 2. API Mocking - Mock the chat API with predictable responses
     await page.route('**/api/chat', async (route) => {
+      console.log('🎯 Chat API route intercepted:', route.request().url());
+      console.log('🎯 Request method:', route.request().method());
       const request = route.request();
-      const body = await request.postDataJSON();
+      
+      // Only intercept POST requests
+      if (request.method() !== 'POST') {
+        await route.continue();
+        return;
+      }
+      
+      let body = null;
+      try {
+        body = await request.postDataJSON();
+      } catch (error) {
+        console.log('🎯 Failed to parse JSON body:', error);
+      }
+      console.log('🎯 Request body:', body);
       
       if (body?.messages) {
         const lastMessage = body.messages[body.messages.length - 1];
@@ -53,23 +68,18 @@ export const test = base.extend({
           mockResponse = "I understand your question.";
         }
         
-        // Create a streaming response similar to real API
+        console.log('🎯 Mock response will be:', mockResponse);
+        
+        // Create a simple streaming response that completes immediately
         const encoder = new TextEncoder();
         const stream = new ReadableStream({
           start(controller) {
-            // Split response into chunks to simulate streaming
-            const chunks = mockResponse.split(' ');
-            chunks.forEach((chunk, index) => {
-              setTimeout(() => {
-                if (index === chunks.length - 1) {
-                  controller.enqueue(encoder.encode(`data: {"type":"text","text":"${chunk}"}\n\n`));
-                  controller.enqueue(encoder.encode('data: {"type":"finish"}\n\n'));
-                  controller.close();
-                } else {
-                  controller.enqueue(encoder.encode(`data: {"type":"text","text":"${chunk} "}\n\n`));
-                }
-              }, index * 10);
-            });
+            console.log('🎯 Stream started, sending response');
+            // Send the complete response immediately
+            controller.enqueue(encoder.encode(`data: {"type":"text","text":"${mockResponse}"}\n\n`));
+            controller.enqueue(encoder.encode('data: {"type":"finish"}\n\n'));
+            controller.close();
+            console.log('🎯 Stream completed');
           }
         });
         
@@ -77,10 +87,10 @@ export const test = base.extend({
           status: 200,
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',
-            'Transfer-Encoding': 'chunked',
           },
           body: stream,
         });
+        console.log('🎯 Route fulfilled');
       } else {
         await route.continue();
       }
