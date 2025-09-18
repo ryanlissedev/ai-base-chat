@@ -16,7 +16,18 @@ const runMigrate = async () => {
   // Check for database URL with fallbacks
   const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
   
+  // Detect build environment (Vercel, CI, or local build without database)
+  const isBuildEnvironment = process.env.VERCEL === '1' || 
+                            process.env.CI === 'true' ||
+                            process.env.NODE_ENV === 'production';
+  
   if (!databaseUrl) {
+    if (isBuildEnvironment) {
+      console.log('🔧 Skipping database migration during build (no database URL provided)');
+      console.log('✅ Build can proceed without database connectivity');
+      process.exit(0);
+    }
+    
     console.error('❌ No database URL found');
     console.error('Please set POSTGRES_URL or DATABASE_URL environment variable');
     console.error('Available environment variables:');
