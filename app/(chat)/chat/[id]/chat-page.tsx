@@ -32,7 +32,7 @@ export function ChatPage({ id }: { id: string }) {
     );
     if (!lastAssistantMessage || !Array.isArray(lastAssistantMessage.parts))
       return null;
-    for (const part of lastAssistantMessage.parts as any[]) {
+    for (const part of lastAssistantMessage.parts) {
       if (
         part?.type === 'tool-deepResearch' &&
         part?.state === 'output-available' &&

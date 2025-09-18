@@ -76,7 +76,7 @@ importers:
         version: 0.32.1
       '@lobehub/icons':
         specifier: ^2.23.1
-        version: 2.33.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+        version: 2.33.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.15(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@mendable/firecrawl-js':
         specifier: 1.29.1
         version: 1.29.1
@@ -284,6 +284,9 @@ importers:
       fast-deep-equal:
         specifier: ^3.1.3
         version: 3.1.3
+      framer-motion:
+        specifier: ^12.23.15
+        version: 12.23.15(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       geist:
         specifier: ^1.4.2
         version: 1.5.1(next@15.5.1-canary.28(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))
@@ -299,6 +302,9 @@ importers:
       js-tiktoken:
         specifier: ^1.0.19
         version: 1.0.21
+      katex:
+        specifier: ^0.16.22
+        version: 0.16.22
       langfuse:
         specifier: ^3.37.0
         version: 3.38.5
@@ -410,6 +416,9 @@ importers:
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
+      shiki:
+        specifier: ^3.12.2
+        version: 3.12.2
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -468,6 +477,9 @@ importers:
       '@storybook/nextjs':
         specifier: 9.1.2
         version: 9.1.2(esbuild@0.25.9)(next@15.5.1-canary.28(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(storybook@9.1.2(@testing-library/dom@10.4.1)(bufferutil@4.0.9)(vite@7.1.5(@types/node@22.18.3)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.5)))(type-fest@2.19.0)(typescript@5.8.3)(webpack-hot-middleware@2.26.1)(webpack@5.101.3(esbuild@0.25.9))
+      '@storybook/react':
+        specifier: ^9.1.7
+        version: 9.1.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(storybook@9.1.2(@testing-library/dom@10.4.1)(bufferutil@4.0.9)(vite@7.1.5(@types/node@22.18.3)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.5)))(typescript@5.8.3)
       '@tailwindcss/postcss':
         specifier: ^4.1.12
         version: 4.1.13
@@ -3622,6 +3634,13 @@ packages:
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
       storybook: ^9.1.2
 
+  '@storybook/react-dom-shim@9.1.7':
+    resolution: {integrity: sha512-ktjCuZ42g3TAF6nMiSdLbJu/EcvC039hYrmVltKpfF7krf+0xHkK3dCuYqSBp5nv3fS+IemrqmzJwREu5BJLuQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+      storybook: ^9.1.7
+
   '@storybook/react@9.1.2':
     resolution: {integrity: sha512-VVXu1HrhDExj/yj+heFYc8cgIzBruXy1UYT3LW0WiJyadgzYz3J41l/Lf/j2FCppyxwlXb19Uv51plb1F1C77w==}
     engines: {node: '>=20.0.0'}
@@ -3629,6 +3648,18 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
       storybook: ^9.1.2
+      typescript: '>= 4.9.x'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@storybook/react@9.1.7':
+    resolution: {integrity: sha512-GxuA2Eh3LlkEF4HHDKFGP+bqQ1+7VtABVacSXukMu82WV4VAOXhhHEDII8R9AVl2Fbs/iPJnNVj06wnkDeUZhA==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0-beta
+      storybook: ^9.1.7
       typescript: '>= 4.9.x'
     peerDependenciesMeta:
       typescript:
@@ -6278,8 +6309,8 @@ packages:
     resolution: {integrity: sha512-wzsgA6WOq+09wrU1tsJ09udeR/YZRaeArL9e1wPbFg3GG2yDnC2ldKpxs4xunpFF9DgqCqOIra3bc1HWrJ37Ww==}
     engines: {node: '>=0.4.x'}
 
-  framer-motion@12.23.12:
-    resolution: {integrity: sha512-6e78rdVtnBvlEVgu6eFEAgG9v3wLnYEboM8I5O5EXvfKC8gxGQB8wXJdhkMy10iVcn05jl6CNw7/HTsTCfwcWg==}
+  framer-motion@12.23.15:
+    resolution: {integrity: sha512-MBxUEHjWr/fRQ2aHg2CgdcjJpHMJ9ttHiPeClHDGiOJOYgmde3OXZUrbWDeeE8yvFrWA62hsPS4+rKQ9OJaoQA==}
     peerDependencies:
       '@emotion/is-prop-valid': '*'
       react: ^18.0.0 || ^19.0.0
@@ -12003,10 +12034,10 @@ snapshots:
 
   '@lobehub/emojilib@1.0.0': {}
 
-  '@lobehub/fluent-emoji@2.0.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
+  '@lobehub/fluent-emoji@2.0.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.15(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
     dependencies:
       '@lobehub/emojilib': 1.0.0
-      '@lobehub/ui': 2.13.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@lobehub/ui': 2.13.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.15(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       antd: 5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       antd-style: 3.7.1(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       emoji-regex: 10.5.0
@@ -12025,9 +12056,9 @@ snapshots:
       - micromark-util-types
       - supports-color
 
-  '@lobehub/icons@2.33.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
+  '@lobehub/icons@2.33.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.15(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
     dependencies:
-      '@lobehub/ui': 2.13.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@lobehub/ui': 2.13.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.15(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       antd: 5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       antd-style: 3.7.1(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       lucide-react: 0.469.0(react@19.1.1)
@@ -12044,7 +12075,7 @@ snapshots:
       - micromark-util-types
       - supports-color
 
-  '@lobehub/ui@2.13.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
+  '@lobehub/ui@2.13.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.15(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
     dependencies:
       '@ant-design/cssinjs': 1.24.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@dnd-kit/core': 6.3.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -12055,8 +12086,8 @@ snapshots:
       '@emoji-mart/react': 1.1.1(emoji-mart@5.6.0)(react@19.1.1)
       '@floating-ui/react': 0.27.16(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@giscus/react': 3.1.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      '@lobehub/fluent-emoji': 2.0.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      '@lobehub/icons': 2.33.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@lobehub/fluent-emoji': 2.0.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.15(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@lobehub/icons': 2.33.0(@babel/core@7.28.4)(@types/mdast@4.0.4)(@types/react@19.1.13)(antd@5.27.3(date-fns@4.1.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(framer-motion@12.23.15(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@mdx-js/mdx': 3.1.1
       '@mdx-js/react': 3.1.1(@types/react@19.1.13)(react@19.1.1)
       '@radix-ui/react-slot': 1.2.3(@types/react@19.1.13)(react@19.1.1)
@@ -12070,7 +12101,7 @@ snapshots:
       dayjs: 1.11.18
       emoji-mart: 5.6.0
       fast-deep-equal: 3.1.3
-      framer-motion: 12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      framer-motion: 12.23.15(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       immer: 10.1.3
       katex: 0.16.22
       leva: 0.10.0(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -13528,10 +13559,26 @@ snapshots:
       react-dom: 19.1.1(react@19.1.1)
       storybook: 9.1.2(@testing-library/dom@10.4.1)(bufferutil@4.0.9)(vite@7.1.5(@types/node@22.18.3)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.5))
 
+  '@storybook/react-dom-shim@9.1.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(storybook@9.1.2(@testing-library/dom@10.4.1)(bufferutil@4.0.9)(vite@7.1.5(@types/node@22.18.3)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.5)))':
+    dependencies:
+      react: 19.1.1
+      react-dom: 19.1.1(react@19.1.1)
+      storybook: 9.1.2(@testing-library/dom@10.4.1)(bufferutil@4.0.9)(vite@7.1.5(@types/node@22.18.3)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.5))
+
   '@storybook/react@9.1.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(storybook@9.1.2(@testing-library/dom@10.4.1)(bufferutil@4.0.9)(vite@7.1.5(@types/node@22.18.3)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.5)))(typescript@5.8.3)':
     dependencies:
       '@storybook/global': 5.0.0
       '@storybook/react-dom-shim': 9.1.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(storybook@9.1.2(@testing-library/dom@10.4.1)(bufferutil@4.0.9)(vite@7.1.5(@types/node@22.18.3)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.5)))
+      react: 19.1.1
+      react-dom: 19.1.1(react@19.1.1)
+      storybook: 9.1.2(@testing-library/dom@10.4.1)(bufferutil@4.0.9)(vite@7.1.5(@types/node@22.18.3)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.5))
+    optionalDependencies:
+      typescript: 5.8.3
+
+  '@storybook/react@9.1.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(storybook@9.1.2(@testing-library/dom@10.4.1)(bufferutil@4.0.9)(vite@7.1.5(@types/node@22.18.3)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.5)))(typescript@5.8.3)':
+    dependencies:
+      '@storybook/global': 5.0.0
+      '@storybook/react-dom-shim': 9.1.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(storybook@9.1.2(@testing-library/dom@10.4.1)(bufferutil@4.0.9)(vite@7.1.5(@types/node@22.18.3)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.5)))
       react: 19.1.1
       react-dom: 19.1.1(react@19.1.1)
       storybook: 9.1.2(@testing-library/dom@10.4.1)(bufferutil@4.0.9)(vite@7.1.5(@types/node@22.18.3)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.5))
@@ -16584,7 +16631,7 @@ snapshots:
 
   format@0.2.2: {}
 
-  framer-motion@12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
+  framer-motion@12.23.15(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
     dependencies:
       motion-dom: 12.23.12
       motion-utils: 12.23.6
@@ -18241,7 +18288,7 @@ snapshots:
 
   motion@12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1):
     dependencies:
-      framer-motion: 12.23.12(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      framer-motion: 12.23.15(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       tslib: 2.8.1
     optionalDependencies:
       react: 19.1.1

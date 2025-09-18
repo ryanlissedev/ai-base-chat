@@ -99,7 +99,7 @@ function PureMultimodalInput({
   const isAnonymous = !session?.user;
   const isModelDisallowedForAnonymous =
     isAnonymous &&
-    !ANONYMOUS_LIMITS.AVAILABLE_MODELS.includes(selectedModelId as any);
+    !ANONYMOUS_LIMITS.AVAILABLE_MODELS.includes(selectedModelId);
 
   // Helper function to auto-switch to PDF-compatible model
   const switchToPdfCompatibleModel = useCallback(() => {

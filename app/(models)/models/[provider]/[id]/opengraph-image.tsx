@@ -1,6 +1,7 @@
 import { ImageResponse } from '@vercel/og';
 
 import { allModels } from '@/lib/ai/all-models';
+import type { ModelFeatures } from '@/lib/models/model-features';
 import { getProviderIconUrl } from '../../../get-provider-icon-url';
 import { ModalitiesRow } from '@/lib/og/ModalitiesRow';
 import {
@@ -30,10 +31,17 @@ export const size = OG_SIZE;
 const TITLE_MAX_LENGTH = 30;
 const DESCRIPTION_MAX_LENGTH = 165;
 
-export default async function OGImage(
-  props: PageProps<'/models/[provider]/[id]'>,
-) {
-  const { provider, id } = await props.params;
+interface PageParams {
+  provider: string;
+  id: string;
+}
+
+export default async function OGImage({
+  params,
+}: {
+  params: Promise<PageParams>;
+}) {
+  const { provider, id } = await params;
   const modelId = `${provider}/${id}`;
   const model = allModels.find((m) => m.id === modelId) || null;
 
@@ -89,10 +97,10 @@ export default async function OGImage(
   const arrowRight = getArrowRightUrl(baseUrl);
 
   const enabledInputKeys = inputModalitiesOrder.filter(
-    (key) => (model?.features?.input as any)?.[key],
+    (key) => model?.features?.input?.[key as keyof ModelFeatures['input']],
   );
   const enabledOutputKeys = outputModalitiesOrder.filter(
-    (key) => (model?.features?.output as any)?.[key],
+    (key) => model?.features?.output?.[key as keyof ModelFeatures['output']],
   );
 
   const appIcon = getAppIconUrl(baseUrl);

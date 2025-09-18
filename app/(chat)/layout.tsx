@@ -26,7 +26,7 @@ export default async function ChatLayout({
 
   if (isAnonymous && cookieModel) {
     const isModelAvailable = ANONYMOUS_LIMITS.AVAILABLE_MODELS.includes(
-      cookieModel as any,
+      cookieModel,
     );
     if (!isModelAvailable) {
       // Switch to default model if current model is not available for anonymous users

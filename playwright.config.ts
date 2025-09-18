@@ -67,7 +67,7 @@ export default defineConfig({
     },
     {
       name: 'chat',
-      testMatch: /chat.test.ts/,
+      testMatch: /tests\/chat\.test\.ts$/,
       dependencies: ['setup:auth'],
       use: {
         ...devices['Desktop Chrome'],

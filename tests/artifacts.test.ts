@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './setup-combined';
 import { ChatPage } from './pages/chat';
 import { ArtifactPage } from './pages/artifact';
 
@@ -13,14 +13,26 @@ test.describe('artifacts activity', () => {
     await chatPage.createNewChat();
   });
 
-  test('create a text artifact', async () => {
+  test('create a text artifact', async ({ page }) => {
     await chatPage.createNewChat();
 
+    console.log('🔍 Starting artifact creation test...');
+    
     await chatPage.sendUserMessage(
       'Help me write an essay about Silicon Valley',
     );
+    console.log('✅ Message sent, waiting for generation...');
+    
     await artifactPage.isGenerationComplete();
+    console.log('✅ Generation complete, checking artifact visibility...');
 
+    // Add debugging - check if artifact exists at all
+    const artifactExists = await page.getByTestId('artifact').count();
+    console.log(`🔍 Artifact elements found: ${artifactExists}`);
+    
+    // Take a screenshot for debugging
+    await page.screenshot({ path: 'artifact-test-debug.png', fullPage: true });
+    
     expect(artifactPage.artifact).toBeVisible();
 
     const assistantMessage = await chatPage.getRecentAssistantMessage();

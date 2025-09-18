@@ -27,7 +27,7 @@ export function PureModelSelector({
     return chatModels.map((m) => {
       const def = getModelDefinition(m.id);
       const disabled =
-        isAnonymous && !ANONYMOUS_LIMITS.AVAILABLE_MODELS.includes(m.id as any);
+        isAnonymous && !ANONYMOUS_LIMITS.AVAILABLE_MODELS.includes(m.id);
       return { id: m.id, definition: def, disabled };
     });
   }, [isAnonymous]);

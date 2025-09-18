@@ -93,8 +93,8 @@ function ContextUsage({
 
   const usedTokens = useMemo(() => {
     if (!usage) return 0;
-    const input = (usage as any).inputTokens ?? 0;
-    const cached = (usage as any).cachedInputTokens ?? 0;
+    const input = ('inputTokens' in usage ? usage.inputTokens : 0) ?? 0;
+    const cached = ('cachedInputTokens' in usage ? usage.cachedInputTokens : 0) ?? 0;
     return input + cached;
   }, [usage]);
 

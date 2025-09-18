@@ -27,17 +27,55 @@ export class ChatPage {
   }
 
   async sendUserMessage(message: string) {
-    await this.multimodalInput.click();
-    await this.multimodalInput.fill(message);
+    // Find the actual textarea/input inside the multimodal input
+    const textInput = this.page.locator('[data-testid="multimodal-input"]').locator('textarea, [contenteditable="true"]').first();
+    await textInput.click();
+    await textInput.fill(message);
+    
+    // Wait for the button to exist (either send-button or stop-button)
+    // and be enabled (status = 'ready', not disabled)
+    await this.page.waitForFunction(() => {
+      const sendButton = document.querySelector('[data-testid="send-button"]');
+      const stopButton = document.querySelector('[data-testid="stop-button"]');
+      
+      // Check if send button exists and is enabled
+      if (sendButton) {
+        return !sendButton.hasAttribute('disabled');
+      }
+      
+      // If only stop button exists, the AI is generating - wait for send button
+      return false;
+    }, { timeout: 10000 });
+    
+    // Click the send button (should exist and be enabled now)
     await this.sendButton.click();
   }
 
   async isGenerationComplete() {
-    const response = await this.page.waitForResponse((response) =>
+    // Wait for the API call to start
+    await this.page.waitForResponse((response) =>
       response.url().includes('/api/chat'),
     );
-
-    await response.finished();
+    
+    // Wait for assistant message to appear and the send button to be enabled again
+    await this.page.waitForSelector('[data-testid="message-assistant"]', {
+      timeout: 15000,
+      state: 'visible'
+    });
+    
+    // Wait for generation to complete (send button becomes enabled)
+    await this.page.waitForFunction(() => {
+      const sendButton = document.querySelector('[data-testid="send-button"]');
+      const stopButton = document.querySelector('[data-testid="stop-button"]');
+      
+      // Generation is complete when send button exists and is enabled
+      if (sendButton) {
+        return !sendButton.hasAttribute('disabled');
+      }
+      
+      // If only stop button exists, generation is still in progress
+      return false;
+    }, { timeout: 15000 });
   }
 
   async isVoteComplete() {
@@ -108,9 +146,20 @@ export class ChatPage {
   }
 
   async getRecentAssistantMessage() {
+    // Wait for assistant messages to appear
+    await this.page.waitForSelector('[data-testid="message-assistant"]', {
+      timeout: 10000,
+      state: 'visible'
+    });
+    
     const messageElements = await this.page
       .getByTestId('message-assistant')
       .all();
+    
+    if (messageElements.length === 0) {
+      throw new Error('No assistant messages found');
+    }
+    
     const lastMessageElement = messageElements[messageElements.length - 1];
 
     const content = await lastMessageElement
@@ -149,7 +198,18 @@ export class ChatPage {
   }
 
   async getRecentUserMessage() {
+    // Wait for user messages to appear
+    await this.page.waitForSelector('[data-testid="message-user"]', {
+      timeout: 10000,
+      state: 'visible'
+    });
+    
     const messageElements = await this.page.getByTestId('message-user').all();
+    
+    if (messageElements.length === 0) {
+      throw new Error('No user messages found');
+    }
+    
     const lastMessageElement = messageElements[messageElements.length - 1];
 
     const content = await lastMessageElement.innerText();

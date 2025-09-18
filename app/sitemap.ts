@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
+import { allModels } from '@/lib/ai/all-models';
 
 import { generateStaticParams as generateModelStaticParams } from '@/app/(models)/models/[provider]/[id]/page';
-import { generateStaticParams as generateCompareStaticParams } from '@/app/(models)/compare/[[...slug]]/page';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = `http://${process.env.VERCEL_PROJECT_PRODUCTION_URL ?? 'localhost:3000'}`;
@@ -46,18 +46,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   try {
-    const compareParams = await generateCompareStaticParams();
-    for (const { slug } of compareParams) {
-      const segments = Array.isArray(slug) ? slug : [];
-      const path = segments.length
-        ? `/compare/${segments.join('/')}`
-        : '/compare';
-      dynamicEntries.push({
-        url: `${baseUrl}${path}`,
-        lastModified: now,
-        changeFrequency: 'weekly',
-        priority: segments.length ? 0.5 : 0.8,
-      });
+    // Generate compare URLs directly from allModels
+    const sortedIds = [...allModels.map((m) => m.id)].sort((a, b) => a.localeCompare(b));
+    
+    // Add some single model comparison pages
+    const popularModels = sortedIds.slice(0, 10);
+    for (const id of popularModels) {
+      const [provider, model] = id.split('/');
+      if (provider && model) {
+        dynamicEntries.push({
+          url: `${baseUrl}/compare/${provider}/${model}`,
+          lastModified: now,
+          changeFrequency: 'weekly',
+          priority: 0.5,
+        });
+      }
+    }
+    
+    // Add a few popular model comparison pairs
+    for (let i = 0; i < Math.min(5, popularModels.length); i++) {
+      for (let j = i + 1; j < Math.min(5, popularModels.length); j++) {
+        const [p1, m1] = popularModels[i].split('/');
+        const [p2, m2] = popularModels[j].split('/');
+        if (p1 && m1 && p2 && m2) {
+          dynamicEntries.push({
+            url: `${baseUrl}/compare/${p1}/${m1}/${p2}/${m2}`,
+            lastModified: now,
+            changeFrequency: 'weekly',
+            priority: 0.4,
+          });
+        }
+      }
     }
   } catch {
     // swallow errors from optional imports

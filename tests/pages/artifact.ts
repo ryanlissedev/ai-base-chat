@@ -34,9 +34,21 @@ export class ArtifactPage {
   }
 
   async getRecentAssistantMessage() {
+    // Wait for assistant messages to appear within artifact
+    await this.artifact.waitFor({ state: 'visible' });
+    await this.artifact.getByTestId('message-assistant').first().waitFor({
+      timeout: 10000,
+      state: 'visible'
+    });
+    
     const messageElements = await this.artifact
       .getByTestId('message-assistant')
       .all();
+    
+    if (messageElements.length === 0) {
+      throw new Error('No assistant messages found in artifact');
+    }
+    
     const lastMessageElement = messageElements[messageElements.length - 1];
 
     const content = await lastMessageElement
@@ -69,9 +81,21 @@ export class ArtifactPage {
   }
 
   async getRecentUserMessage() {
+    // Wait for user messages to appear within artifact
+    await this.artifact.waitFor({ state: 'visible' });
+    await this.artifact.getByTestId('message-user').first().waitFor({
+      timeout: 10000,
+      state: 'visible'
+    });
+    
     const messageElements = await this.artifact
       .getByTestId('message-user')
       .all();
+    
+    if (messageElements.length === 0) {
+      throw new Error('No user messages found in artifact');
+    }
+    
     const lastMessageElement = messageElements[messageElements.length - 1];
 
     const content = await lastMessageElement.innerText();

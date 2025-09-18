@@ -2,13 +2,17 @@ import { expect as baseExpect, test as baseTest } from '@playwright/test';
 import { createAuthenticatedContext, type UserContext } from './helpers';
 import { getUnixTime } from 'date-fns';
 
-interface Fixtures {
+// eslint-disable-next-line @typescript-eslint/ban-types
+// biome-ignore lint/complexity/noBannedTypes: Required for Playwright worker fixtures
+type EmptyTestFixtures = {};
+
+interface WorkerFixtures {
   adaContext: UserContext;
   babbageContext: UserContext;
   curieContext: UserContext;
 }
 
-export const test = baseTest.extend<{}, Fixtures>({
+export const test = baseTest.extend<EmptyTestFixtures, WorkerFixtures>({
   adaContext: [
     async ({ browser }, use, workerInfo) => {
       const ada = await createAuthenticatedContext({

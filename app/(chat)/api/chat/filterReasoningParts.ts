@@ -1,4 +1,4 @@
-export function filterReasoningParts<T extends { parts: any[] }>(
+export function filterReasoningParts<T extends { parts: Array<{ type: string }> }>(
   messages: T[],
 ): T[] {
   return messages.map((message) => ({
