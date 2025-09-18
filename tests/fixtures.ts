@@ -8,7 +8,7 @@ interface WorkerFixtures {
   curieContext: UserContext;
 }
 
-export const test = baseTest.extend<{}, WorkerFixtures>({
+export const test = baseTest.extend<Record<string, never>, WorkerFixtures>({
   adaContext: [
     async ({ browser }, use, workerInfo) => {
       const ada = await createAuthenticatedContext({
