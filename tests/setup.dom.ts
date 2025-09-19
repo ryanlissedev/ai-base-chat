@@ -55,23 +55,15 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 })) as unknown as typeof ResizeObserver;
 
 // Clipboard API mock for user-event clipboard interactions
-// Ensure navigator.clipboard exists
-if (!('clipboard' in navigator)) {
-  Object.defineProperty(navigator, 'clipboard', {
-    value: {
-      writeText: vi.fn().mockResolvedValue(undefined),
-      readText: vi.fn().mockResolvedValue(''),
-    },
-    writable: true
-  });
-} else {
-  if (!navigator.clipboard.writeText) {
-    navigator.clipboard.writeText = vi.fn().mockResolvedValue(undefined);
-  }
-  if (!navigator.clipboard.readText) {
-    navigator.clipboard.readText = vi.fn().mockResolvedValue('');
-  }
-}
+// Ensure navigator.clipboard exists and is configurable for user-event
+Object.defineProperty(navigator, 'clipboard', {
+  value: {
+    writeText: vi.fn().mockResolvedValue(undefined),
+    readText: vi.fn().mockResolvedValue(''),
+  },
+  writable: true,
+  configurable: true
+});
 
 // Common DOM helpers used in tests and components
 if (!window.scrollTo) {

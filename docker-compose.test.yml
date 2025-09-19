@@ -1,4 +1,4 @@
-version: '3.8'
+# Docker Compose configuration for test database
 
 services:
   postgres-test:
@@ -9,16 +9,32 @@ services:
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
       POSTGRES_HOST_AUTH_METHOD: trust
+      # Performance and timeout settings
+      POSTGRES_INITDB_ARGS: "--auth-host=trust --auth-local=trust"
+      # Connection settings
+      POSTGRES_MAX_CONNECTIONS: 100
+      POSTGRES_SHARED_BUFFERS: 128MB
     ports:
-      - "5433:5432"
+      - "${TEST_DB_PORT:-5433}:5432"
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
       - ./tests/db/init:/docker-entrypoint-initdb.d
+    # Enhanced healthcheck with better timeout handling
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U test_user -d test_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD-SHELL", "pg_isready -U test_user -d test_db -h localhost -p 5432"]
+      interval: 5s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
+    # Ensure container has enough resources
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    # Add restart policy for reliability
+    restart: unless-stopped
 
   pgtap-test:
     image: postgres:16-alpine
@@ -38,20 +54,58 @@ services:
     working_dir: /tests
     command: >
       sh -c "
-        # Install dependencies
-        apk add --no-cache git curl build-base perl-dev postgresql-dev &&
-        # Install pgTAP
+        echo 'Installing pgTAP test dependencies...' &&
+        
+        # Install system dependencies including proper Perl modules
+        echo 'Installing system packages...' &&
+        apk add --no-cache git curl build-base perl-dev postgresql-dev \
+          make perl perl-utils &&
+        
+        # Install cpanminus manually since the package name varies
+        echo 'Installing cpanminus...' &&
+        curl -L https://cpanmin.us | perl - App::cpanminus &&
+        
+        # Install pgTAP from source (this includes pg_prove)
+        echo 'Installing pgTAP extension and tools...' &&
         git clone https://github.com/theory/pgtap.git /tmp/pgtap &&
         cd /tmp/pgtap &&
-        make &&
-        make install &&
-        # Wait for postgres to be ready
+        make USE_PGXS=1 &&
+        make USE_PGXS=1 install &&
+        
+        # Install required Perl TAP modules
+        echo 'Installing Perl TAP modules...' &&
+        cpanm --notest --quiet TAP::Parser::SourceHandler::pgTAP TAP::Harness &&
+        
+        # Verify pg_prove is available (it should be installed with pgTAP)
+        echo 'Verifying pg_prove installation...' &&
+        which pg_prove || (echo 'ERROR: pg_prove not found!' && ls -la /usr/local/bin/pg* && exit 1) &&
+        pg_prove --version &&
+        
+        # Wait for postgres to be ready with timeout
+        echo 'Waiting for PostgreSQL to be ready...' &&
+        timeout=300
+        elapsed=0
         until pg_isready -h postgres-test -U test_user -d test_db; do
-          echo 'Waiting for PostgreSQL to be ready...'
-          sleep 2
+          if [ $$elapsed -ge $$timeout ]; then
+            echo 'Timeout waiting for PostgreSQL to be ready'
+            exit 1
+          fi
+          echo \"Waiting for PostgreSQL to be ready... ($$elapsed/$$timeout seconds)\"
+          sleep 5
+          elapsed=$$((elapsed + 5))
         done &&
         echo 'PostgreSQL is ready!' &&
+        
+        # Install pgTAP extension in the database
+        echo 'Installing pgTAP extension in database...' &&
+        psql -h postgres-test -U test_user -d test_db -c 'CREATE EXTENSION IF NOT EXISTS pgtap;' &&
+        
+        # Verify pgTAP is installed
+        echo 'Verifying pgTAP installation in database...' &&
+        psql -h postgres-test -U test_user -d test_db -c \"SELECT 'pgTAP installed: ' || (CASE WHEN EXISTS(SELECT 1 FROM pg_extension WHERE extname = 'pgtap') THEN 'YES' ELSE 'NO' END);\" &&
+        
         # Run tests
+        echo 'Running pgTAP tests...' &&
         pg_prove -h postgres-test -U test_user -d test_db /tests/sql/*.sql
       "
     profiles:

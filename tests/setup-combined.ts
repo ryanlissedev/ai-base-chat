@@ -1,25 +1,26 @@
 import { test as base, expect } from '@playwright/test';
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
+import { runTestMigration } from '../lib/db/migrate-test';
 
 // Combined test setup with database isolation and API mocking
 export const test = base.extend({
   page: async ({ page }, use) => {
-    // 1. Database Setup - Clean database before each test
-    const testDbPath = path.join(process.cwd(), 'test.db');
-    if (fs.existsSync(testDbPath)) {
-      fs.unlinkSync(testDbPath);
-    }
-
-    // Initialize fresh test database
+    // 1. Database Setup - Initialize PostgreSQL test database
+    const testPort = process.env.TEST_DB_PORT || '5433';
+    const testDatabaseUrl = process.env.POSTGRES_URL || `postgresql://test_user:test_password@localhost:${testPort}/test_db`;
+    
     try {
-      execSync('DATABASE_URL=file:./test.db npx tsx lib/db/migrate.ts', {
-        stdio: 'ignore',
-        env: { ...process.env, DATABASE_URL: 'file:./test.db' }
-      });
+      // The database container should already be running from globalSetup
+      // but we still need to run migrations for test isolation
+      await runTestMigration(testDatabaseUrl);
     } catch (error) {
-      console.warn('Database setup failed, continuing with existing database:', error);
+      console.error('Database setup failed:', error);
+      console.error('This usually means:');
+      console.error('1. The test database container is not running');
+      console.error('2. Database connection parameters are incorrect');
+      console.error('3. Database migrations failed');
+      console.error('Make sure to run the global setup or start the database manually with:');
+      console.error('  docker compose -f docker-compose.test.yml up -d postgres-test');
+      throw error; // Fail fast instead of continuing with broken database
     }
 
     // 2. API Mocking - Mock the chat API with predictable responses
@@ -70,25 +71,16 @@ export const test = base.extend({
         
         console.log('🎯 Mock response will be:', mockResponse);
         
-        // Create a simple streaming response that completes immediately
-        const encoder = new TextEncoder();
-        const stream = new ReadableStream({
-          start(controller) {
-            console.log('🎯 Stream started, sending response');
-            // Send the complete response immediately
-            controller.enqueue(encoder.encode(`data: {"type":"text","text":"${mockResponse}"}\n\n`));
-            controller.enqueue(encoder.encode('data: {"type":"finish"}\n\n'));
-            controller.close();
-            console.log('🎯 Stream completed');
-          }
-        });
+        // Create a simple streaming response body as a string
+        // For tests, we simulate streaming by sending the complete response immediately
+        const streamBody = `data: {"type":"text","text":"${mockResponse}"}\n\ndata: {"type":"finish"}\n\n`;
         
         await route.fulfill({
           status: 200,
           headers: {
             'Content-Type': 'text/plain; charset=utf-8',
           },
-          body: stream,
+          body: streamBody,
         });
         console.log('🎯 Route fulfilled');
       } else {

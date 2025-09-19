@@ -400,7 +400,7 @@ export async function POST(request: NextRequest) {
           userMessage.metadata.parentMessageId,
         );
 
-    const messages = [...messageThreadToParent, userMessage].slice(-5);
+    const messages: ChatMessage[] = [...messageThreadToParent, userMessage].slice(-5);
 
     // Process conversation history
     const lastGeneratedImage = getRecentGeneratedImage(messages);

@@ -1,15 +1,21 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
 describe('Chat Input Component', () => {
   let onSendMessage: ReturnType<typeof vi.fn>;
   let onStop: ReturnType<typeof vi.fn>;
+  let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
     onSendMessage = vi.fn();
     onStop = vi.fn();
+    user = userEvent.setup({ delay: null });
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it('renders input field and send button', () => {
@@ -25,7 +31,6 @@ describe('Chat Input Component', () => {
   });
 
   it('handles text input', async () => {
-    const user = userEvent.setup();
 
     render(
       <div>
@@ -41,7 +46,6 @@ describe('Chat Input Component', () => {
   });
 
   it('sends message on button click', async () => {
-    const user = userEvent.setup();
     const handleSend = vi.fn();
 
     render(
@@ -91,7 +95,6 @@ describe('Chat Input Component', () => {
   });
 
   it('handles Enter key to send message', async () => {
-    const user = userEvent.setup();
     const handleSend = vi.fn();
 
     render(
@@ -117,7 +120,6 @@ describe('Chat Input Component', () => {
   });
 
   it('allows Shift+Enter for new line', async () => {
-    const user = userEvent.setup();
     const handleSend = vi.fn();
 
     render(
@@ -157,7 +159,6 @@ describe('Chat Input Component', () => {
   });
 
   it('handles file attachments', async () => {
-    const user = userEvent.setup();
     const handleFileSelect = vi.fn();
 
     render(
@@ -190,7 +191,6 @@ describe('Chat Input Component', () => {
   });
 
   it('clears input after sending message', async () => {
-    const user = userEvent.setup();
 
     render(
       <div>
@@ -222,7 +222,6 @@ describe('Chat Input Component', () => {
   });
 
   it('handles multiline input', async () => {
-    const user = userEvent.setup();
 
     render(
       <textarea
@@ -239,7 +238,6 @@ describe('Chat Input Component', () => {
   });
 
   it('auto-resizes textarea based on content', async () => {
-    const user = userEvent.setup();
 
     const handleResize = vi.fn((element: HTMLTextAreaElement) => {
       element.style.height = 'auto';
@@ -261,7 +259,6 @@ describe('Chat Input Component', () => {
   });
 
   it('limits message length', async () => {
-    const user = userEvent.setup();
     const maxLength = 10;
 
     render(

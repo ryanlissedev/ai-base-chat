@@ -28,7 +28,7 @@
     "test:components:watch": "vitest --config vitest.config.unit.ts",
     "test:all": "vitest run --config vitest.config.ts && vitest run --config vitest.config.unit.ts",
     "test:types": "next typegen . && tsc --noEmit",
-    "test:db": "tests/db/scripts/run-tests.sh",
+    "test:db": "tests/db/scripts/run-simple-tests.sh",
     "test:db:ci": "tests/db/scripts/ci-test.sh",
     "test:db:start": "docker-compose -f docker-compose.test.yml up -d postgres-test",
     "test:db:stop": "docker-compose -f docker-compose.test.yml down -v",
@@ -37,7 +37,9 @@
     "test:db:shell": "tests/db/scripts/run-tests.sh shell",
     "test:db:logs": "tests/db/scripts/run-tests.sh logs",
     "test:db:file": "tests/db/scripts/run-tests.sh -f",
-    "db:test:migrate": "DATABASE_URL=postgresql://test_user:test_password@localhost:5433/test_db npx tsx lib/db/migrate.ts"
+    "test:db:supabase": "vitest run tests/db/supabase-example.test.ts",
+    "test:db:pgtap": "tests/db/scripts/run-pgtap.sh",
+    "db:test:migrate": "DATABASE_URL=postgresql://test_user:test_password@localhost:${TEST_DB_PORT:-5433}/test_db npx tsx lib/db/migrate.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.3",
