@@ -80,7 +80,7 @@ function PureArtifact({
     if (documents && documents.length > 0) {
       // At first we set the most recent document realted to the messageId selected
       const mostRecentDocumentIndex = documents.findLastIndex(
-        (document) => document.messageId === artifact.messageId,
+        (document: Document) => document.messageId === artifact.messageId,
       );
 
       if (mostRecentDocumentIndex !== -1) {

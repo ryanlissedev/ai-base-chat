@@ -61,7 +61,7 @@ Avoid:
 
       // If any content is missing, use extract to get it
       if (!title || !description || !extractedContent) {
-        const extractResult = await app.extract([url], {
+        const extractResult = await firecrawlApp.extract([url], {
           prompt:
             'Extract the page title, main content, and a brief description.',
           schema: schema,

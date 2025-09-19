@@ -20,6 +20,23 @@ export class ChatPage {
 
   async createNewChat() {
     await this.page.goto('/');
+    
+    // Wait for the page to fully load and the chat interface to be ready
+    // Check if we got redirected to a 404 page or if the chat interface is loading
+    await this.page.waitForLoadState('networkidle');
+    
+    // Wait for either the multimodal input to appear (success) or a specific error state
+    try {
+      await this.page.waitForSelector('[data-testid="multimodal-input"]', { 
+        state: 'visible', 
+        timeout: 30000 
+      });
+    } catch (error) {
+      // If multimodal input doesn't appear, check if we're on the right page
+      const url = this.page.url();
+      const title = await this.page.title();
+      throw new Error(`Chat interface not found. Current URL: ${url}, Title: ${title}`);
+    }
   }
 
   public getCurrentURL(): string {
@@ -27,28 +44,34 @@ export class ChatPage {
   }
 
   async sendUserMessage(message: string) {
-    // Find the actual textarea/input inside the multimodal input
-    const textInput = this.page.locator('[data-testid="multimodal-input"]').locator('textarea, [contenteditable="true"]').first();
-    await textInput.click();
-    await textInput.fill(message);
+    // Wait for the multimodal input to be visible and stable
+    await this.page.waitForSelector('[data-testid="multimodal-input"]', { state: 'visible' });
     
-    // Wait for the button to exist (either send-button or stop-button)
-    // and be enabled (status = 'ready', not disabled)
+    // The multimodal input uses Lexical ContentEditable, so we target the contenteditable element directly
+    const textInput = this.page.locator('[data-testid="multimodal-input"]').first();
+    
+    // Ensure the element is ready for interaction
+    await textInput.waitFor({ state: 'visible' });
+    await textInput.click();
+    
+    // For Lexical editor, we need to clear content and type using keyboard events
+    // Clear existing content with Ctrl+A and then type
+    await this.page.keyboard.press('Control+a');
+    await this.page.keyboard.type(message);
+    
+    // Wait for the send button to be available and enabled
+    const sendButton = this.page.getByTestId('send-button');
+    await sendButton.waitFor({ state: 'visible', timeout: 10000 });
+    await sendButton.waitFor({ state: 'attached', timeout: 5000 });
+    
+    // Wait for the button to be enabled (not disabled)
     await this.page.waitForFunction(() => {
-      const sendButton = document.querySelector('[data-testid="send-button"]');
-      const stopButton = document.querySelector('[data-testid="stop-button"]');
-      
-      // Check if send button exists and is enabled
-      if (sendButton) {
-        return !sendButton.hasAttribute('disabled');
-      }
-      
-      // If only stop button exists, the AI is generating - wait for send button
-      return false;
+      const btn = document.querySelector('[data-testid="send-button"]');
+      return btn && !btn.hasAttribute('disabled') && !btn.classList.contains('disabled');
     }, { timeout: 10000 });
     
-    // Click the send button (should exist and be enabled now)
-    await this.sendButton.click();
+    // Click the send button
+    await sendButton.click();
   }
 
   async isGenerationComplete() {

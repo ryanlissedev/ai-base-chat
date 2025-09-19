@@ -3,17 +3,13 @@ const nextConfig = {
   experimental: {
     // Use partial prerendering for performance
     ppr: 'incremental',
-    // Skip API route static analysis during build to prevent API key errors
-    skipTrailingSlashRedirect: true,
   },
+  
+  // Skip trailing slash redirect (moved out of experimental)
+  skipTrailingSlashRedirect: true,
   
   // Skip page data collection for API routes during build
   async redirects() {
-    return [];
-  },
-
-  // Disable static generation for API routes to prevent build-time execution
-  async generateStaticParams() {
     return [];
   },
 

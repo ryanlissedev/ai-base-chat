@@ -503,7 +503,7 @@ export async function deleteMessagesByChatIdAfterTimestamp({
         and(eq(message.chatId, chatId), gte(message.createdAt, timestamp)),
       );
 
-    const messageIds = messagesToDelete.map((message) => message.id);
+    const messageIds = messagesToDelete.map((message: DBMessage) => message.id);
 
     if (messageIds.length > 0) {
       // Clean up attachments before deleting messages
@@ -555,7 +555,7 @@ export async function deleteMessagesByChatIdAfterMessageId({
       .orderBy(asc(message.createdAt));
 
     // Find the index of the target message
-    const targetIndex = allMessages.findIndex((msg) => msg.id === messageId);
+    const targetIndex = allMessages.findIndex((msg: DBMessage) => msg.id === messageId);
 
     if (targetIndex === -1) {
       throw new Error('Target message not found in chat');
@@ -563,7 +563,7 @@ export async function deleteMessagesByChatIdAfterMessageId({
 
     // Delete all messages after the target message (including the target itself)
     const messagesToDelete = allMessages.slice(targetIndex);
-    const messageIdsToDelete = messagesToDelete.map((msg) => msg.id);
+    const messageIdsToDelete = messagesToDelete.map((msg: DBMessage) => msg.id);
 
     if (messageIdsToDelete.length > 0) {
       // Clean up attachments before deleting messages

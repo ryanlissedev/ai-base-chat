@@ -4,6 +4,7 @@ import { db } from '@/lib/db/client';
 import { createModuleLogger } from '@/lib/logger';
 import { getMainPool } from '@/lib/db/pool';
 import { rateLimit, RateLimitPresets } from '@/lib/middleware/rate-limiter';
+import { withApiErrorHandler, ApiErrors, withTimeout } from '@/lib/api/error-handler';
 
 const logger = createModuleLogger('api:health');
 
@@ -42,8 +43,11 @@ async function checkDatabase(): Promise<HealthCheck['checks']['database']> {
   const startTime = Date.now();
 
   try {
-    // Try to execute a simple query
-    await db.execute(sql`SELECT 1`);
+    // Try to execute a simple query with timeout
+    await withTimeout(async (signal) => {
+      await db.execute(sql`SELECT 1`);
+    }, 5000); // 5 second timeout
+
     const latency = Date.now() - startTime;
 
     // Get pool stats if available
@@ -53,7 +57,7 @@ async function checkDatabase(): Promise<HealthCheck['checks']['database']> {
       poolStats = pool.getPoolStats();
     } catch (error) {
       // Pool might not be available
-      logger.debug('Pool stats not available');
+      logger.debug('Pool stats not available: %s', error instanceof Error ? error.message : String(error));
     }
 
     return {
@@ -92,20 +96,20 @@ function checkMemory(): HealthCheck['checks']['memory'] {
 }
 
 export async function GET(request: Request) {
-  // Apply rate limiting
-  const rateLimitResponse = await healthRateLimiter(request);
-  if (rateLimitResponse) {
-    return rateLimitResponse;
-  }
+  return withApiErrorHandler(async () => {
+    // Apply rate limiting
+    const rateLimitResponse = await healthRateLimiter(request);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
 
-  const startTime = process.hrtime.bigint();
-
-  try {
-    // Perform health checks
-    const [databaseCheck, memoryCheck] = await Promise.all([
-      checkDatabase(),
-      checkMemory(),
-    ]);
+    // Perform health checks with timeout
+    const [databaseCheck, memoryCheck] = await withTimeout(async () => {
+      return Promise.all([
+        checkDatabase(),
+        checkMemory(),
+      ]);
+    }, 10000); // 10 second timeout for health checks
 
     // Calculate overall status
     let overallStatus: HealthCheck['status'] = 'healthy';
@@ -132,31 +136,31 @@ export async function GET(request: Request) {
     const statusCode = overallStatus === 'healthy' ? 200 : overallStatus === 'degraded' ? 207 : 503;
 
     return NextResponse.json(health, { status: statusCode });
-  } catch (error) {
-    logger.error('Health check error: %s', error instanceof Error ? error.message : String(error));
-
-    return NextResponse.json({
-      status: 'unhealthy',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      error: error instanceof Error ? error.message : 'Unknown error',
-    }, { status: 503 });
-  }
+  }, 'health-check');
 }
 
 // Support HEAD requests for simple up/down checks
 export async function HEAD(request: Request) {
-  // Apply rate limiting
-  const rateLimitResponse = await healthRateLimiter(request);
-  if (rateLimitResponse) {
-    return new Response(null, { status: 429 });
-  }
+  return withApiErrorHandler(async () => {
+    // Apply rate limiting
+    const rateLimitResponse = await healthRateLimiter(request);
+    if (rateLimitResponse) {
+      return new Response(null, { status: 429 });
+    }
 
-  try {
-    await db.execute(sql`SELECT 1`);
+    // Simple database connectivity check with timeout
+    await withTimeout(async () => {
+      await db.execute(sql`SELECT 1`);
+    }, 3000); // 3 second timeout for HEAD check
+
     return new Response(null, { status: 200 });
-  } catch (error) {
-    logger.error('Health check HEAD failed: %s', error instanceof Error ? error.message : String(error));
+  }, 'health-check-head').then(response => {
+    // Convert NextResponse to Response for HEAD
+    if (response.status === 200) {
+      return new Response(null, { status: 200 });
+    }
     return new Response(null, { status: 503 });
-  }
+  }).catch(() => {
+    return new Response(null, { status: 503 });
+  });
 }

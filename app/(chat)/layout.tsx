@@ -8,6 +8,7 @@ import { ANONYMOUS_LIMITS } from '@/lib/types/anonymous';
 import { AppSidebar } from '@/components/app-sidebar';
 import { KeyboardShortcuts } from '@/components/keyboard-shortcuts';
 import { SessionProvider } from 'next-auth/react';
+import ErrorBoundary from '@/components/error-boundary';
 import type { ModelId } from '@/lib/models/model-id';
 
 export default async function ChatLayout({
@@ -36,18 +37,23 @@ export default async function ChatLayout({
 
   return (
     <SessionProvider session={session}>
-      <ChatProviders user={session?.user}>
-        <SidebarProvider defaultOpen={!isCollapsed}>
-          <AppSidebar />
-          <SidebarInset>
-            <DefaultModelProvider defaultModel={defaultModel}>
-              <KeyboardShortcuts />
-
-              {children}
-            </DefaultModelProvider>
-          </SidebarInset>
-        </SidebarProvider>
-      </ChatProviders>
+      <ErrorBoundary>
+        <ChatProviders user={session?.user}>
+          <ErrorBoundary>
+            <SidebarProvider defaultOpen={!isCollapsed}>
+              <AppSidebar />
+              <SidebarInset>
+                <DefaultModelProvider defaultModel={defaultModel}>
+                  <KeyboardShortcuts />
+                  <ErrorBoundary>
+                    {children}
+                  </ErrorBoundary>
+                </DefaultModelProvider>
+              </SidebarInset>
+            </SidebarProvider>
+          </ErrorBoundary>
+        </ChatProviders>
+      </ErrorBoundary>
     </SessionProvider>
   );
 }

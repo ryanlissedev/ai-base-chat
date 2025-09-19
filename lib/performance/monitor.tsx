@@ -22,6 +22,7 @@ class PerformanceMonitor {
   private config: PerformanceConfig;
   private metrics: PerformanceMetric[] = [];
   private observers: Map<string, PerformanceObserver> = new Map();
+  private memoryInterval: NodeJS.Timeout | null = null;
 
   constructor(config: Partial<PerformanceConfig> = {}) {
     this.config = {
@@ -192,7 +193,7 @@ class PerformanceMonitor {
 
     // Monitor memory usage (if available)
     if ('memory' in performance) {
-      setInterval(() => {
+      this.memoryInterval = setInterval(() => {
         const memory = (performance as any).memory;
         this.recordMetric('memory-used', memory.usedJSHeapSize, {
           total: memory.totalJSHeapSize,
@@ -241,6 +242,11 @@ class PerformanceMonitor {
   cleanup(): void {
     this.observers.forEach((observer) => observer.disconnect());
     this.observers.clear();
+    
+    if (this.memoryInterval) {
+      clearInterval(this.memoryInterval);
+      this.memoryInterval = null;
+    }
   }
 }
 
@@ -263,12 +269,18 @@ export function withPerformanceMonitoring<P extends object>(
   componentName: string,
 ) {
   return function MonitoredComponent(props: P) {
-    const endTiming = performanceMonitor.startTiming(
-      `component-render-${componentName}`,
-    );
-
     useEffect(() => {
+      const endTiming = performanceMonitor.startTiming(
+        `component-render-${componentName}`,
+      );
+      
+      // Call endTiming immediately after render
       endTiming();
+      
+      // Return cleanup function (though not needed for this specific case)
+      return () => {
+        // Cleanup logic if needed in the future
+      };
     });
 
     return <Component {...props} />;

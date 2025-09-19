@@ -13,6 +13,7 @@ import {
   updateChatIsPinnedById,
   deleteChatById,
 } from '@/lib/db/queries';
+import type { Chat } from '@/lib/db/schema';
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -41,7 +42,7 @@ export const chatRouter = createTRPCRouter({
     const chats = await getChatsByUserId({ id: ctx.user.id });
 
     // Sort chats by pinned status, then by last updated date
-    chats.sort((a, b) => {
+    chats.sort((a: Chat, b: Chat) => {
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
@@ -304,7 +305,7 @@ export const chatRouter = createTRPCRouter({
       }
 
       // Get all documents associated with the source messages
-      const sourceMessageIds = sourceMessages.map((msg) => msg.id);
+      const sourceMessageIds = sourceMessages.map((msg: DBMessage) => msg.id);
       const sourceDocuments = await getDocumentsByMessageIds({
         messageIds: sourceMessageIds,
       });

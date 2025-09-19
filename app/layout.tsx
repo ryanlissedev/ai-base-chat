@@ -7,6 +7,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from 'sonner';
 import { TRPCReactProvider } from '@/trpc/react';
+import { GlobalErrorHandler } from '@/components/global-error-handler';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://sparka.ai'),
@@ -144,15 +145,17 @@ export default async function RootLayout({
           src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
           strategy="beforeInteractive"
         />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Toaster position="top-center" />
-          <TRPCReactProvider>{children}</TRPCReactProvider>
-        </ThemeProvider>
+        <GlobalErrorHandler>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Toaster position="top-center" />
+            <TRPCReactProvider>{children}</TRPCReactProvider>
+          </ThemeProvider>
+        </GlobalErrorHandler>
         <Analytics />
       </body>
     </html>

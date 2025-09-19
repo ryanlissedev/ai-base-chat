@@ -16,70 +16,32 @@ const getLogLevel = () => {
   }
 };
 
-// Prefer JSON in production; pretty in development.
+// Use consistent JSON logging across all environments to avoid thread-stream issues.
 // We also add base bindings so child loggers inherit app metadata.
-export const logger: Logger =
-  process.env.NODE_ENV === 'production'
-    ? pino({
-        level: getLogLevel(),
-        base: { app: 'sparka' },
-        timestamp: stdTimeFunctions.isoTime,
-        redact: {
-          paths: [
-            'password',
-            'headers.authorization',
-            'headers.cookie',
-            'cookies',
-            'token',
-            'DATABASE_URL',
-            'POSTGRES_URL',
-            '*.password',
-            '*.token',
-            '*.secret',
-            '*.DATABASE_URL',
-            '*.POSTGRES_URL',
-          ],
-          remove: false,
-        },
-      })
-    : process.env.NODE_ENV === 'test'
-    ? pino({
-        level: getLogLevel(),
-        base: { app: 'sparka' },
-        timestamp: stdTimeFunctions.isoTime,
-        redact: {
-          paths: [
-            'password',
-            'headers.authorization',
-            'headers.cookie',
-            'cookies',
-            'token',
-            'DATABASE_URL',
-            'POSTGRES_URL',
-            '*.password',
-            '*.token',
-            '*.secret',
-            '*.DATABASE_URL',
-            '*.POSTGRES_URL',
-          ],
-          remove: false,
-        },
-      })
-    : pino({
-        level: getLogLevel(),
-        base: { app: 'sparka' },
-        timestamp: stdTimeFunctions.isoTime,
-        // Use simple console output in development to avoid thread-stream issues
-        transport: process.env.DISABLE_PINO_PRETTY === 'true' ? undefined : {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'SYS:standard',
-            ignore: 'pid,hostname',
-            singleLine: false,
-          },
-        },
-      });
+const baseConfig = {
+  level: getLogLevel(),
+  base: { app: 'sparka' },
+  timestamp: stdTimeFunctions.isoTime,
+  redact: {
+    paths: [
+      'password',
+      'headers.authorization',
+      'headers.cookie',
+      'cookies',
+      'token',
+      'DATABASE_URL',
+      'POSTGRES_URL',
+      '*.password',
+      '*.token',
+      '*.secret',
+      '*.DATABASE_URL',
+      '*.POSTGRES_URL',
+    ],
+    remove: false,
+  },
+};
+
+export const logger: Logger = pino(baseConfig);
 
 export function createModuleLogger(moduleName: string): Logger {
   return logger.child({ module: moduleName });
