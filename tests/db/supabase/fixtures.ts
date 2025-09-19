@@ -277,3 +277,112 @@ export class TestDataFactory {
 export function createTestDataFactory(): TestDataFactory {
   return new TestDataFactory();
 }
+
+/**
+ * Enhanced factory with builder pattern for complex data generation
+ */
+export class TestDataBuilder {
+  private factory: TestDataFactory;
+
+  constructor() {
+    this.factory = new TestDataFactory();
+  }
+
+  /**
+   * Build a complete conversation with multiple messages
+   */
+  buildConversation(messageCount = 5) {
+    const user = this.factory.createUser();
+    const chat = this.factory.createChat(user.id);
+    const messages = [];
+
+    for (let i = 0; i < messageCount; i++) {
+      const role = i % 2 === 0 ? 'user' : 'assistant';
+      messages.push(this.factory.createMessage(chat.id, {
+        role,
+        sequence: i + 1,
+        content: role === 'user'
+          ? `User question ${i + 1}`
+          : `Assistant response ${i + 1}`
+      }));
+    }
+
+    return { user, chat, messages };
+  }
+
+  /**
+   * Build a user with multiple chats
+   */
+  buildUserWithChats(chatCount = 3) {
+    const user = this.factory.createUser();
+    const chats = [];
+
+    for (let i = 0; i < chatCount; i++) {
+      chats.push(this.factory.createChat(user.id, {
+        title: `Chat ${i + 1} for ${user.name}`,
+        visibility: i === 0 ? 'public' : 'private'
+      }));
+    }
+
+    return { user, chats };
+  }
+
+  /**
+   * Build test data for rate limiting scenarios
+   */
+  buildRateLimitScenario() {
+    const users = Array.from({ length: 10 }, (_, i) =>
+      this.factory.createUser({
+        credits: i < 5 ? 100 : 0,
+        name: `RateLimit User ${i + 1}`
+      })
+    );
+
+    return { users };
+  }
+
+  /**
+   * Build test data for pagination testing
+   */
+  buildPaginationData(itemCount = 50) {
+    const user = this.factory.createUser();
+    const chats = Array.from({ length: itemCount }, (_, i) =>
+      this.factory.createChat(user.id, {
+        title: `Page Test Chat ${i + 1}`,
+        createdAt: new Date(Date.now() - i * 1000000)
+      })
+    );
+
+    return { user, chats };
+  }
+
+  /**
+   * Build test data with relationships (users, chats, messages)
+   */
+  buildCompleteTestSuite() {
+    const users = [
+      this.factory.createUser({ name: 'Admin User', role: 'admin' }),
+      this.factory.createUser({ name: 'Regular User', role: 'user' }),
+      this.factory.createUser({ name: 'Premium User', credits: 1000 })
+    ];
+
+    const chats = users.flatMap(user => [
+      this.factory.createChat(user.id, { visibility: 'public' }),
+      this.factory.createChat(user.id, { visibility: 'private' })
+    ]);
+
+    const messages = chats.flatMap(chat => [
+      this.factory.createMessage(chat.id, { role: 'user', sequence: 1 }),
+      this.factory.createMessage(chat.id, { role: 'assistant', sequence: 2 })
+    ]);
+
+    return { users, chats, messages };
+  }
+}
+
+/**
+ * Create a test data builder instance
+ */
+export function createTestDataBuilder(): TestDataBuilder {
+  return new TestDataBuilder();
+}

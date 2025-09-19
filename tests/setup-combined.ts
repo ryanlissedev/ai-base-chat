@@ -5,7 +5,8 @@ import { runTestMigration } from '../lib/db/migrate-test';
 export const test = base.extend({
   page: async ({ page }, use) => {
     // 1. Database Setup - Initialize PostgreSQL test database
-    const testDatabaseUrl = process.env.POSTGRES_URL || 'postgresql://test_user:test_password@localhost:5433/test_db';
+    const testPort = process.env.TEST_DB_PORT || '5433';
+    const testDatabaseUrl = process.env.POSTGRES_URL || `postgresql://test_user:test_password@localhost:${testPort}/test_db`;
     
     try {
       // The database container should already be running from globalSetup

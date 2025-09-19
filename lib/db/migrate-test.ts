@@ -4,6 +4,15 @@ import postgres from 'postgres';
 
 /**
  * Retry wrapper for database operations with exponential backoff
+ *
+ * @param operation - The async operation to retry
+ * @param maxRetries - Maximum number of retry attempts (default: 5)
+ * @param baseDelay - Initial delay in milliseconds (default: 1000ms)
+ *                    Doubles with each retry up to max 10 seconds
+ * @param operationName - Name for logging purposes
+ *
+ * Exponential backoff formula: delay = min(baseDelay * 2^(attempt-1), 10000)
+ * Example delays: 1s, 2s, 4s, 8s, 10s (capped)
  */
 async function withRetry<T>(
   operation: () => Promise<T>,

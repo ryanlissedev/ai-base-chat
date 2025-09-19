@@ -47,7 +47,7 @@ Current test coverage: **99.3%** (149/150 tests passing)
 ### Database Test Environment
 
 #### PostgreSQL Container
-- **Port**: 5433 (to avoid conflicts with development database)
+- **Port**: Configurable via `TEST_DB_PORT` environment variable (defaults to 5433 to avoid conflicts with development database)
 - **Credentials**:
   - User: `test_user`
   - Password: `test_password`
@@ -60,7 +60,7 @@ services:
   postgres-test:
     image: postgres:16
     ports:
-      - "5433:5432"
+      - "${TEST_DB_PORT:-5433}:5432"
     environment:
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
@@ -114,7 +114,7 @@ The test infrastructure uses the following ports:
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| PostgreSQL Test | 5433 | Test database |
+| PostgreSQL Test | ${TEST_DB_PORT:-5433} | Test database (configurable via TEST_DB_PORT) |
 | Next.js Dev Server | 3000 | E2E test target |
 | Storybook | 6006 | Component documentation |
 
@@ -175,7 +175,7 @@ Tests are automatically run in CI with:
 If port 5433 is already in use:
 1. Check for existing PostgreSQL instances: `lsof -i :5433`
 2. Stop conflicting services
-3. Or change the port in `docker-compose.test.yml` and `.env.test`
+3. Or set a different port: `export TEST_DB_PORT=5434`
 
 #### Database Connection Issues
 ```bash

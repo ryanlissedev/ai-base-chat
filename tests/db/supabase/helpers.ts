@@ -30,10 +30,11 @@ export class SupabaseTestContext {
   private savepointCounter = 0;
 
   constructor(connectionString?: string) {
+    const testPort = process.env.TEST_DB_PORT || '5433';
     const dbUrl =
       connectionString ||
       process.env.TEST_DATABASE_URL ||
-      'postgresql://test_user:test_password@localhost:5433/test_db';
+      `postgresql://test_user:test_password@localhost:${testPort}/test_db`;
 
     this.pool = createPooledDatabase(dbUrl, {
       max: 10,

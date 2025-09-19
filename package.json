@@ -39,7 +39,7 @@
     "test:db:file": "tests/db/scripts/run-tests.sh -f",
     "test:db:supabase": "vitest run tests/db/supabase-example.test.ts",
     "test:db:pgtap": "tests/db/scripts/run-pgtap.sh",
-    "db:test:migrate": "DATABASE_URL=postgresql://test_user:test_password@localhost:5433/test_db npx tsx lib/db/migrate.ts"
+    "db:test:migrate": "DATABASE_URL=postgresql://test_user:test_password@localhost:${TEST_DB_PORT:-5433}/test_db npx tsx lib/db/migrate.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.3",

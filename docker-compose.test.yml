@@ -15,7 +15,7 @@ services:
       POSTGRES_MAX_CONNECTIONS: 100
       POSTGRES_SHARED_BUFFERS: 128MB
     ports:
-      - "5433:5432"
+      - "${TEST_DB_PORT:-5433}:5432"
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
       - ./tests/db/init:/docker-entrypoint-initdb.d

@@ -3,8 +3,12 @@ import { sql } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { createModuleLogger } from '@/lib/logger';
 import { getMainPool } from '@/lib/db/pool';
+import { rateLimit, RateLimitPresets } from '@/lib/middleware/rate-limiter';
 
 const logger = createModuleLogger('api:health');
+
+// Apply rate limiting to health endpoint
+const healthRateLimiter = rateLimit(RateLimitPresets.health);
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -88,6 +92,12 @@ function checkMemory(): HealthCheck['checks']['memory'] {
 }
 
 export async function GET(request: Request) {
+  // Apply rate limiting
+  const rateLimitResponse = await healthRateLimiter(request);
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   const startTime = process.hrtime.bigint();
 
   try {
@@ -136,6 +146,12 @@ export async function GET(request: Request) {
 
 // Support HEAD requests for simple up/down checks
 export async function HEAD(request: Request) {
+  // Apply rate limiting
+  const rateLimitResponse = await healthRateLimiter(request);
+  if (rateLimitResponse) {
+    return new Response(null, { status: 429 });
+  }
+
   try {
     await db.execute(sql`SELECT 1`);
     return new Response(null, { status: 200 });
