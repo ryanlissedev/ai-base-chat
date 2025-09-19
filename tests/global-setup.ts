@@ -1,7 +1,9 @@
 import { spawn } from 'child_process';
 import { promisify } from 'util';
 import { execSync, exec } from 'child_process';
+import { createModuleLogger } from '../lib/logger';
 
+const logger = createModuleLogger('test:global-setup');
 const execAsync = promisify(exec);
 
 /**
@@ -9,7 +11,7 @@ const execAsync = promisify(exec);
  * Handles database container lifecycle and ensures proper test environment
  */
 async function globalSetup() {
-  console.log('🔧 Setting up test environment...');
+  logger.info('🔧 Setting up test environment...');
 
   try {
     // Check if Docker is available
@@ -32,14 +34,14 @@ async function globalSetup() {
     }
 
     // Stop any existing test containers
-    console.log('🛑 Stopping any existing test containers...');
+    logger.info('🛑 Stopping any existing test containers...');
     try {
       execSync('docker compose -f docker-compose.test.yml down -v --remove-orphans', { 
         stdio: 'inherit',
         timeout: 30000 
       });
     } catch (error) {
-      console.log('ℹ️  No existing containers to stop');
+      logger.info('ℹ️  No existing containers to stop');
     }
 
     // Clean up any orphaned containers
@@ -50,19 +52,19 @@ async function globalSetup() {
     }
 
     // Start the test database container
-    console.log('🐳 Starting test database container...');
+    logger.info('🐳 Starting test database container...');
     execSync('docker compose -f docker-compose.test.yml up -d postgres-test', { 
       stdio: 'inherit',
       timeout: 60000 
     });
 
     // Wait for the database to be ready
-    console.log('⏳ Waiting for database to be ready...');
+    logger.info('⏳ Waiting for database to be ready...');
     await waitForDatabase();
 
-    console.log('✅ Test environment setup completed');
+    logger.info('✅ Test environment setup completed');
   } catch (error) {
-    console.error('❌ Failed to setup test environment:', error);
+    logger.error('❌ Failed to setup test environment:', error);
     throw error;
   }
 }
@@ -88,7 +90,7 @@ async function waitForDatabase(maxRetries = 20, baseDelay = 1000): Promise<void>
         timeout: 5000
       });
 
-      console.log(`✅ Database is ready after ${attempt} attempts`);
+      logger.info(`✅ Database is ready after ${attempt} attempts`);
       return;
     } catch (error) {
       const delay = Math.min(baseDelay * Math.pow(1.5, attempt - 1), 8000);
@@ -97,16 +99,16 @@ async function waitForDatabase(maxRetries = 20, baseDelay = 1000): Promise<void>
         // Try to get container logs for debugging
         try {
           const { stdout: logs } = await execAsync('docker compose -f docker-compose.test.yml logs postgres-test --tail 20');
-          console.error('Database container logs:', logs);
+          logger.error('Database container logs:', logs);
         } catch (logError) {
-          console.error('Could not retrieve container logs:', logError);
+          logger.error('Could not retrieve container logs:', logError);
         }
         
         throw new Error(`Database failed to become ready after ${maxRetries} attempts. Last error: ${error}`);
       }
 
-      console.log(`⏳ Database not ready (attempt ${attempt}/${maxRetries}), retrying in ${delay}ms...`);
-      console.log(`   Error: ${error instanceof Error ? error.message : String(error)}`);
+      logger.info(`⏳ Database not ready (attempt ${attempt}/${maxRetries}), retrying in ${delay}ms...`);
+      logger.info(`   Error: ${error instanceof Error ? error.message : String(error)}`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }

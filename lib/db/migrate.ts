@@ -3,6 +3,9 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 import { existsSync } from 'fs';
+import { createModuleLogger } from '../logger';
+
+const logger = createModuleLogger('db:migrate');
 
 // Load environment configuration with fallbacks
 const envFiles = ['.env.local', '.env.test', '.env'];
@@ -33,23 +36,23 @@ const runMigrate = async () => {
       const reason = !databaseUrl 
         ? 'no database URL provided' 
         : 'local file database not available in cloud environment';
-      console.log(`🔧 Skipping database migration during build (${reason})`);
-      console.log('✅ Build can proceed without database connectivity');
+      logger.info(`🔧 Skipping database migration during build (${reason})`);
+      logger.info('✅ Build can proceed without database connectivity');
       process.exit(0);
     }
     
     if (!databaseUrl) {
-      console.error('❌ No database URL found');
-      console.error('Please set POSTGRES_URL or DATABASE_URL environment variable');
-      console.error('Available environment variables:');
+      logger.error('❌ No database URL found');
+      logger.error('Please set POSTGRES_URL or DATABASE_URL environment variable');
+      logger.error('Available environment variables:');
       Object.keys(process.env)
         .filter(key => key.includes('DATABASE') || key.includes('POSTGRES'))
-        .forEach(key => console.error(`  ${key}=${process.env[key]}`));
+        .forEach(key => logger.error(`  ${key}=${process.env[key]}`));
       process.exit(1);
     }
   }
 
-  console.log(`🔗 Connecting to database: ${databaseUrl.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@')}`);
+  logger.info(`🔗 Connecting to database: ${databaseUrl.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@')}`);
 
   try {
     // Create connection with enhanced timeout and error handling
@@ -63,36 +66,36 @@ const runMigrate = async () => {
 
     const db = drizzle(connection);
 
-    console.log('⏳ Running migrations...');
+    logger.info('⏳ Running migrations...');
 
     const start = Date.now();
     await migrate(db, { migrationsFolder: './lib/db/migrations' });
     const end = Date.now();
 
-    console.log('✅ Migrations completed in', end - start, 'ms');
+    logger.info(`✅ Migrations completed in ${end - start}ms`);
     
     // Close connection gracefully
     await connection.end();
     process.exit(0);
   } catch (error) {
-    console.error('❌ Migration failed');
-    
+    logger.error('❌ Migration failed');
+
     if (error instanceof Error) {
       // Provide specific error handling for common issues
       if (error.message.includes('ECONNREFUSED')) {
-        console.error('🔌 Connection refused - is the database running?');
-        console.error('For test database, try: make test-db-start');
+        logger.error('🔌 Connection refused - is the database running?');
+        logger.error('For test database, try: make test-db-start');
       } else if (error.message.includes('ENOTFOUND')) {
-        console.error('🌐 Host not found - check your database URL');
+        logger.error('🌐 Host not found - check your database URL');
       } else if (error.message.includes('password authentication failed')) {
-        console.error('🔐 Authentication failed - check username/password');
+        logger.error('🔐 Authentication failed - check username/password');
       } else if (error.message.includes('timeout')) {
-        console.error('⏰ Connection timeout - database may be overloaded');
+        logger.error('⏰ Connection timeout - database may be overloaded');
       } else {
-        console.error('Error details:', error.message);
+        logger.error('Error details:', error.message);
       }
     } else {
-      console.error(error);
+      logger.error(error);
     }
     
     process.exit(1);
