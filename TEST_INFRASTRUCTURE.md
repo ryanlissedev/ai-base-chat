@@ -226,16 +226,159 @@ DEBUG=* bun test
 4. **Monitor test execution time**
 5. **Fix flaky tests immediately**
 
+## Supabase Database Testing Best Practices
+
+### Overview
+
+Our test infrastructure now implements Supabase's recommended database testing patterns for production-grade reliability and performance.
+
+### Key Features
+
+#### 1. **Template Database Pattern** (`tests/db/supabase/template.sql`)
+- Fast test database creation using templates
+- Pre-configured with extensions (uuid-ossp, pgTAP, pgcrypto)
+- Automatic cleanup of old test databases
+
+#### 2. **Test Fixtures System** (`tests/db/supabase/fixtures.ts`)
+- Predefined test users, chats, and messages
+- Dynamic test data factory for generating unique test data
+- Automatic dependency resolution when loading fixtures
+
+#### 3. **Schema Version Tracking** (`tests/db/supabase/schema-version.ts`)
+- Track and validate schema versions
+- Calculate schema checksums for integrity verification
+- Migration runner with version tracking
+
+#### 4. **Performance Monitoring** (`tests/db/supabase/performance.ts`)
+- Track test execution time, memory usage, and query counts
+- Performance thresholds and baseline comparisons
+- Automatic performance regression detection
+- Performance report generation
+
+#### 5. **Database Snapshots** (`tests/db/supabase/snapshots.ts`)
+- Create and restore database snapshots
+- Quick rollback for test isolation
+- Snapshot comparison and integrity verification
+- Checkpoint system for temporary snapshots
+
+#### 6. **Comprehensive Test Helpers** (`tests/db/supabase/helpers.ts`)
+- Transaction-based test isolation with savepoints
+- Row-level security (RLS) testing utilities
+- Concurrent operation simulation
+- Query monitoring and slow query detection
+
+### Usage Example
+
+```typescript
+import { createSupabaseTestContext } from './tests/db/supabase';
+
+describe('Database Tests', () => {
+  const context = createSupabaseTestContext();
+  const wrapper = context.createTestWrapper();
+
+  beforeAll(async () => {
+    await wrapper.beforeAll(); // Initialize and load fixtures
+  });
+
+  afterAll(async () => {
+    await wrapper.afterAll(); // Cleanup
+  });
+
+  beforeEach(async () => {
+    await wrapper.beforeEach(); // Create checkpoint
+  });
+
+  afterEach(async () => {
+    await wrapper.afterEach(); // Rollback to checkpoint
+  });
+
+  it('should test with transaction isolation', async () => {
+    await context.runInTransaction(async (tx) => {
+      // All changes will be rolled back automatically
+      await tx.execute(sql`INSERT INTO "User" ...`);
+    });
+  });
+
+  it('should track performance', async () => {
+    context.performance.startTest('my-test');
+    // Run test operations
+    const metrics = await context.performance.endTest('my-test');
+    expect(metrics.executionTimeMs).toBeLessThan(100);
+  });
+});
+```
+
+### Performance Thresholds
+
+Set performance thresholds for critical operations:
+
+```typescript
+@performanceTest({
+  maxExecutionTimeMs: 100,
+  maxQueries: 5,
+  maxMemoryUsageKb: 1024
+})
+async function criticalOperation() {
+  // Operation will fail if thresholds are exceeded
+}
+```
+
+### Migration Management
+
+Run migrations with automatic version tracking:
+
+```typescript
+const runner = new MigrationRunner(db);
+
+await runner.runMigration(
+  '1.0.0',
+  'Add user preferences table',
+  async () => {
+    await db.execute(sql`CREATE TABLE user_preferences ...`);
+  }
+);
+```
+
+### Test Data Management
+
+Use fixtures for consistent test data:
+
+```typescript
+const loader = createFixtureLoader(db);
+await loader.loadUsers([TEST_USERS.alice, TEST_USERS.bob]);
+await loader.loadChats();
+await loader.loadMessages();
+```
+
+### Snapshot Testing
+
+Create and restore database snapshots:
+
+```typescript
+await snapshots.createSnapshot('before-complex-operation');
+// Run complex operations
+await snapshots.restoreSnapshot('before-complex-operation');
+```
+
 ## Future Improvements
 
-### Planned Enhancements
+### Completed Enhancements ✅
 
-1. **pgTAP Integration**: SQL-based testing framework for more robust database tests
-2. **Connection Pooling**: Implement pg-pool for better database connection management
-3. **Health Check Endpoint**: Add `/health` endpoint for database readiness checks
-4. **Transaction-based Isolation**: Use database transactions for test isolation
-5. **Visual Regression Testing**: Add Percy or similar for UI testing
-6. **Load Testing**: Add k6 or similar for performance testing
+1. ~~**pgTAP Integration**: SQL-based testing framework for more robust database tests~~
+2. ~~**Connection Pooling**: Implement pg-pool for better database connection management~~
+3. ~~**Health Check Endpoint**: Add `/health` endpoint for database readiness checks~~
+4. ~~**Transaction-based Isolation**: Use database transactions for test isolation~~
+5. ~~**Template Database Pattern**: Fast test database creation~~
+6. ~~**Performance Monitoring**: Track and analyze test performance~~
+7. ~~**Database Snapshots**: Quick rollback mechanism~~
+8. ~~**Schema Version Tracking**: Track database schema changes~~
+
+### Remaining Enhancements
+
+1. **Visual Regression Testing**: Add Percy or similar for UI testing
+2. **Load Testing**: Add k6 or similar for performance testing
+3. **Multi-tenant Testing**: Add utilities for testing multi-tenant scenarios
+4. **Real-time Testing**: Add utilities for testing real-time subscriptions
 
 ## References
 
@@ -243,3 +386,5 @@ DEBUG=* bun test
 - [Vitest Documentation](https://vitest.dev/)
 - [PostgreSQL Testing Guide](https://www.postgresql.org/docs/current/regress.html)
 - [Docker Compose Reference](https://docs.docker.com/compose/)
+- [Supabase Database Testing Guide](https://supabase.com/docs/guides/database/testing)
+- [pgTAP Documentation](https://pgtap.org/)
