@@ -6,9 +6,8 @@
  */
 
 import postgres from 'postgres';
-import { readdir, readFile } from 'fs/promises';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,7 +15,7 @@ const __dirname = dirname(__filename);
 // Test configuration
 const DB_CONFIG = {
   host: process.env.PGHOST || 'localhost',
-  port: parseInt(process.env.PGPORT || '5433'),
+  port: Number.parseInt(process.env.PGPORT || '5433'),
   database: process.env.PGDATABASE || 'test_db',
   user: process.env.PGUSER || 'test_user',
   password: process.env.PGPASSWORD || 'test_password',
@@ -84,7 +83,7 @@ class SimpleTestRunner {
       this.results.failed++;
       this.results.failures.push({
         description,
-        sql: sql.substring(0, 100) + '...',
+        sql: `${sql.substring(0, 100)}...`,
         error: error.message,
       });
       this.log(`  ✗ ${description}: ${error.message}`, 'red');

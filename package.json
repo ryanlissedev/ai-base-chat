@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "next dev --turbo",
-    "build": "tsx lib/db/migrate && next build",
+    "build": "SKIP_BUILD_API_VALIDATION=true tsx lib/db/migrate && SKIP_BUILD_API_VALIDATION=true next build",
     "start": "next start",
     "lint": "next lint && biome lint --write --unsafe",
     "lint:fix": "next lint --fix && biome lint --write --unsafe",
@@ -184,6 +184,7 @@
     "superjson": "^2.2.2",
     "swr": "^2.2.5",
     "tailwind-merge": "^3.3.1",
+    "thread-stream": "^3.1.0",
     "throttleit": "^2.1.0",
     "tokenlens": "^1.1.2",
     "use-stick-to-bottom": "^1.1.1",

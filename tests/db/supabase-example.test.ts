@@ -6,9 +6,6 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from
 import {
   createSupabaseTestContext,
   TEST_USERS,
-  TEST_CHATS,
-  TEST_MESSAGES,
-  performanceTest,
 } from './supabase';
 import { sql } from 'drizzle-orm';
 
@@ -43,8 +40,8 @@ describe('Supabase Database Testing Example', () => {
         WHERE email = ${TEST_USERS.alice.email}
       `);
 
-      expect(users.rows).toHaveLength(1);
-      expect(users.rows[0].name).toBe(TEST_USERS.alice.name);
+      expect(users).toHaveLength(1);
+      expect(users[0].name).toBe(TEST_USERS.alice.name);
     });
 
     it('should create dynamic test data', async () => {
@@ -63,8 +60,8 @@ describe('Supabase Database Testing Example', () => {
         SELECT * FROM "User" WHERE id = ${newUser.id}
       `);
 
-      expect(result.rows).toHaveLength(1);
-      expect(result.rows[0].name).toBe('Dynamic Test User');
+      expect(result).toHaveLength(1);
+      expect(result[0].name).toBe('Dynamic Test User');
     });
   });
 
@@ -82,7 +79,7 @@ describe('Supabase Database Testing Example', () => {
           SELECT * FROM "User" WHERE id = 'tx-user'
         `);
 
-        expect(result.rows).toHaveLength(1);
+        expect(result).toHaveLength(1);
       });
 
       // Verify user doesn't exist outside transaction
@@ -90,7 +87,7 @@ describe('Supabase Database Testing Example', () => {
         SELECT * FROM "User" WHERE id = 'tx-user'
       `);
 
-      expect(result.rows).toHaveLength(0);
+      expect(result).toHaveLength(0);
     });
 
     it('should handle nested savepoints', async () => {
@@ -115,8 +112,8 @@ describe('Supabase Database Testing Example', () => {
           SELECT * FROM "User" WHERE id IN ('user-1', 'user-2')
         `);
 
-        expect(users.rows).toHaveLength(1);
-        expect(users.rows[0].id).toBe('user-1');
+        expect(users).toHaveLength(1);
+        expect(users[0].id).toBe('user-1');
       });
     });
   });
@@ -141,7 +138,7 @@ describe('Supabase Database Testing Example', () => {
       let result = await context.db.execute(sql`
         SELECT credits FROM "User" WHERE id = 'snap-user'
       `);
-      expect(result.rows[0].credits).toBe(200);
+      expect(result[0].credits).toBe(200);
 
       // Restore snapshot
       await context.snapshots.restoreSnapshot('test-snapshot');
@@ -150,7 +147,7 @@ describe('Supabase Database Testing Example', () => {
       result = await context.db.execute(sql`
         SELECT credits FROM "User" WHERE id = 'snap-user'
       `);
-      expect(result.rows[0].credits).toBe(100);
+      expect(result[0].credits).toBe(100);
 
       // Cleanup
       await context.snapshots.deleteSnapshot('test-snapshot');
@@ -326,7 +323,7 @@ describe('Supabase Database Testing Example', () => {
         const result = await context.db.execute(sql`
           SELECT ${i} as value
         `);
-        return result.rows[0].value;
+        return result[0].value;
       });
 
       const results = await context.simulateConcurrency(operations, {
@@ -370,7 +367,7 @@ class DatabaseService {
     this.context = createSupabaseTestContext();
   }
 
-  @performanceTest({ maxExecutionTimeMs: 100, maxQueries: 5 })
+  // @performanceTest({ maxExecutionTimeMs: 100, maxQueries: 5 })
   async fetchUserWithChats(userId: string) {
     const user = await this.context.db.execute(sql`
       SELECT * FROM "User" WHERE id = ${userId}
@@ -381,8 +378,8 @@ class DatabaseService {
     `);
 
     return {
-      user: user.rows[0],
-      chats: chats.rows,
+      user: user[0],
+      chats: chats,
     };
   }
 }

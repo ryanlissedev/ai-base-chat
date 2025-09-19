@@ -66,19 +66,22 @@ export function useSaveChat() {
     },
     onSuccess: async ({ tempChat, message }) => {
       // Generate proper title asynchronously after successful save
-      const data = await generateTitleMutation.mutateAsync({ message });
-      if (data?.title) {
-        // Update the chat with the generated title
-        await saveAnonymousChatToStorage({
-          ...tempChat,
-          title: data.title,
-          isPinned: false,
-        });
+      // Only generate title if message is not empty
+      if (message && message.trim().length > 0) {
+        const data = await generateTitleMutation.mutateAsync({ message });
+        if (data?.title) {
+          // Update the chat with the generated title
+          await saveAnonymousChatToStorage({
+            ...tempChat,
+            title: data.title,
+            isPinned: false,
+          });
 
-        // Invalidate chats to refresh the UI
-        queryClient.invalidateQueries({
-          queryKey: trpc.chat.getAllChats.queryKey(),
-        });
+          // Invalidate chats to refresh the UI
+          queryClient.invalidateQueries({
+            queryKey: trpc.chat.getAllChats.queryKey(),
+          });
+        }
       }
     },
     onError: (error) => {

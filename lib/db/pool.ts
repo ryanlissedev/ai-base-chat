@@ -42,7 +42,7 @@ export function createPooledDatabase(
     max_lifetime: config.max_lifetime ?? 60 * 30, // 30 minutes
   };
 
-  logger.debug('Creating database pool with config:', defaultConfig);
+  logger.debug('Creating database pool with config: %o', defaultConfig);
 
   // Create the postgres client with pooling configuration
   const client = postgres(connectionString, {
@@ -51,7 +51,7 @@ export function createPooledDatabase(
     connect_timeout: defaultConfig.connect_timeout,
     max_lifetime: defaultConfig.max_lifetime,
     onnotice: (notice) => {
-      logger.debug('Database notice:', notice);
+      logger.debug('Database notice: %s', notice.message || String(notice));
     },
     onparameter: (key, value) => {
       logger.trace(`Database parameter: ${key} = ${value}`);
@@ -81,7 +81,7 @@ export function createPooledDatabase(
       await client.end();
       logger.info('Database connection pool closed successfully');
     } catch (error) {
-      logger.error('Error closing database pool:', error);
+      logger.error('Error closing database pool: %s', error instanceof Error ? error.message : String(error));
       throw error;
     }
   };
@@ -110,9 +110,9 @@ export function getMainPool(): PooledDatabase {
     }
 
     const poolConfig: PoolConfig = {
-      max: process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 10,
-      idle_timeout: process.env.DB_POOL_IDLE_TIMEOUT ? parseInt(process.env.DB_POOL_IDLE_TIMEOUT, 10) : 30,
-      connect_timeout: process.env.DB_POOL_CONNECT_TIMEOUT ? parseInt(process.env.DB_POOL_CONNECT_TIMEOUT, 10) : 30,
+      max: process.env.DB_POOL_MAX ? Number.parseInt(process.env.DB_POOL_MAX, 10) : 10,
+      idle_timeout: process.env.DB_POOL_IDLE_TIMEOUT ? Number.parseInt(process.env.DB_POOL_IDLE_TIMEOUT, 10) : 30,
+      connect_timeout: process.env.DB_POOL_CONNECT_TIMEOUT ? Number.parseInt(process.env.DB_POOL_CONNECT_TIMEOUT, 10) : 30,
     };
 
     mainPool = createPooledDatabase(connectionString, poolConfig);

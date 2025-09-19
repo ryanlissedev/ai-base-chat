@@ -3,8 +3,8 @@
  * Comprehensive utilities for database testing
  */
 
-import { sql, eq, and, or, desc } from 'drizzle-orm';
-import { type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { sql, } from 'drizzle-orm';
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { createPooledDatabase, type PooledDatabase } from '../../../lib/db/pool';
 import { createModuleLogger } from '../../../lib/logger';
 import { FixtureLoader } from './fixtures';
@@ -79,7 +79,7 @@ export class SupabaseTestContext {
           AND pid <> pg_backend_pid()
       `);
 
-      logger.debug(`Terminated ${result.rowCount} connections`);
+      logger.debug(`Terminated ${result.length} connections`);
 
       // Note: In a real scenario, you'd create a new database from template
       // For testing, we'll just ensure clean state
@@ -88,7 +88,7 @@ export class SupabaseTestContext {
 
       logger.info('Database setup with template completed');
     } catch (error) {
-      logger.error('Failed to setup database with template:', error);
+      logger.error('Failed to setup database with template: %s', error instanceof Error ? error.message : String(error));
       throw error;
     }
   }
@@ -173,7 +173,7 @@ export class SupabaseTestContext {
         await this.db.execute(sql.raw(`TRUNCATE TABLE "${table}" CASCADE`));
         logger.debug(`Truncated table: ${table}`);
       } catch (error) {
-        logger.warn(`Failed to truncate ${table}, trying DELETE:`, error);
+        logger.warn(`Failed to truncate ${table}, trying DELETE: %s`, error instanceof Error ? error.message : String(error));
         await this.db.execute(sql.raw(`DELETE FROM "${table}"`));
       }
     }
@@ -194,7 +194,7 @@ export class SupabaseTestContext {
       WHERE sequence_schema = 'public'
     `);
 
-    for (const row of sequences.rows) {
+    for (const row of sequences) {
       const seqName = row.sequence_name as string;
       await this.db.execute(sql.raw(`ALTER SEQUENCE "${seqName}" RESTART WITH 1`));
     }
@@ -244,7 +244,7 @@ export class SupabaseTestContext {
       sql.raw(`SELECT COUNT(*) as count FROM "${table}" ${whereClause}`)
     );
 
-    const actualCount = Number(result.rows[0].count);
+    const actualCount = Number(result[0].count);
 
     if (actualCount !== expectedCount) {
       throw new Error(
@@ -273,7 +273,7 @@ export class SupabaseTestContext {
       WHERE s.relname = ${table}
     `);
 
-    if (stats.rows.length === 0) {
+    if (stats.length === 0) {
       return {
         rowCount: 0,
         sizeBytes: 0,
@@ -282,7 +282,7 @@ export class SupabaseTestContext {
       };
     }
 
-    const row = stats.rows[0];
+    const row = stats[0];
     return {
       rowCount: Number(row.row_count),
       sizeBytes: Number(row.size_bytes),
@@ -306,9 +306,9 @@ export class SupabaseTestContext {
     const executionTimeMs = Math.round(performance.now() - startTime);
 
     return {
-      rows: result.rows,
+      rows: result,
       executionTimeMs,
-      rowCount: result.rowCount || 0,
+      rowCount: result.length || 0,
     };
   }
 
@@ -410,7 +410,7 @@ export class SupabaseTestContext {
       try {
         await fn();
       } catch (error) {
-        logger.error('Cleanup function failed:', error);
+        logger.error('Cleanup function failed: %s', error instanceof Error ? error.message : String(error));
       }
     }
 
@@ -436,7 +436,7 @@ export class SupabaseTestContext {
         try {
           await context.snapshots.rollbackToCheckpoint('before_test');
         } catch (error) {
-          logger.error('Failed to rollback checkpoint:', error);
+          logger.error('Failed to rollback checkpoint: %s', error instanceof Error ? error.message : String(error));
         }
       },
 

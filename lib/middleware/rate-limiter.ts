@@ -143,7 +143,7 @@ export function rateLimit(config: RateLimitConfig) {
 
       return undefined; // Continue to next middleware/handler
     } catch (error) {
-      logger.error('Rate limiting error:', error);
+      logger.error('Rate limiting error: %s', error instanceof Error ? error.message : String(error));
       return undefined; // Don't block request on error
     }
   };

@@ -13,6 +13,11 @@ export async function GET(
 ) {
   const { id: chatId } = await params;
 
+  // Skip API processing during build time to prevent API key errors
+  if (process.env.SKIP_BUILD_API_VALIDATION === 'true') {
+    return new Response('Build mode - API disabled', { status: 503 });
+  }
+
   const streamContext = getStreamContext();
   const resumeRequestedAt = new Date();
 

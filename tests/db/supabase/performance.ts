@@ -4,8 +4,8 @@
  */
 
 import { sql } from 'drizzle-orm';
-import { type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { performance } from 'perf_hooks';
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { performance } from 'node:perf_hooks';
 import { createModuleLogger } from '../../../lib/logger';
 
 const logger = createModuleLogger('db:test-performance');
@@ -150,7 +150,7 @@ export class TestPerformanceMonitor {
     this.activeTests.delete(testName);
     this.queryMetrics.delete(testName);
 
-    logger.debug(`Ended monitoring test: ${testName}`, metrics);
+    logger.debug(`Ended monitoring test: ${testName} - Duration: ${metrics.executionTimeMs}ms, Queries: ${metrics.queriesExecuted}`);
 
     return metrics;
   }
@@ -252,11 +252,11 @@ export class TestPerformanceMonitor {
       LIMIT 1
     `);
 
-    if (result.rows.length === 0) {
+    if (result.length === 0) {
       return null;
     }
 
-    const row = result.rows[0];
+    const row = result[0];
     return {
       testName: row.test_name as string,
       executionTimeMs: row.execution_time_ms as number,
@@ -311,7 +311,7 @@ export class TestPerformanceMonitor {
       GROUP BY p.p50, p.p95, p.p99
     `);
 
-    if (result.rows.length === 0) {
+    if (result.length === 0) {
       return {
         avg: 0,
         min: 0,
@@ -323,7 +323,7 @@ export class TestPerformanceMonitor {
       };
     }
 
-    const row = result.rows[0];
+    const row = result[0];
     return {
       avg: Math.round(row.avg as number),
       min: row.min as number,
@@ -393,7 +393,7 @@ export class TestPerformanceMonitor {
       WHERE test_name = ${testName}
     `);
 
-    if (baseline.rows.length === 0) {
+    if (baseline.length === 0) {
       return {
         withinBaseline: true,
         percentChange: 0,
@@ -401,7 +401,7 @@ export class TestPerformanceMonitor {
       };
     }
 
-    const baselineData = baseline.rows[0];
+    const baselineData = baseline[0];
     const p95Baseline = baselineData.p95_execution_time_ms as number;
     const percentChange = ((latest.executionTimeMs - p95Baseline) / p95Baseline) * 100;
 
@@ -446,7 +446,7 @@ export class TestPerformanceMonitor {
     report += '| Test Name | Runs | Success Rate | Avg Time (ms) | Min/Max (ms) | Avg Memory (KB) | Avg Queries |\n';
     report += '|-----------|------|--------------|---------------|--------------|-----------------|-------------|\n';
 
-    for (const row of result.rows) {
+    for (const row of result) {
       const successRate = ((row.successful_runs as number) / (row.total_runs as number) * 100).toFixed(1);
       report += `| ${row.test_name} | ${row.total_runs} | ${successRate}% | ${Math.round(row.avg_time as number)} | ${row.min_time}/${row.max_time} | ${Math.round(row.avg_memory as number || 0)} | ${Math.round(row.avg_queries as number || 0)} |\n`;
     }
@@ -470,11 +470,11 @@ export function createTestPerformanceMonitor(
 export function performanceTest(
   thresholds?: PerformanceThresholds
 ): MethodDecorator {
-  return function (
+  return (
     target: any,
     propertyKey: string | symbol,
     descriptor: PropertyDescriptor
-  ) {
+  ) => {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {

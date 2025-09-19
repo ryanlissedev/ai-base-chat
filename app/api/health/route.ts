@@ -47,7 +47,7 @@ async function checkDatabase(): Promise<HealthCheck['checks']['database']> {
     const latency = Date.now() - startTime;
 
     // Get pool stats if available
-    let poolStats;
+    let poolStats: HealthCheck['checks']['database']['poolStats'];
     try {
       const pool = getMainPool();
       poolStats = pool.getPoolStats();
@@ -62,7 +62,7 @@ async function checkDatabase(): Promise<HealthCheck['checks']['database']> {
       poolStats,
     };
   } catch (error) {
-    logger.error('Database health check failed:', error);
+    logger.error('Database health check failed: %s', error instanceof Error ? error.message : String(error));
     return {
       status: 'down',
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -133,7 +133,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(health, { status: statusCode });
   } catch (error) {
-    logger.error('Health check error:', error);
+    logger.error('Health check error: %s', error instanceof Error ? error.message : String(error));
 
     return NextResponse.json({
       status: 'unhealthy',
@@ -156,7 +156,7 @@ export async function HEAD(request: Request) {
     await db.execute(sql`SELECT 1`);
     return new Response(null, { status: 200 });
   } catch (error) {
-    logger.error('Health check HEAD failed:', error);
+    logger.error('Health check HEAD failed: %s', error instanceof Error ? error.message : String(error));
     return new Response(null, { status: 503 });
   }
 }

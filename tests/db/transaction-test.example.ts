@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { setupTestDatabase, runInTransaction } from '@/lib/db/test-utils';
+import { setupTestDatabase, } from '@/lib/db/test-utils';
 import { sql } from 'drizzle-orm';
 
 describe('Database Transaction Tests', () => {
@@ -32,8 +32,8 @@ describe('Database Transaction Tests', () => {
         SELECT * FROM "User" WHERE id = 'test-tx-user'
       `);
 
-      expect(result.rows).toHaveLength(1);
-      expect(result.rows[0].email).toBe('tx@example.com');
+      expect(result).toHaveLength(1);
+      expect(result[0].email).toBe('tx@example.com');
     });
 
     // Verify data doesn't exist outside transaction (was rolled back)
@@ -41,7 +41,7 @@ describe('Database Transaction Tests', () => {
       SELECT * FROM "User" WHERE id = 'test-tx-user'
     `);
 
-    expect(result.rows).toHaveLength(0);
+    expect(result).toHaveLength(0);
   });
 
   it('should isolate tests from each other', async () => {
@@ -56,7 +56,7 @@ describe('Database Transaction Tests', () => {
         SELECT COUNT(*) as count FROM "User" WHERE id LIKE 'isolated-%'
       `);
 
-      expect(count.rows[0].count).toBe('1');
+      expect(count[0].count).toBe('1');
     });
 
     // Test 2: Create another user in separate transaction
@@ -71,7 +71,7 @@ describe('Database Transaction Tests', () => {
         SELECT COUNT(*) as count FROM "User" WHERE id LIKE 'isolated-%'
       `);
 
-      expect(count.rows[0].count).toBe('1');
+      expect(count[0].count).toBe('1');
     });
 
     // Outside transactions, neither user should exist
@@ -79,7 +79,7 @@ describe('Database Transaction Tests', () => {
       SELECT COUNT(*) as count FROM "User" WHERE id LIKE 'isolated-%'
     `);
 
-    expect(finalCount.rows[0].count).toBe('0');
+    expect(finalCount[0].count).toBe('0');
   });
 
   it('should handle nested savepoints', async () => {
@@ -102,7 +102,7 @@ describe('Database Transaction Tests', () => {
       let result = await db.execute(sql`
         SELECT credits FROM "User" WHERE id = 'savepoint-user'
       `);
-      expect(result.rows[0].credits).toBe(200);
+      expect(result[0].credits).toBe(200);
 
       // Rollback to savepoint
       await db.execute(sql`ROLLBACK TO SAVEPOINT sp1`);
@@ -111,7 +111,7 @@ describe('Database Transaction Tests', () => {
       result = await db.execute(sql`
         SELECT credits FROM "User" WHERE id = 'savepoint-user'
       `);
-      expect(result.rows[0].credits).toBe(100);
+      expect(result[0].credits).toBe(100);
     });
   });
 
@@ -140,6 +140,6 @@ describe('Database Transaction Tests', () => {
       SELECT * FROM "User" WHERE id = 'error-test-user'
     `);
 
-    expect(result.rows).toHaveLength(0);
+    expect(result).toHaveLength(0);
   });
 });

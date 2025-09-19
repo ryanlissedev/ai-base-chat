@@ -104,8 +104,7 @@ export const runTestMigration = async (databaseUrl: string) => {
     // Add more context to the error
     if (error instanceof Error && error.message.includes('ECONNREFUSED')) {
       throw new Error(
-        `Database connection refused. Make sure the test database container is running on the expected port. ` +
-        `Original error: ${error.message}`
+        `Database connection refused. Make sure the test database container is running on the expected port. Original error: ${error.message}`
       );
     }
     

@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { createPooledDatabase, type PooledDatabase } from './pool';
 import { createModuleLogger } from '../logger';
 
@@ -62,7 +62,7 @@ export async function runInTransaction<T>(
     try {
       await db.execute(sql`ROLLBACK`);
     } catch (rollbackError) {
-      logger.error('Failed to rollback transaction:', rollbackError);
+      logger.error('Failed to rollback transaction: %s', rollbackError instanceof Error ? rollbackError.message : String(rollbackError));
     }
 
     throw error;
@@ -124,7 +124,7 @@ export async function cleanupTestData(
       await db.execute(sql.raw(`DELETE FROM "${table}" WHERE id LIKE 'test-%'`));
       logger.debug(`Cleaned test data from table: ${table}`);
     } catch (error) {
-      logger.warn(`Failed to clean table ${table}:`, error);
+      logger.warn('Failed to clean table %s: %s', table, error instanceof Error ? error.message : String(error));
     }
   }
 }
@@ -206,7 +206,7 @@ export class TestContext {
       try {
         await fn();
       } catch (error) {
-        logger.error('Cleanup function failed:', error);
+        logger.error('Cleanup function failed: %s', error instanceof Error ? error.message : String(error));
       }
     }
 

@@ -1,6 +1,6 @@
-import { spawn } from 'child_process';
-import { promisify } from 'util';
-import { execSync, exec } from 'child_process';
+
+import { promisify } from 'node:util';
+import { execSync, exec } from 'node:child_process';
 import { createModuleLogger } from '../lib/logger';
 
 const logger = createModuleLogger('test:global-setup');
@@ -64,7 +64,7 @@ async function globalSetup() {
 
     logger.info('✅ Test environment setup completed');
   } catch (error) {
-    logger.error('❌ Failed to setup test environment:', error);
+    logger.error('❌ Failed to setup test environment: %s', error instanceof Error ? error.message : String(error));
     throw error;
   }
 }
@@ -99,9 +99,9 @@ async function waitForDatabase(maxRetries = 20, baseDelay = 1000): Promise<void>
         // Try to get container logs for debugging
         try {
           const { stdout: logs } = await execAsync('docker compose -f docker-compose.test.yml logs postgres-test --tail 20');
-          logger.error('Database container logs:', logs);
+          logger.error('Database container logs: %s', logs);
         } catch (logError) {
-          logger.error('Could not retrieve container logs:', logError);
+          logger.error('Could not retrieve container logs: %s', logError instanceof Error ? logError.message : String(logError));
         }
         
         throw new Error(`Database failed to become ready after ${maxRetries} attempts. Last error: ${error}`);
