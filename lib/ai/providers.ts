@@ -18,10 +18,15 @@ const telemetryConfig = {
 export const getLanguageModel = (modelId: ModelId) => {
   const model = getModelDefinition(modelId);
 
+  // Skip provider creation during build time to prevent API key errors
+  if (process.env.SKIP_BUILD_API_VALIDATION === 'true') {
+    throw new Error('Language model unavailable during build');
+  }
+
   // Use AI Gateway with default baseURL and optional API key
   const gatewayProvider = createGatewayProvider({
     baseURL: process.env.AI_GATEWAY_BASE_URL || 'https://ai-gateway.vercel.sh/v1/ai',
-    apiKey: process.env.AI_GATEWAY_API_KEY,
+    apiKey: process.env.AI_GATEWAY_API_KEY || 'dummy-key-for-build',
   });
 
   const languageProvider = gatewayProvider(model.id);

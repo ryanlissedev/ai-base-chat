@@ -4,8 +4,8 @@
  */
 
 import { sql } from 'drizzle-orm';
-import { type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import crypto from 'crypto';
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import crypto from 'node:crypto';
 import { createModuleLogger } from '../../../lib/logger';
 
 const logger = createModuleLogger('db:schema-version');
@@ -66,11 +66,11 @@ export class SchemaVersionManager {
       LIMIT 1
     `);
 
-    if (result.rows.length === 0) {
+    if (result.length === 0) {
       return null;
     }
 
-    const row = result.rows[0];
+    const row = result[0];
     return {
       version: row.version as string,
       description: row.description as string,
@@ -146,7 +146,7 @@ export class SchemaVersionManager {
     `);
 
     // Create a deterministic string representation of the schema
-    const schemaString = JSON.stringify(schema.rows, null, 0);
+    const schemaString = JSON.stringify(schema, null, 0);
 
     // Calculate MD5 checksum
     const checksum = crypto.createHash('md5').update(schemaString).digest('hex');
@@ -191,7 +191,7 @@ export class SchemaVersionManager {
       LIMIT ${limit}
     `);
 
-    return result.rows.map((row) => ({
+    return result.map((row) => ({
       version: row.version as string,
       description: row.description as string,
       checksum: row.checksum as string,
@@ -288,7 +288,7 @@ export class MigrationRunner {
 
       logger.info(`Migration ${version} completed in ${executionTime}ms`);
     } catch (error) {
-      logger.error(`Migration ${version} failed:`, error);
+      logger.error(`Migration ${version} failed: %s`, error instanceof Error ? error.message : String(error));
       throw error;
     }
   }

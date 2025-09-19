@@ -4,7 +4,7 @@
  */
 
 import { sql } from 'drizzle-orm';
-import { type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { createModuleLogger } from '../../../lib/logger';
 
 const logger = createModuleLogger('db:fixtures');
@@ -233,7 +233,13 @@ export class TestDataFactory {
   /**
    * Create a test user
    */
-  createUser(overrides?: Partial<typeof TEST_USERS.alice>) {
+  createUser(overrides?: Partial<{
+    id: string;
+    email: string;
+    name: string;
+    credits: number;
+    role: string;
+  }>) {
     return {
       id: this.generateId('user'),
       email: `test-${this.idCounter}@test.supabase.io`,
@@ -246,12 +252,18 @@ export class TestDataFactory {
   /**
    * Create a test chat
    */
-  createChat(userId: string, overrides?: Partial<typeof TEST_CHATS.publicChat>) {
+  createChat(userId: string, overrides?: Partial<{
+    id: string;
+    title: string;
+    userId: string;
+    visibility: 'public' | 'private';
+    createdAt: Date;
+  }>) {
     return {
       id: this.generateId('chat'),
       title: `Test Chat ${this.idCounter}`,
       userId,
-      visibility: 'private' as const,
+      visibility: 'private' as 'public' | 'private',
       ...overrides,
     };
   }
@@ -259,11 +271,16 @@ export class TestDataFactory {
   /**
    * Create a test message
    */
-  createMessage(chatId: string, overrides?: Partial<typeof TEST_MESSAGES.userMessage>) {
+  createMessage(chatId: string, overrides?: Partial<{
+    id: string;
+    role: 'user' | 'assistant' | 'system';
+    content: string;
+    sequence: number;
+  }>) {
     return {
       id: this.generateId('msg'),
       chatId,
-      role: 'user' as const,
+      role: 'user' as 'user' | 'assistant' | 'system',
       content: `Test message ${this.idCounter}`,
       sequence: this.idCounter,
       ...overrides,

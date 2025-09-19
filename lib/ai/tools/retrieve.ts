@@ -2,9 +2,17 @@ import { tool } from 'ai';
 import { z } from 'zod';
 import FirecrawlApp from '@mendable/firecrawl-js';
 
-const app = new FirecrawlApp({
-  apiKey: process.env.FIRECRAWL_API_KEY,
-});
+// Lazy initialization to avoid API key errors at module load
+let app: FirecrawlApp | null = null;
+
+function getFirecrawlApp() {
+  if (!app && process.env.FIRECRAWL_API_KEY) {
+    app = new FirecrawlApp({
+      apiKey: process.env.FIRECRAWL_API_KEY,
+    });
+  }
+  return app;
+}
 
 export const retrieve = tool({
   description: `Fetch structured information from a single URL via Firecrawl.
@@ -19,7 +27,17 @@ Avoid:
   }),
   execute: async ({ url }: { url: string }) => {
     try {
-      const content = await app.scrapeUrl(url);
+      const firecrawlApp = getFirecrawlApp();
+      if (!firecrawlApp) {
+        return {
+          results: [
+            {
+              error: 'Firecrawl API key not configured',
+            },
+          ],
+        };
+      }
+      const content = await firecrawlApp.scrapeUrl(url);
       if (!content.success || !content.metadata) {
         return {
           results: [

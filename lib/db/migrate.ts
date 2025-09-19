@@ -2,7 +2,7 @@ import { config } from 'dotenv';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
-import { existsSync } from 'fs';
+import { existsSync } from 'node:fs';
 import { createModuleLogger } from '../logger';
 
 const logger = createModuleLogger('db:migrate');
@@ -16,6 +16,13 @@ config({
 });
 
 const runMigrate = async () => {
+  // Check for skip flag first
+  if (process.env.SKIP_DB_MIGRATION === 'true') {
+    logger.info('🔧 Database migration skipped (SKIP_DB_MIGRATION=true)');
+    logger.info('✅ Build can proceed without database connectivity');
+    process.exit(0);
+  }
+
   // Check for database URL with fallbacks
   const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
   
@@ -92,10 +99,10 @@ const runMigrate = async () => {
       } else if (error.message.includes('timeout')) {
         logger.error('⏰ Connection timeout - database may be overloaded');
       } else {
-        logger.error('Error details:', error.message);
+        logger.error('Error details: %s', error.message);
       }
     } else {
-      logger.error(error);
+      logger.error('Migration error: %s', String(error));
     }
     
     process.exit(1);

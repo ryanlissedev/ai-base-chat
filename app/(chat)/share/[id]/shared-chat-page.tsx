@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import { WithSkeleton } from '@/components/with-skeleton';
 import { usePublicChat, usePublicChatMessages } from '@/hooks/use-shared-chat';
 import { notFound } from 'next/navigation';
+import type { ChatMessage } from '@/lib/ai/types';
 
 export function SharedChatPage({ id }: { id: string }) {
   const {
@@ -19,9 +20,9 @@ export function SharedChatPage({ id }: { id: string }) {
   } = usePublicChatMessages(id as string);
 
   const initialThreadMessages = useMemo(() => {
-    if (!messages) return [];
+    if (!messages || !Array.isArray(messages)) return [];
     return getDefaultThread(
-      messages.map((msg) => ({ ...msg, id: msg.id.toString() })),
+      (messages as ChatMessage[]).map((msg) => ({ ...msg, id: msg.id.toString() })),
     );
   }, [messages]);
 

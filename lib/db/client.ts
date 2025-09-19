@@ -7,16 +7,17 @@ import { getMainPool } from './pool';
 // https://authjs.dev/reference/adapter/drizzle
 
 // Use pooled connection if available, otherwise fall back to direct connection
-let db;
+let db: ReturnType<typeof drizzle> & { $client: any };
 try {
   // Try to use the pooled connection
   const pool = getMainPool();
-  db = pool.db;
+  db = Object.assign(pool.db, { $client: pool.client });
 } catch (error) {
   // Fallback to direct connection if pool fails
   // biome-ignore lint: Forbidden non-null assertion.
   const client = postgres(process.env.POSTGRES_URL!);
-  db = drizzle(client);
+  const drizzleDb = drizzle(client);
+  db = Object.assign(drizzleDb, { $client: client });
 }
 
 export { db };

@@ -35,9 +35,10 @@ export function chatMessageToDbMessage(
   message: ChatMessage,
   chatId: string,
 ): DBMessage {
-  const parentMessageId = message.metadata.parentMessageId || null;
-  const isPartial = message.metadata.isPartial || false;
-  const selectedModel = message.metadata.selectedModel;
+  const metadata = message.metadata || {};
+  const parentMessageId = metadata.parentMessageId || null;
+  const isPartial = metadata.isPartial || false;
+  const selectedModel = metadata.selectedModel;
 
   return {
     id: message.id,
@@ -45,12 +46,12 @@ export function chatMessageToDbMessage(
     role: message.role,
     parts: message.parts,
     attachments: [],
-    lastContext: message.metadata?.usage || null,
-    createdAt: message.metadata?.createdAt || new Date(),
+    lastContext: metadata.usage || null,
+    createdAt: metadata.createdAt || new Date(),
     annotations: [],
     isPartial: isPartial,
     parentMessageId: parentMessageId,
     selectedModel: selectedModel,
-    selectedTool: message.metadata?.selectedTool || null,
+    selectedTool: metadata.selectedTool || null,
   };
 }

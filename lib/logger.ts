@@ -69,7 +69,8 @@ export const logger: Logger =
         level: getLogLevel(),
         base: { app: 'sparka' },
         timestamp: stdTimeFunctions.isoTime,
-        transport: {
+        // Use simple console output in development to avoid thread-stream issues
+        transport: process.env.DISABLE_PINO_PRETTY === 'true' ? undefined : {
           target: 'pino-pretty',
           options: {
             colorize: true,

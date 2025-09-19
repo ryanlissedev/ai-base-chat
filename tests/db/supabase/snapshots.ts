@@ -4,7 +4,7 @@
  */
 
 import { sql } from 'drizzle-orm';
-import { type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { createModuleLogger } from '../../../lib/logger';
 
 const logger = createModuleLogger('db:snapshots');
@@ -93,7 +93,7 @@ export class SnapshotManager {
       try {
         // Get all data from table
         const result = await this.db.execute(sql.raw(`SELECT * FROM "${table}"`));
-        const rows = result.rows;
+        const rows = result;
 
         snapshotData.push({
           name,
@@ -106,12 +106,12 @@ export class SnapshotManager {
 
         logger.debug(`Captured ${rows.length} rows from ${table}`);
       } catch (error) {
-        logger.warn(`Failed to snapshot table ${table}:`, error);
+        logger.warn(`Failed to snapshot table ${table}: %s`, error instanceof Error ? error.message : String(error));
       }
     }
 
     // Calculate checksum
-    const crypto = await import('crypto');
+    const crypto = await import('node:crypto');
     const checksum = crypto.createHash('md5').update(checksumData).digest('hex');
 
     // Store manifest
@@ -127,7 +127,7 @@ export class SnapshotManager {
       RETURNING *
     `);
 
-    const manifest = manifestResult.rows[0] as any;
+    const manifest = manifestResult[0] as any;
 
     // Store snapshot data
     for (const snapshot of snapshotData) {
@@ -169,11 +169,11 @@ export class SnapshotManager {
       WHERE name = ${name}
     `);
 
-    if (manifestResult.rows.length === 0) {
+    if (manifestResult.length === 0) {
       throw new Error(`Snapshot not found: ${name}`);
     }
 
-    const manifest = manifestResult.rows[0] as any;
+    const manifest = manifestResult[0] as any;
 
     // Get snapshot data
     const dataResult = await this.db.execute(sql`
@@ -197,7 +197,7 @@ export class SnapshotManager {
       }
 
       // Restore data in original order
-      for (const row of dataResult.rows) {
+      for (const row of dataResult) {
         const tableName = row.table_name as string;
         const data = row.data as any[];
 
@@ -228,7 +228,7 @@ export class SnapshotManager {
       logger.info(`Snapshot restored successfully: ${name}`);
     } catch (error) {
       await this.db.execute(sql`ROLLBACK`);
-      logger.error(`Failed to restore snapshot: ${name}`, error);
+      logger.error(`Failed to restore snapshot: ${name} - %s`, error instanceof Error ? error.message : String(error));
       throw error;
     }
   }
@@ -257,7 +257,7 @@ export class SnapshotManager {
       ORDER BY created_at DESC
     `);
 
-    return result.rows.map((row: any) => ({
+    return result.map((row: any) => ({
       id: row.id,
       name: row.name,
       tables: row.tables,
@@ -297,7 +297,7 @@ export class SnapshotManager {
       RETURNING id
     `);
 
-    const deletedCount = result.rows.length;
+    const deletedCount = result.length;
     logger.info(`Cleaned up ${deletedCount} old snapshots`);
 
     return deletedCount;
@@ -312,11 +312,11 @@ export class SnapshotManager {
       WHERE name = ${name}
     `);
 
-    if (manifestResult.rows.length === 0) {
+    if (manifestResult.length === 0) {
       return false;
     }
 
-    const manifest = manifestResult.rows[0] as any;
+    const manifest = manifestResult[0] as any;
 
     // Get snapshot data and recalculate checksum
     const dataResult = await this.db.execute(sql`
@@ -326,11 +326,11 @@ export class SnapshotManager {
     `);
 
     let checksumData = '';
-    for (const row of dataResult.rows) {
+    for (const row of dataResult) {
       checksumData += JSON.stringify(row.data);
     }
 
-    const crypto = await import('crypto');
+    const crypto = await import('node:crypto');
     const actualChecksum = crypto.createHash('md5').update(checksumData).digest('hex');
 
     const isValid = actualChecksum === manifest.checksum;
@@ -406,11 +406,11 @@ export class SnapshotManager {
       WHERE name = ${name}
     `);
 
-    if (manifestResult.rows.length === 0) {
+    if (manifestResult.length === 0) {
       throw new Error(`Snapshot not found: ${name}`);
     }
 
-    const manifestId = (manifestResult.rows[0] as any).id;
+    const manifestId = (manifestResult[0] as any).id;
 
     const dataResult = await this.db.execute(sql`
       SELECT table_name, data
@@ -420,7 +420,7 @@ export class SnapshotManager {
 
     const snapshotData: Record<string, any[]> = {};
 
-    for (const row of dataResult.rows) {
+    for (const row of dataResult) {
       snapshotData[row.table_name as string] = row.data as any[];
     }
 
