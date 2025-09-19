@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "next dev --turbo",
-    "build": "SKIP_BUILD_API_VALIDATION=true tsx lib/db/migrate && SKIP_BUILD_API_VALIDATION=true next build",
+    "build": "SKIP_DB_MIGRATION=true SKIP_BUILD_API_VALIDATION=true tsx lib/db/migrate && SKIP_BUILD_API_VALIDATION=true next build",
     "start": "next start",
     "lint": "next lint && biome lint --write --unsafe",
     "lint:fix": "next lint --fix && biome lint --write --unsafe",

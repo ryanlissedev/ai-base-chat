@@ -22,6 +22,7 @@ class PerformanceMonitor {
   private config: PerformanceConfig;
   private metrics: PerformanceMetric[] = [];
   private observers: Map<string, PerformanceObserver> = new Map();
+  private memoryInterval: NodeJS.Timeout | null = null;
 
   constructor(config: Partial<PerformanceConfig> = {}) {
     this.config = {
@@ -192,7 +193,7 @@ class PerformanceMonitor {
 
     // Monitor memory usage (if available)
     if ('memory' in performance) {
-      setInterval(() => {
+      this.memoryInterval = setInterval(() => {
         const memory = (performance as any).memory;
         this.recordMetric('memory-used', memory.usedJSHeapSize, {
           total: memory.totalJSHeapSize,
@@ -241,6 +242,11 @@ class PerformanceMonitor {
   cleanup(): void {
     this.observers.forEach((observer) => observer.disconnect());
     this.observers.clear();
+    
+    if (this.memoryInterval) {
+      clearInterval(this.memoryInterval);
+      this.memoryInterval = null;
+    }
   }
 }
 
