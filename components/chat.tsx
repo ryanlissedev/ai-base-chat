@@ -49,6 +49,9 @@ export function Chat({
       messageIds.length >= 2 && !isReadonly && !!session?.user && !isLoading,
   });
 
+  // Ensure votes is properly typed as array or undefined
+  const validVotes = Array.isArray(votes) ? votes : undefined;
+
   const { state } = useSidebar();
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
 
@@ -70,7 +73,7 @@ export function Chat({
         <MessagesPane
           chatId={id}
           status={status}
-          votes={votes}
+          votes={validVotes}
           isReadonly={isReadonly}
           isVisible={!isArtifactVisible}
           className="bg-background"
@@ -81,7 +84,7 @@ export function Chat({
         chatId={id}
         status={status}
         stop={stopAsync}
-        votes={votes}
+        votes={validVotes}
         isReadonly={isReadonly}
         isAuthenticated={!!session?.user}
       />

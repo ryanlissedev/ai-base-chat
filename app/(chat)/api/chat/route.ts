@@ -62,10 +62,44 @@ let redisSubscriber: RedisClient = null;
 
 if (process.env.REDIS_URL) {
   (async () => {
-    const redis = await import('redis');
-    redisPublisher = redis.createClient({ url: process.env.REDIS_URL });
-    redisSubscriber = redis.createClient({ url: process.env.REDIS_URL });
-    await Promise.all([redisPublisher.connect(), redisSubscriber.connect()]);
+    try {
+      const redis = await import('redis');
+      redisPublisher = redis.createClient({ url: process.env.REDIS_URL });
+      redisSubscriber = redis.createClient({ url: process.env.REDIS_URL });
+      
+      // Add error handlers before connecting
+      redisPublisher.on('error', (err) => {
+        console.error('Redis Publisher Error:', err);
+      });
+      
+      redisSubscriber.on('error', (err) => {
+        console.error('Redis Subscriber Error:', err);
+      });
+      
+      await Promise.all([redisPublisher.connect(), redisSubscriber.connect()]);
+      
+      // Setup graceful shutdown
+      const cleanup = async () => {
+        try {
+          if (redisPublisher?.isOpen) {
+            await redisPublisher.quit();
+          }
+          if (redisSubscriber?.isOpen) {
+            await redisSubscriber.quit();
+          }
+        } catch (error) {
+          console.error('Error during Redis cleanup:', error);
+        }
+      };
+      
+      process.on('SIGTERM', cleanup);
+      process.on('SIGINT', cleanup);
+      process.on('beforeExit', cleanup);
+    } catch (error) {
+      console.error('Failed to setup Redis connections:', error);
+      redisPublisher = null;
+      redisSubscriber = null;
+    }
   })();
 }
 
@@ -111,7 +145,7 @@ export async function POST(request: NextRequest) {
   
   // Skip API processing during build time to prevent API key errors
   if (process.env.SKIP_BUILD_API_VALIDATION === 'true') {
-    return new Response('Build mode - API disabled', { status: 503 });
+    return Response.json({ error: 'Build mode - API disabled' }, { status: 503 });
   }
   
   try {

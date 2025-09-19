@@ -346,7 +346,7 @@ export function useDeleteTrailingMessages() {
       // Optimistically update cache - keep only messages before the messageId
       queryClient.setQueryData(messagesQueryKey, (old) => {
         if (!old) return old;
-        const messageIndex = old.findIndex((msg) => msg.id === messageId);
+        const messageIndex = old.findIndex((msg: ChatMessage) => msg.id === messageId);
         if (messageIndex === -1) return old;
         return old.slice(0, messageIndex);
       });
@@ -436,7 +436,7 @@ export function useCloneChat() {
 
         const newId = generateUUID();
         await cloneAnonymousChat(
-          originalMessages.map((message) =>
+          originalMessages.map((message: ChatMessage) =>
             chatMessageToDbMessage(message, chatId),
           ),
           originalChat,

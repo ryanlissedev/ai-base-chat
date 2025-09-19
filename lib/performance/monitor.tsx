@@ -269,12 +269,18 @@ export function withPerformanceMonitoring<P extends object>(
   componentName: string,
 ) {
   return function MonitoredComponent(props: P) {
-    const endTiming = performanceMonitor.startTiming(
-      `component-render-${componentName}`,
-    );
-
     useEffect(() => {
+      const endTiming = performanceMonitor.startTiming(
+        `component-render-${componentName}`,
+      );
+      
+      // Call endTiming immediately after render
       endTiming();
+      
+      // Return cleanup function (though not needed for this specific case)
+      return () => {
+        // Cleanup logic if needed in the future
+      };
     });
 
     return <Component {...props} />;
